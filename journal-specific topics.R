@@ -1,3 +1,7 @@
+## TODO:  "accuracy" comparisons using the method from Malaterre and Lareau 2022
+
+
+library(psych)
 library(tidyverse)
 library(tidytext)
 library(irlba)
@@ -8,7 +12,7 @@ source('R/generators.R')
 k = 5              # Num. topics / journals
 Mj = 100           # Num. documents per journal
 M = Mj*k
-vocab = 5*M       # Vocabulary length
+vocab = 10*M       # Vocabulary length
 
 size = 3      # Size and mean for the negative binomial distribution of doc lengths
 mu = 300
@@ -77,7 +81,8 @@ N = rnbinom(M, size = size, mu = mu)
 ## - log + PCA scaling: maybe worse than log alone
 ## - log length norm + PCA scaling: comparable to log length norm
 ## - **log1p seems to work well**
-N[1:Mj] = 10*N[1:Mj]
+## 
+# N[1:Mj] = 10*N[1:Mj]
 
 hist(N)
 
@@ -89,6 +94,8 @@ dtm = corpus |>
     ungroup() |>
     cast_sparse(row = doc, col = word, value = n)
 
+words = colnames(dtm)
+
 
 ## Simple PCA + varimax ---
 # library(tictoc)
@@ -96,7 +103,7 @@ dtm = corpus |>
 # pca_trad = prcomp(dtm)
 # toc()
 # tic()
-pca_fit = prcomp_irlba(dtm, n = ceiling(10*k), scale. = FALSE)
+pca_fit = prcomp_irlba(dtm, n = ceiling(10*k), scale. = TRUE)
 # toc()
 
 ## Screeplot indicates k factors
@@ -105,33 +112,142 @@ screeplot(pca_fit)
 ## But note that this is less than 80% of the variance
 cumsum(pca_fit$sdev^2) / pca_fit$totalvar
 
-raw_loadings = pca_fit$rotation[,1:k] %*% diag(pca_fit$sdev, k, k)
 
-varimax_fit = varimax(raw_loadings)
+## Varimax rotation ----
+raw_loadings = pca_fit$rotation[,1:k] %*% diag(pca_fit$sdev, k, k) |> 
+    magrittr::set_rownames(words)
+varimax_fit_prelim = varimax(raw_loadings)
+skew(varimax_fit_prelim$loadings)
 
+## Reverse factors with negative skew (left tails)
+varimax_fit = map(varimax_fit_prelim, 
+                  ~ .x %*% diag(1 - 2*(skew(varimax_fit_prelim$loadings) < 0)))
+skew(varimax_fit$loadings)
+
+
+
+## Scores ----
 scores = scale(pca_fit$x[,1:k]) %*% varimax_fit$rotmat
+# scores = pca_fit$x[,1:k] %*% varimax_fit$rotmat
+skew(scores)
+
+## scores x loadings should approximate dtm
+all(colnames(dtm) == colnames(scores %*% t(varimax_fit$loadings)))
+{dtm - scores %*% t(varimax_fit$loadings)} |>
+    as.numeric() |>
+    summary()
+
 
 scores_df = scores |> 
     as_tibble(rownames = 'doc') |> 
     mutate(doc = as.integer(doc)) |> 
     pivot_longer(starts_with('V'), 
                  names_to = 'factor', 
-                 values_to = 'value')
+                 values_to = 'score')
 
-ggplot(scores_df, aes(value)) +
-    geom_density() +
-    facet_wrap(vars(factor))
+ggplot(scores_df, aes(factor, score)) +
+    geom_violin(draw_quantiles = .5)
 
-ggplot(scores_df, aes(doc, factor, fill = abs(value))) +
+ggplot(scores_df, aes(doc, factor, fill = score)) +
     geom_tile() +
     scale_fill_gradient2()
 
+## Crude accuracy check
 scores_df |> 
     left_join(theta_df, by = 'doc') |> 
     group_by(doc) |> 
-    filter(abs(value) == max(abs(value)), prob == max(prob)) |> 
+    filter((score) == max((score)), prob == max(prob)) |> 
     ungroup() |> 
-    count(topic, factor) |> view()
+    # count(topic, factor) |> view()
     ggplot(aes(topic, factor)) +
     geom_tile(stat = 'bin2d') +
     theme_minimal()
+
+
+## Better accuracy check, using the method from Malaterre and Lareau 2022 ----
+source('hellinger.R')
+
+## True word-topic distribution matrix
+# t(phi)
+
+## beta: fitted varimax loadings, transformed to probability distributions
+beta = varimax_fit$loadings |> 
+    as_tibble(rownames = 'word') |> 
+    pivot_longer(starts_with('V'), 
+                 names_to = 'factor', 
+                 values_to = 'loading') |> 
+    group_by(factor) |> 
+    ## Nudge smallest loading to 0, then normalize to sum to 1
+    ## Crappy results! 
+    # mutate(loading = loading - min(loading)) |> 
+    ## Trim at 0, then normalize to sum to 1
+    ## Seems to work a little better
+    filter(loading > 0) |>
+    mutate(loading = loading / sum(loading)) |> 
+    ungroup() |> 
+    pivot_wider(names_from = 'factor', values_from = 'loading', values_fill = 0) |> 
+    ## Fix order of words
+    mutate(word = as.integer(word)) |> 
+    arrange(word) |> 
+    ## And dropped words
+    complete(word = 1:vocab, fill = list(V1 = 0, V2 = 0, V3 = 0, V4 = 0, V5 = 0)) |> 
+    column_to_rownames('word') |> 
+    as.matrix()
+
+
+hellinger_(phi, t(beta)) |> 
+    view()
+
+
+
+## Convert scores to topics ----
+## varimax_fit$loadings contains the rotated loadings (word-topic scores)
+
+# list(phi = t(phi), 
+#      beta = varimax_fit$loadings) |> 
+#     map(as_tibble, rownames = 'word') |> 
+#     map(pivot_longer, 
+#         starts_with('V'), names_to = 'factor', values_to = 'score') |> 
+#     reduce(inner_join, 
+#            by = c('word'), 
+#            suffix = c('.true', '.fitted')) |> 
+#     ggplot(aes(log10(score.true), score.fitted)) +
+#     geom_point() +
+#     stat_smooth(method = 'lm') +
+#     facet_grid(rows = vars(factor.fitted), 
+#                cols = vars(factor.true))
+
+
+# beta_df = varimax_fit$loadings |> str()
+#     as_tibble(rownames = 'word') |> 
+#     pivot_longer(starts_with('V'), 
+#                  names_to = 'factor', 
+#                  values_to = 'score')
+# 
+# ggplot(beta_df, aes(factor, score)) +
+#     geom_violin(draw_quantiles = .5)
+# 
+# beta_df |> 
+#     filter(score > 0) |> 
+#     distinct(word) |> 
+#     nrow()
+
+
+## Not all documents have at least one positive score
+scores_df |> 
+    filter(score > 0) |> 
+    distinct(doc) |> 
+    nrow()
+
+## Nudge everything so the minimum value is 0? 
+gamma_df = scores_df |> 
+    group_by(doc) |> 
+    mutate(score = score - min(score), 
+           share = score / sum(score)) |> 
+    ungroup()
+
+gamma_df |> 
+    mutate(journal = (doc - 1) %/% Mj + 1) |> 
+    ggplot(aes(factor, share, group = doc, color = as.factor(journal))) +
+    geom_line(alpha = .25) +
+    facet_wrap(vars(journal), scales = 'free_x')
