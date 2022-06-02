@@ -3,7 +3,8 @@
 ## - prcomp with centering but *without* scaling (scaling makes it harder to get probability distributions)
 ## - after rotation, reverse factors with negative skew
 ## - trim loadings/scores at 0, then normalize to construct probability distributions
-## - if working with beta, need to account for change in order of words (and dropped words)
+## - if comparing beta (fitted word-topic) to phi (true word-topic), need to account for change in order of words (and dropped words)
+## - if comparing fitted & true topic-doc dists, need to account for change in order of topics
 ## minimum Hellinger distance of word-topic distributions in these tests ~.16
 ## Journal w/ giant papers seems to be a little muddier, w/ minimum ~.22
 
