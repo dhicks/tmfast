@@ -1,5 +1,11 @@
-## TODO:  "accuracy" comparisons using the method from Malaterre and Lareau 2022
-
+## This works okay! 
+## - log1p doc term counts (don't divide by length)
+## - prcomp with centering but *without* scaling (scaling makes it harder to get probability distributions)
+## - after rotation, reverse factors with negative skew
+## - trim loadings/scores at 0, then normalize to construct probability distributions
+## - if working with beta, need to account for change in order of words (and dropped words)
+## minimum Hellinger distance of word-topic distributions in these tests ~.16
+## Journal w/ giant papers seems to be a little muddier, w/ minimum ~.22
 
 library(psych)
 library(tidyverse)
@@ -7,12 +13,13 @@ library(tidytext)
 library(irlba)
 
 source('R/generators.R')
+source('R/hellinger.R')
 
 ## Parameters ----
 k = 5              # Num. topics / journals
 Mj = 100           # Num. documents per journal
 M = Mj*k
-vocab = 10*M       # Vocabulary length
+vocab = 3*M       # Vocabulary length
 
 size = 3      # Size and mean for the negative binomial distribution of doc lengths
 mu = 300
@@ -25,7 +32,7 @@ alpha = function(k, j, peak = .8) {
     return(alpha)
 }
 
-theta = map(1:k, ~rdirichlet(Mj, alpha(k, .x))) %>% 
+theta = map(1:k, ~rdirichlet(Mj, alpha(k, .x, peak = .8))) %>% 
     do.call(rbind, .)
 
 theta_df = theta |> 
@@ -39,7 +46,7 @@ ggplot(theta_df, aes(doc, topic, fill = prob)) +
 
 ## Build the rest of the dtm ----
 ## phi_j:  Word distribution for topic j
-phi = rdirichlet(k, 200/vocab, k = vocab)
+phi = rdirichlet(k, .1, k = vocab)
 
 ## Word distributions
 phi |> 
@@ -82,7 +89,7 @@ N = rnbinom(M, size = size, mu = mu)
 ## - log length norm + PCA scaling: comparable to log length norm
 ## - **log1p seems to work well**
 ## 
-# N[1:Mj] = 10*N[1:Mj]
+N[1:Mj] = 10*N[1:Mj]
 
 hist(N)
 
@@ -103,7 +110,7 @@ words = colnames(dtm)
 # pca_trad = prcomp(dtm)
 # toc()
 # tic()
-pca_fit = prcomp_irlba(dtm, n = ceiling(10*k), scale. = TRUE)
+pca_fit = prcomp_irlba(dtm, n = ceiling(10*k), scale. = FALSE)
 # toc()
 
 ## Screeplot indicates k factors
@@ -153,20 +160,18 @@ ggplot(scores_df, aes(doc, factor, fill = score)) +
     scale_fill_gradient2()
 
 ## Crude accuracy check
-scores_df |> 
-    left_join(theta_df, by = 'doc') |> 
-    group_by(doc) |> 
-    filter((score) == max((score)), prob == max(prob)) |> 
-    ungroup() |> 
-    # count(topic, factor) |> view()
-    ggplot(aes(topic, factor)) +
-    geom_tile(stat = 'bin2d') +
-    theme_minimal()
+# scores_df |> 
+#     left_join(theta_df, by = 'doc') |> 
+#     group_by(doc) |> 
+#     filter((score) == max((score)), prob == max(prob)) |> 
+#     ungroup() |> 
+#     # count(topic, factor) |> view()
+#     ggplot(aes(topic, factor)) +
+#     geom_tile(stat = 'bin2d') +
+#     theme_minimal()
 
 
 ## Better accuracy check, using the method from Malaterre and Lareau 2022 ----
-source('hellinger.R')
-
 ## True word-topic distribution matrix
 # t(phi)
 
@@ -179,7 +184,7 @@ beta = varimax_fit$loadings |>
     group_by(factor) |> 
     ## Nudge smallest loading to 0, then normalize to sum to 1
     ## Crappy results! 
-    # mutate(loading = loading - min(loading)) |> 
+    # mutate(loading = loading - min(loading)) |>
     ## Trim at 0, then normalize to sum to 1
     ## Seems to work a little better
     filter(loading > 0) |>
@@ -194,60 +199,56 @@ beta = varimax_fit$loadings |>
     column_to_rownames('word') |> 
     as.matrix()
 
+## Compare Zipfian distributions
+bind_rows({beta |> 
+        as_tibble(rownames = 'word') |> 
+        rename_with(.cols = starts_with('V'), ~ str_replace(.x, 'V', 'fa')) |> 
+        pivot_longer(starts_with('fa'), 
+                     names_to = 'dim', 
+                     values_to = 'value') |> 
+        mutate(type = 'fitted')},
+        {phi |> 
+                t() |> 
+                as_tibble(rownames = 'word') |> 
+                pivot_longer(starts_with('V'), 
+                             names_to = 'dim', 
+                             values_to = 'value') |> 
+                mutate(type = 'true')}
+) |> 
+    group_by(dim) |> 
+    mutate(rank = rank(desc(value))) |> 
+    arrange(dim, rank) |> 
+    filter(rank < 500) |>
+    ggplot(aes(rank, value, color = type, group = dim)) +
+    geom_line() +
+    scale_y_log10() +
+    scale_x_log10()
 
-hellinger_(phi, t(beta)) |> 
-    view()
+## Hellinger distance
+hellinger_(phi, t(beta))
 
 
 
 ## Convert scores to topics ----
-## varimax_fit$loadings contains the rotated loadings (word-topic scores)
-
-# list(phi = t(phi), 
-#      beta = varimax_fit$loadings) |> 
-#     map(as_tibble, rownames = 'word') |> 
-#     map(pivot_longer, 
-#         starts_with('V'), names_to = 'factor', values_to = 'score') |> 
-#     reduce(inner_join, 
-#            by = c('word'), 
-#            suffix = c('.true', '.fitted')) |> 
-#     ggplot(aes(log10(score.true), score.fitted)) +
-#     geom_point() +
-#     stat_smooth(method = 'lm') +
-#     facet_grid(rows = vars(factor.fitted), 
-#                cols = vars(factor.true))
-
-
-# beta_df = varimax_fit$loadings |> str()
-#     as_tibble(rownames = 'word') |> 
-#     pivot_longer(starts_with('V'), 
-#                  names_to = 'factor', 
-#                  values_to = 'score')
-# 
-# ggplot(beta_df, aes(factor, score)) +
-#     geom_violin(draw_quantiles = .5)
-# 
-# beta_df |> 
-#     filter(score > 0) |> 
-#     distinct(word) |> 
-#     nrow()
-
-
 ## Not all documents have at least one positive score
-scores_df |> 
-    filter(score > 0) |> 
-    distinct(doc) |> 
+scores_df |>
+    filter(score > 0) |>
+    distinct(doc) |>
     nrow()
 
 ## Nudge everything so the minimum value is 0? 
 gamma_df = scores_df |> 
+    # filter(score > 0) |> 
     group_by(doc) |> 
-    mutate(score = score - min(score), 
-           share = score / sum(score)) |> 
-    ungroup()
+    mutate(score = score - min(score)) |> 
+    mutate(gamma = score / sum(score)) |> 
+    ungroup() |> 
+    rename(topic = factor)
 
 gamma_df |> 
     mutate(journal = (doc - 1) %/% Mj + 1) |> 
-    ggplot(aes(factor, share, group = doc, color = as.factor(journal))) +
+    ggplot(aes(topic, gamma, group = doc, color = as.factor(journal))) +
     geom_line(alpha = .25) +
     facet_wrap(vars(journal), scales = 'free_x')
+
+## Want to do a Hellinger distance comparison for topic-docs, but this requires first reordering fitted topics to make true ones
