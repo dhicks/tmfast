@@ -1,5 +1,18 @@
 #' Functions to generate document-term matrices
 
+#' Alpha parameter with a single peak
+#' 
+#' This function allows us to quickly define an `alpha` parameter for a Dirichlet distribution with a single (presumably high) `peak` value at component `i` and all other components a uniform (presumably low) value `(1-peak)/(k-1)`. 
+#' 
+#' @param k Number of components 
+#' @param i Index for the component that takes value `peak`
+#' @param peak Value for the single peak component
+peak_alpha = function(k, i, peak = .8) {
+    alpha = rep((1 - peak)/(k-1), k)
+    alpha[i] = peak
+    return(alpha)
+}
+
 #' Sample from the Dirichlet distribution
 #' 
 #' @param n Number of samples (rows) to draw
