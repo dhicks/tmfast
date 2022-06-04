@@ -12,6 +12,7 @@
 library(tidyverse)
 # library(tidytext)
 # library(irlba)
+library(lpSolve)
 
 source('R/generators.R')
 source('R/hellinger.R')
@@ -108,20 +109,7 @@ cumsum(fitted$sdev^2) / fitted$totalvar
 ## Scores all have positive skew
 psych::skew(fitted$scores)
 
-## TODO: move this to tidier
-scores_df = fitted$scores |> 
-    as_tibble(rownames = 'doc') |> 
-    mutate(doc = as.integer(doc)) |> 
-    pivot_longer(starts_with('V'), 
-                 names_to = 'factor', 
-                 values_to = 'score')
 
-ggplot(scores_df, aes(factor, score)) +
-    geom_violin(draw_quantiles = .5)
-
-ggplot(scores_df, aes(doc, factor, fill = score)) +
-    geom_tile() +
-    scale_fill_gradient2()
 
 ## Accuracy check, using the method from Malaterre and Lareau 2022 ----
 ## True word-topic distribution matrix
@@ -143,7 +131,9 @@ beta = fitted$loadings |>
     filter(loading > 0) |>
     mutate(loading = loading / sum(loading)) |> 
     ungroup() |> 
-    pivot_wider(names_from = 'factor', values_from = 'loading', values_fill = 0) |> 
+    pivot_wider(names_from = 'factor', 
+                values_from = 'loading', values_fill = 0, 
+                names_sort = TRUE) |> 
     ## Fix order of words
     mutate(word = as.integer(word)) |> 
     arrange(word) |> 
@@ -180,9 +170,33 @@ bind_rows({beta |>
 ## Hellinger distance
 hellinger_(phi, t(beta))
 
+## Use lpSolve to match fitted topics to true topics
+dist = hellinger_(phi, t(beta))
+soln = lp.assign(dist)
 
+## NB In a couple of simulation rounds, soln$solution was symmetric.  Seems like this shouldn't be true in general. 
+hellinger_(t(soln$solution) %*% phi, t(beta))
 
-## Convert scores to topics ----
+## Tidy scores ----
+## TODO: move this to tidier
+scores_df = fitted$scores %>% 
+    ## With the rotation to match fitted to true topics
+    {. %*% soln$solution} |>
+    as_tibble(rownames = 'doc') |> 
+    mutate(doc = as.integer(doc)) |> 
+    pivot_longer(starts_with('V'), 
+                 names_to = 'factor', 
+                 values_to = 'score')
+
+ggplot(scores_df, aes(factor, score)) +
+    geom_violin(draw_quantiles = .5)
+
+## This confirms graphically that the docs mostly have the correct topics
+ggplot(scores_df, aes(doc, factor, fill = score)) +
+    geom_tile() +
+    scale_fill_gradient2()
+
+## Scores to topic distributions ----
 ## Not all documents have at least one positive score
 scores_df |>
     filter(score > 0) |>
@@ -206,4 +220,18 @@ gamma_df |>
     facet_wrap(vars(journal), scales = 'free_x') +
     scale_color_discrete(guide = 'none')
 
-## Want to do a Hellinger distance comparison for topic-docs, but this requires first reordering fitted topics to make true ones
+## Accuracy of topic-doc distributions ----
+doc_compare = hellinger(rename(theta_df, gamma = prob), 'doc', 
+          topics2 = gamma_df, id2 = 'doc', 
+          df = TRUE)
+
+ggplot(doc_compare, aes(doc_x, doc_y, fill = 1 - dist)) +
+    geom_raster() +
+    scale_x_discrete(breaks = 'none') +
+    scale_y_discrete(breaks = 'none')
+
+## Comparable to word-topics, mean around .17
+doc_compare |> 
+    filter(doc_x == doc_y) |> 
+    pull(dist) |> 
+    summary()

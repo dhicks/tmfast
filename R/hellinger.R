@@ -9,6 +9,7 @@ hellinger_ = function(mx1, mx2 = NULL) {
     
     mx1.2 = sqrt(mx1) %*% sqrt(mx2)
     return(sqrt(1 - mx1.2))
+    # return(sqrt(round(1 - mx1.2, 8)))
 }
 
 #' Convert a tidied topic model dataframe to a matrix
@@ -49,7 +50,7 @@ hellinger = function(topics1, id1,
     if (!df) {
         return(hellinger_matrix)
     }
-    if (are_equal(id1, id2)) {
+    if (assertthat::are_equal(id1, id2)) {
         id1 = str_c(id1, '_x')
         id2 = str_c(id2, '_y')
     }
