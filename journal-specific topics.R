@@ -13,6 +13,7 @@ library(tidyverse)
 # library(tidytext)
 # library(irlba)
 library(lpSolve)
+library(tictoc)
 
 source('R/generators.R')
 source('R/hellinger.R')
@@ -99,7 +100,9 @@ dtm = corpus |>
     # cast_sparse(row = doc, col = word, value = n)
 
 ## Explore fitted model ----
-fitted = varimax_tm(dtm, k)
+tic()
+fitted = varimax_tm(dtm, c(k, 2*k))
+toc()
 
 ## TODO: screeplot
 
@@ -107,7 +110,8 @@ fitted = varimax_tm(dtm, k)
 cumsum(fitted$sdev^2) / fitted$totalvar
 
 ## Scores all have positive skew
-psych::skew(fitted$scores)
+## TODO: easier access to varimax contents
+psych::skew(scores(fitted, k))
 
 
 
@@ -115,106 +119,85 @@ psych::skew(fitted$scores)
 ## True word-topic distribution matrix
 # t(phi)
 
-## TODO: move this to tidier
 ## beta: fitted varimax loadings, transformed to probability distributions
-beta = fitted$loadings |> 
-    as_tibble(rownames = 'word') |> 
-    pivot_longer(starts_with('V'), 
-                 names_to = 'factor', 
-                 values_to = 'loading') |> 
-    group_by(factor) |> 
-    ## Nudge smallest loading to 0, then normalize to sum to 1
-    ## Crappy results! 
-    # mutate(loading = loading - min(loading)) |>
-    ## Trim at 0, then normalize to sum to 1
-    ## Seems to work a little better
-    filter(loading > 0) |>
-    mutate(loading = loading / sum(loading)) |> 
-    ungroup() |> 
-    pivot_wider(names_from = 'factor', 
-                values_from = 'loading', values_fill = 0, 
-                names_sort = TRUE) |> 
-    ## Fix order of words
-    mutate(word = as.integer(word)) |> 
-    arrange(word) |> 
-    ## And dropped words
-    complete(word = 1:vocab, fill = list(V1 = 0, V2 = 0, V3 = 0, V4 = 0, V5 = 0)) |> 
-    column_to_rownames('word') |> 
-    as.matrix()
+beta = tidy(fitted, 5, 'beta')
 
 ## Compare Zipfian distributions
 bind_rows({beta |> 
-        as_tibble(rownames = 'word') |> 
-        rename_with(.cols = starts_with('V'), ~ str_replace(.x, 'V', 'fa')) |> 
-        pivot_longer(starts_with('fa'), 
-                     names_to = 'dim', 
-                     values_to = 'value') |> 
         mutate(type = 'fitted')},
         {phi |> 
                 t() |> 
-                as_tibble(rownames = 'word') |> 
+                as_tibble(rownames = 'token') |> 
                 pivot_longer(starts_with('V'), 
-                             names_to = 'dim', 
-                             values_to = 'value') |> 
+                             names_to = 'topic', 
+                             values_to = 'beta') |> 
                 mutate(type = 'true')}
 ) |> 
-    group_by(dim) |> 
-    mutate(rank = rank(desc(value))) |> 
-    arrange(dim, rank) |> 
+    group_by(type, topic) |> 
+    mutate(rank = rank(desc(beta))) |> 
+    arrange(type, topic, rank) |> 
     filter(rank < 500) |>
-    ggplot(aes(rank, value, color = type, group = dim)) +
+    ggplot(aes(rank, beta, color = type, group = interaction(topic, type))) +
     geom_line() +
     scale_y_log10() +
     scale_x_log10()
 
-## Hellinger distance
-hellinger_(phi, t(beta))
+## Hellinger distance of word-topic distributions
+beta_mx = beta |> 
+    ## Fix order of words
+    mutate(token = as.integer(token)) |>
+    arrange(token) |>
+    ## And dropped words
+    complete(token = 1:vocab) |>
+    pivot_wider(names_from = 'topic',
+                values_from = 'beta', values_fill = 0,
+                names_sort = TRUE) |>
+    select(-`NA`) |> 
+    ## Coerce to matrix
+    column_to_rownames('token') |>
+    as.matrix()
+hellinger_(phi, t(beta_mx))
 
 ## Use lpSolve to match fitted topics to true topics
-dist = hellinger_(phi, t(beta))
+dist = hellinger_(phi, t(beta_mx))
 soln = lp.assign(dist)
+soln$solution
 
 ## NB In a couple of simulation rounds, soln$solution was symmetric.  Seems like this shouldn't be true in general. 
-hellinger_(t(soln$solution) %*% phi, t(beta))
+hellinger_(phi, soln$solution %*% t(beta_mx))
+hellinger_(phi, soln$solution %*% t(beta_mx)) |> 
+    diag() |> 
+    summary()
 
 ## Tidy scores ----
-## TODO: move this to tidier
-scores_df = fitted$scores %>% 
-    ## With the rotation to match fitted to true topics
-    {. %*% soln$solution} |>
-    as_tibble(rownames = 'doc') |> 
-    mutate(doc = as.integer(doc)) |> 
-    pivot_longer(starts_with('V'), 
-                 names_to = 'factor', 
-                 values_to = 'score')
-
-ggplot(scores_df, aes(factor, score)) +
-    geom_violin(draw_quantiles = .5)
-
-## This confirms graphically that the docs mostly have the correct topics
-ggplot(scores_df, aes(doc, factor, fill = score)) +
-    geom_tile() +
-    scale_fill_gradient2()
+# scores_df = tidy(fitted, k, 'gamma', rotation = soln$solution) #%>% 
+#     
+# ggplot(scores_df, aes(topic, gamma)) +
+#     geom_violin(draw_quantiles = .5)
+# 
+# ## This confirms graphically that the docs mostly have the correct topics
+# ggplot(scores_df, aes(as.integer(doc), topic, fill = gamma)) +
+#     geom_tile() +
+#     scale_fill_gradient2()
 
 ## Scores to topic distributions ----
 ## Not all documents have at least one positive score
-scores_df |>
-    filter(score > 0) |>
-    distinct(doc) |>
-    nrow()
+# scores_df |>
+#     filter(score > 0) |>
+#     distinct(doc) |>
+#     nrow()
 
-## TODO: move this to tidier
-## Nudge everything so the minimum value is 0
-gamma_df = scores_df |> 
-    # filter(score > 0) |> 
-    group_by(doc) |> 
-    mutate(score = score - min(score)) |> 
-    mutate(gamma = score / sum(score)) |> 
-    ungroup() |> 
-    rename(topic = factor)
+gamma_df = tidy(fitted, 5, 'gamma', rotation = soln$solution)
 
 gamma_df |> 
-    mutate(journal = (doc - 1) %/% Mj + 1) |> 
+    mutate(doc = as.integer(doc)) |> 
+    ggplot(aes(doc, topic, fill = gamma)) +
+    geom_raster() +
+    scale_x_continuous(breaks = NULL)
+
+gamma_df |> 
+    mutate(doc = as.integer(doc), 
+           journal = (doc - 1) %/% Mj + 1) |> 
     ggplot(aes(topic, gamma, group = doc, color = as.factor(journal))) +
     geom_line(alpha = .25) +
     facet_wrap(vars(journal), scales = 'free_x') +
@@ -227,8 +210,8 @@ doc_compare = hellinger(rename(theta_df, gamma = prob), 'doc',
 
 ggplot(doc_compare, aes(doc_x, doc_y, fill = 1 - dist)) +
     geom_raster() +
-    scale_x_discrete(breaks = 'none') +
-    scale_y_discrete(breaks = 'none')
+    scale_x_discrete(breaks = NULL) +
+    scale_y_discrete(breaks = NULL)
 
 ## Comparable to word-topics, mean around .17
 doc_compare |> 

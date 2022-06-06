@@ -4,7 +4,6 @@
 ## - convert loadings to dataframe
 ## - convert scores to dataframe
 ## - screeplot
-## TODO: accept multiple values of n, w/ single PCA fit but multiple varimax fits
 
 #' Fit a varimax-rotated PCA using irlba
 #' 
@@ -32,12 +31,29 @@ varimax_irlba = function(mx,
     rows = rownames(mx)
     cols = colnames(mx)
     ## PCA fit
-    pca_fit = do.call(prcomp_fn, c(list(x = mx, n = n), 
+    pca_fit = do.call(prcomp_fn, c(list(x = mx, 
+                                        n = max(n)), 
                                    prcomp_opts))
     
     ## Varimax fit
-    raw_loadings = pca_fit$rotation[,1:n] %*% diag(pca_fit$sdev, n, n) |> 
-        magrittr::set_rownames(cols)
+    varimaxes = n |> 
+        set_names() |> 
+        map(fit_varimax, 
+                    pca_fit, cols, rows, varimax_fn, varimax_opts)
+    
+    toreturn = list(totalvar = pca_fit$totalvar, 
+                    sdev = pca_fit$sdev, 
+                    n = n,
+                    varimax = varimaxes)
+    return(toreturn)
+}
+
+#' Given a (rank n) PCA fit, return a rank k < n varimax fit
+fit_varimax = function(k, pca, 
+                       feature_names, obs_names, 
+                       varimax_fn, varimax_opts) {
+    raw_loadings = pca$rotation[,1:k] %*% diag(pca$sdev, k, k) |> 
+        magrittr::set_rownames(feature_names)
     varimax_fit_prelim = do.call(varimax_fn, c(list(x = raw_loadings), 
                                                varimax_opts))
     
@@ -48,13 +64,11 @@ varimax_irlba = function(mx,
                             msg = 'Varimax loadings do not all have positive skew')
     
     ## Scores
-    scores = scale(pca_fit$x[,1:n]) %*% varimax_fit$rotmat |> 
-        magrittr::set_rownames(rows)
+    scores = scale(pca$x[,1:k]) %*% varimax_fit$rotmat |> 
+        magrittr::set_rownames(obs_names)
     
-    toreturn = list(totalvar = pca_fit$totalvar, 
-                    sdev = pca_fit$sdev, 
-                    loadings = varimax_fit$loadings, 
-                    rotmat = varimax_fit$rotmat, 
+    toreturn = list(loadings = varimax_fit$loadings, 
+                    rotmat = varimax_fit$rotmat,
                     scores = scores)
     return(toreturn)
 }
@@ -74,5 +88,10 @@ varimax_tm = function(dtm, n, row = doc, column = word, value = n, ...) {
     if (!inherits(dtm, 'Matrix')) {
         dtm = tidytext::cast_sparse(dtm, {{row}}, {{column}}, {{value}})
     }
-    return(varimax_irlba(dtm, n, prcomp_opts = list(.scale = FALSE), ...))
+    fitted = varimax_irlba(dtm, n, prcomp_opts = list(.scale = FALSE), ...)
+    class(fitted) = 'varimaxtm'
+    return(fitted)
 }
+
+
+source('R/s3.R')
