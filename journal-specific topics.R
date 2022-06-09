@@ -17,20 +17,20 @@ library(tictoc)
 
 source('R/generators.R')
 source('R/hellinger.R')
-source('R/varimaxtm.R')
+source('R/tmfast.R')
 
 ## Parameters ----
 k = 5              # Num. topics / journals
-Mj = 100           # Num. documents per journal
+Mj = 20           # Num. documents per journal
 M = Mj*k
-vocab = 3*M       # Vocabulary length
+vocab = M       # Vocabulary length
 
 size = 3      # Size and mean for the negative binomial distribution of doc lengths
 mu = 300
 
 ## Build journal-specific topic distributions ----
 ## Journal-specific alpha, with a peak value (.8 by default) and uniform otherwise
-theta = map(1:k, ~rdirichlet(Mj, peak_alpha(k, .x, peak = .8))) %>% 
+theta = map(1:k, ~rdirichlet(Mj, peak_alpha(k, .x, peak = .8, scale = 10))) %>% 
     do.call(rbind, .)
 
 theta_df = theta |> 
@@ -44,7 +44,7 @@ ggplot(theta_df, aes(doc, topic, fill = prob)) +
 
 ## Build the rest of the dtm ----
 ## phi_j:  Word distribution for topic j
-phi = rdirichlet(k, .1, k = vocab)
+phi = rdirichlet(k, .01, k = vocab)
 
 ## Word distributions
 phi |> 
@@ -101,8 +101,16 @@ dtm = corpus |>
 
 ## Explore fitted model ----
 tic()
-fitted = varimax_tm(dtm, c(k, 2*k))
+fitted = tmfast(dtm, c(2, 3, k, 2*k))
 toc()
+
+# tidy(fitted, 3, matrix = 'gamma') |> 
+#     pivot_wider(names_from = 'topic', 
+#                 values_from = 'gamma') |> 
+#     mutate(journal = (as.integer(doc) - 1) %/% Mj + 1) |> 
+#     ggplot(aes(V1, V2)) +
+#     geom_jitter() +
+#     facet_wrap(vars(journal))
 
 ## TODO: screeplot
 
@@ -120,7 +128,7 @@ psych::skew(scores(fitted, k))
 # t(phi)
 
 ## beta: fitted varimax loadings, transformed to probability distributions
-beta = tidy(fitted, 5, 'beta')
+beta = tidy(fitted, k, 'beta')
 
 ## Compare Zipfian distributions
 bind_rows({beta |> 
@@ -156,16 +164,15 @@ beta_mx = beta |>
     ## Coerce to matrix
     column_to_rownames('token') |>
     as.matrix()
-hellinger_(phi, t(beta_mx))
+hellinger(phi, t(beta_mx))
 
 ## Use lpSolve to match fitted topics to true topics
-dist = hellinger_(phi, t(beta_mx))
+dist = hellinger(phi, t(beta_mx))
 soln = lp.assign(dist)
 soln$solution
 
-## NB In a couple of simulation rounds, soln$solution was symmetric.  Seems like this shouldn't be true in general. 
-hellinger_(phi, soln$solution %*% t(beta_mx))
-hellinger_(phi, soln$solution %*% t(beta_mx)) |> 
+hellinger(phi, soln$solution %*% t(beta_mx))
+hellinger(phi, soln$solution %*% t(beta_mx)) |> 
     diag() |> 
     summary()
 
@@ -187,7 +194,7 @@ hellinger_(phi, soln$solution %*% t(beta_mx)) |>
 #     distinct(doc) |>
 #     nrow()
 
-gamma_df = tidy(fitted, 5, 'gamma', rotation = soln$solution)
+gamma_df = tidy(fitted, k, 'gamma', rotation = soln$solution)
 
 gamma_df |> 
     mutate(doc = as.integer(doc)) |> 
@@ -208,7 +215,7 @@ doc_compare = hellinger(rename(theta_df, gamma = prob), 'doc',
           topics2 = gamma_df, id2 = 'doc', 
           df = TRUE)
 
-ggplot(doc_compare, aes(doc_x, doc_y, fill = 1 - dist)) +
+ggplot(doc_compare, aes(as.integer(doc_x), as.integer(doc_y), fill = 1 - dist)) +
     geom_raster() +
     scale_x_discrete(breaks = NULL) +
     scale_y_discrete(breaks = NULL)

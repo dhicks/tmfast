@@ -1,4 +1,11 @@
-hellinger_ = function(mx1, mx2 = NULL) {
+hellinger = function(x, ...) {
+    UseMethod("hellinger")
+}
+
+#' Hellinger distance for matrices
+#' 
+#' Calculates Hellinger distance for each pair of rows in the given matrix, or each combination of rows from the two matrices
+hellinger.matrix = function(mx1, mx2 = NULL) {
     if (is.null(mx2)) {
         mx2 = t(mx1)
     } else {
@@ -27,10 +34,11 @@ build_matrix = function(topics, id_col, ...) {
 #' 
 #' Hellinger distances, either pairwise within a single topic model df or between two topic model dfs
 #' @param {topics1, topics2} Tidied topic model dataframes
+#' @param ... Filtering conditions to use on tidied topic models
 #' @param {id1, id2} Document identifiers (auids, ORU name, etc.)
 #' @param df Should the function return the matrix of Hellinger distances (default) or a tidy dataframe? 
-#' @return matrix (default) or tidy dataframe of Hellinger distances
-hellinger = function(topics1, id1, 
+#' @return matrix or tidy dataframe (default) of Hellinger distances
+hellinger.data.frame = function(topics1, id1, 
                      ...,
                      topics2 = NULL, id2 = NULL, 
                      df = FALSE) {
@@ -44,7 +52,7 @@ hellinger = function(topics1, id1,
         matrix2 = build_matrix(topics2, id2, ...)
     }
     
-    hellinger_matrix = hellinger_(matrix1, matrix2)
+    hellinger_matrix = hellinger(matrix1, matrix2)
     hellinger_matrix = replace_na(hellinger_matrix, 0.0)
     
     if (!df) {

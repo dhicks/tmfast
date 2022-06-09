@@ -14,7 +14,7 @@ loadings.default = function(x) {
     # message('loadings.default')
     stats::loadings(x)
 }
-loadings.varimaxtm = function(x, k) {
+loadings.varimaxes = function(x, k) {
     # message('loadings.varimaxtm')
     assertthat::assert_that(k %in% x$n, 
                             msg = glue::glue('Rank {k} not in fitted model'))
@@ -26,7 +26,7 @@ loadings.varimaxtm = function(x, k) {
 scores = function(x, ...) {
     UseMethod("scores")
 }
-scores.varimaxtm = function(x, k) {
+scores.varimaxes = function(x, k) {
     assertthat::assert_that(k %in% x$n, 
                             msg = glue::glue('Rank {k} not in fitted model'))
     x$varimax[[as.character(k)]]$scores
@@ -37,7 +37,7 @@ scores.varimaxtm = function(x, k) {
 rotation = function(x, ...) {
     UseMethod('rotation')
 }
-rotation.varimaxtm = function(x, k) {
+rotation.varimaxes = function(x, k) {
     assertthat::assert_that(k %in% x$n, 
                             msg = glue::glue('Rank {k} not in fitted model'))
     x$varimax[[as.character(k)]]$rotmat
@@ -47,7 +47,7 @@ rotation.varimaxtm = function(x, k) {
 tidy = function(x, ...) {
     UseMethod('tidy')
 }
-tidy.varimaxtm = function(x, k, 
+tidy.tmfast = function(x, k, 
                           matrix = c('beta', 'gamma'), 
                           df = TRUE, 
                           rotation = NULL) {

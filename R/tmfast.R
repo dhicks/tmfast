@@ -1,5 +1,7 @@
 #' Fitting "topic models" with PCA+varimax
 
+source('R/s3.R')
+
 ## TODO: tidiers that
 ## - convert loadings to dataframe
 ## - convert scores to dataframe
@@ -14,7 +16,7 @@
 #' @param prcomp_opts List of options to pass to `prcomp_fn`
 #' @param varimax_fn Function to use for varimax rotation
 #' @param varimax_opts List of options to pass to `varimax_fn`
-#' @return A list with elements
+#' @return A list of class `varimaxes`, with elements
 #'   - `totalvar`: Total variance, from PCA
 #'   - `sdev`:  Standard deviations of the extracted principal components
 #'   - `loadings`: Varimax-rotated standardized loadings
@@ -45,6 +47,7 @@ varimax_irlba = function(mx,
                     sdev = pca_fit$sdev, 
                     n = n,
                     varimax = varimaxes)
+    class(toreturn) = c('varimaxes', class(toreturn))
     return(toreturn)
 }
 
@@ -81,17 +84,15 @@ fit_varimax = function(k, pca,
 #' @param column In dataframe `dtm`, column column
 #' @param value In dataframe `dtm`, value column
 #' @param ... Other arguments, passed to `varimax_irlba`
-#' @return As per `varimax_irlba`
+#' @return As per `varimax_irlba`, of class `tmfast`
 #' @details If `dtm` is not a matrix, will be cast to a sparse matrix using `tidytext::case_sparse()`
 #' @export
-varimax_tm = function(dtm, n, row = doc, column = word, value = n, ...) {
+tmfast = function(dtm, n, row = doc, column = word, value = n, ...) {
     if (!inherits(dtm, 'Matrix')) {
         dtm = tidytext::cast_sparse(dtm, {{row}}, {{column}}, {{value}})
     }
     fitted = varimax_irlba(dtm, n, prcomp_opts = list(.scale = FALSE), ...)
-    class(fitted) = 'varimaxtm'
+    class(fitted) = c('tmfast', class(fitted))
     return(fitted)
 }
 
-
-source('R/s3.R')
