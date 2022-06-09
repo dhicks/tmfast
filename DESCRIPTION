@@ -1,0 +1,12 @@
+Package: tmfast
+Title: Fast topic models using varimax
+Version: 0.0.0.9000
+Authors@R: 
+    person("Dan", "Hicks", , "hicks.daniel.j@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0001-7945-4416"))
+Description: Fit topic models fast using varimax-rotated PCA
+License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
+    license
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.0.0

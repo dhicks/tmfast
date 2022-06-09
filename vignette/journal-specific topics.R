@@ -1,4 +1,4 @@
-## This works okay! 
+## This works okay!
 ## - log1p doc term counts (don't divide by length)
 ## - prcomp with centering but *without* scaling (scaling makes it harder to get probability distributions)
 ## - after rotation, reverse factors with negative skew
@@ -15,9 +15,10 @@ library(tidyverse)
 library(lpSolve)
 library(tictoc)
 
-source('R/generators.R')
-source('R/hellinger.R')
-source('R/tmfast.R')
+library(tmfast)
+# source('R/generators.R')
+# source('R/hellinger.R')
+# source('R/tmfast.R')
 
 ## Parameters ----
 k = 5              # Num. topics / journals
@@ -30,14 +31,14 @@ mu = 300
 
 ## Build journal-specific topic distributions ----
 ## Journal-specific alpha, with a peak value (.8 by default) and uniform otherwise
-theta = map(1:k, ~rdirichlet(Mj, peak_alpha(k, .x, peak = .8, scale = 10))) %>% 
+theta = map(1:k, ~rdirichlet(Mj, peak_alpha(k, .x, peak = .8, scale = 10))) %>%
     do.call(rbind, .)
 
-theta_df = theta |> 
-    as_tibble(rownames = 'doc') |> 
-    mutate(doc = as.integer(doc)) |> 
-    pivot_longer(starts_with('V'), 
-                 names_to = 'topic', 
+theta_df = theta |>
+    as_tibble(rownames = 'doc') |>
+    mutate(doc = as.integer(doc)) |>
+    pivot_longer(starts_with('V'),
+                 names_to = 'topic',
                  values_to = 'prob')
 ggplot(theta_df, aes(doc, topic, fill = prob)) +
     geom_tile()
@@ -47,24 +48,24 @@ ggplot(theta_df, aes(doc, topic, fill = prob)) +
 phi = rdirichlet(k, .01, k = vocab)
 
 ## Word distributions
-phi |> 
-    as_tibble(rownames = 'topic') |> 
-    pivot_longer(starts_with('V'), 
-                 names_to = 'word', 
-                 values_to = 'prob') |> 
+phi |>
+    as_tibble(rownames = 'topic') |>
+    pivot_longer(starts_with('V'),
+                 names_to = 'word',
+                 values_to = 'prob') |>
     ggplot(aes(topic, word, fill = (prob))) +
     geom_tile() +
     scale_y_discrete(breaks = NULL)
 
 ## Zipf's law
-phi |> 
-    as_tibble(rownames = 'topic') |> 
-    pivot_longer(starts_with('V'), 
-                 names_to = 'word', 
-                 values_to = 'prob') |> 
-    group_by(topic) |> 
-    mutate(rank = rank(desc(prob))) |> 
-    arrange(topic, rank) |> 
+phi |>
+    as_tibble(rownames = 'topic') |>
+    pivot_longer(starts_with('V'),
+                 names_to = 'word',
+                 values_to = 'prob') |>
+    group_by(topic) |>
+    mutate(rank = rank(desc(prob))) |>
+    arrange(topic, rank) |>
     filter(rank < vocab/2) |>
     ggplot(aes(rank, prob, color = topic)) +
     geom_line() +
@@ -86,13 +87,13 @@ N = rnbinom(M, size = size, mu = mu)
 ## - log + PCA scaling: maybe worse than log alone
 ## - log length norm + PCA scaling: comparable to log length norm
 ## - **log1p seems to work well**
-## 
+##
 # N[1:Mj] = 10*N[1:Mj]
 
 hist(N)
 
 corpus = draw_corpus(N, theta, phi)
-dtm = corpus |> 
+dtm = corpus |>
     group_by(doc) |>
     mutate(len = sum(n),
            n = log1p(n)) |>
@@ -104,17 +105,17 @@ tic()
 fitted = tmfast(dtm, c(2, 3, k, 2*k))
 toc()
 
-# tidy(fitted, 3, matrix = 'gamma') |> 
-#     pivot_wider(names_from = 'topic', 
-#                 values_from = 'gamma') |> 
-#     mutate(journal = (as.integer(doc) - 1) %/% Mj + 1) |> 
+# tidy(fitted, 3, matrix = 'gamma') |>
+#     pivot_wider(names_from = 'topic',
+#                 values_from = 'gamma') |>
+#     mutate(journal = (as.integer(doc) - 1) %/% Mj + 1) |>
 #     ggplot(aes(V1, V2)) +
 #     geom_jitter() +
 #     facet_wrap(vars(journal))
 
 ## TODO: screeplot
 
-## Variance coverage? 
+## Variance coverage?
 cumsum(fitted$sdev^2) / fitted$totalvar
 
 ## Scores all have positive skew
@@ -131,19 +132,19 @@ psych::skew(scores(fitted, k))
 beta = tidy(fitted, k, 'beta')
 
 ## Compare Zipfian distributions
-bind_rows({beta |> 
+bind_rows({beta |>
         mutate(type = 'fitted')},
-        {phi |> 
-                t() |> 
-                as_tibble(rownames = 'token') |> 
-                pivot_longer(starts_with('V'), 
-                             names_to = 'topic', 
-                             values_to = 'beta') |> 
+        {phi |>
+                t() |>
+                as_tibble(rownames = 'token') |>
+                pivot_longer(starts_with('V'),
+                             names_to = 'topic',
+                             values_to = 'beta') |>
                 mutate(type = 'true')}
-) |> 
-    group_by(type, topic) |> 
-    mutate(rank = rank(desc(beta))) |> 
-    arrange(type, topic, rank) |> 
+) |>
+    group_by(type, topic) |>
+    mutate(rank = rank(desc(beta))) |>
+    arrange(type, topic, rank) |>
     filter(rank < 500) |>
     ggplot(aes(rank, beta, color = type, group = interaction(topic, type))) +
     geom_line() +
@@ -151,7 +152,7 @@ bind_rows({beta |>
     scale_x_log10()
 
 ## Hellinger distance of word-topic distributions
-beta_mx = beta |> 
+beta_mx = beta |>
     ## Fix order of words
     mutate(token = as.integer(token)) |>
     arrange(token) |>
@@ -160,7 +161,7 @@ beta_mx = beta |>
     pivot_wider(names_from = 'topic',
                 values_from = 'beta', values_fill = 0,
                 names_sort = TRUE) |>
-    select(-`NA`) |> 
+    select(-`NA`) |>
     ## Coerce to matrix
     column_to_rownames('token') |>
     as.matrix()
@@ -172,16 +173,16 @@ soln = lp.assign(dist)
 soln$solution
 
 hellinger(phi, soln$solution %*% t(beta_mx))
-hellinger(phi, soln$solution %*% t(beta_mx)) |> 
-    diag() |> 
+hellinger(phi, soln$solution %*% t(beta_mx)) |>
+    diag() |>
     summary()
 
 ## Tidy scores ----
-# scores_df = tidy(fitted, k, 'gamma', rotation = soln$solution) #%>% 
-#     
+# scores_df = tidy(fitted, k, 'gamma', rotation = soln$solution) #%>%
+#
 # ggplot(scores_df, aes(topic, gamma)) +
 #     geom_violin(draw_quantiles = .5)
-# 
+#
 # ## This confirms graphically that the docs mostly have the correct topics
 # ggplot(scores_df, aes(as.integer(doc), topic, fill = gamma)) +
 #     geom_tile() +
@@ -196,23 +197,23 @@ hellinger(phi, soln$solution %*% t(beta_mx)) |>
 
 gamma_df = tidy(fitted, k, 'gamma', rotation = soln$solution)
 
-gamma_df |> 
-    mutate(doc = as.integer(doc)) |> 
+gamma_df |>
+    mutate(doc = as.integer(doc)) |>
     ggplot(aes(doc, topic, fill = gamma)) +
     geom_raster() +
     scale_x_continuous(breaks = NULL)
 
-gamma_df |> 
-    mutate(doc = as.integer(doc), 
-           journal = (doc - 1) %/% Mj + 1) |> 
+gamma_df |>
+    mutate(doc = as.integer(doc),
+           journal = (doc - 1) %/% Mj + 1) |>
     ggplot(aes(topic, gamma, group = doc, color = as.factor(journal))) +
     geom_line(alpha = .25) +
     facet_wrap(vars(journal), scales = 'free_x') +
     scale_color_discrete(guide = 'none')
 
 ## Accuracy of topic-doc distributions ----
-doc_compare = hellinger(rename(theta_df, gamma = prob), 'doc', 
-          topics2 = gamma_df, id2 = 'doc', 
+doc_compare = hellinger(rename(theta_df, gamma = prob), 'doc',
+          topics2 = gamma_df, id2 = 'doc',
           df = TRUE)
 
 ggplot(doc_compare, aes(as.integer(doc_x), as.integer(doc_y), fill = 1 - dist)) +
@@ -221,7 +222,7 @@ ggplot(doc_compare, aes(as.integer(doc_x), as.integer(doc_y), fill = 1 - dist)) 
     scale_y_discrete(breaks = NULL)
 
 ## Comparable to word-topics, mean around .17
-doc_compare |> 
-    filter(doc_x == doc_y) |> 
-    pull(dist) |> 
+doc_compare |>
+    filter(doc_x == doc_y) |>
+    pull(dist) |>
     summary()
