@@ -1,12 +1,3 @@
-## Scratchwork for S3 class
-## TODO:
-## - validator:
-##      - length(sdev) == max(n)
-##      - names(varimax) == as.character(n)
-##      - each varimax sol'n has ncol corresponding to name
-## - tidy method
-## - documentation
-
 #' Extract a PCA/varimax loadings matrix
 #'
 #' @export

@@ -1,9 +1,6 @@
 #' Fitting "topic models" with PCA+varimax
 NULL
 
-## TODO:
-## - screeplot
-
 #' Fit a varimax-rotated PCA using irlba
 #'
 #' Extract `n` principal components from the matrix `mx` using `irlba`, then rotate the solution using `varimax`
