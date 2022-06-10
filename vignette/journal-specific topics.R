@@ -22,7 +22,7 @@ library(tmfast)
 
 ## Parameters ----
 k = 5              # Num. topics / journals
-Mj = 20           # Num. documents per journal
+Mj = 100           # Num. documents per journal
 M = Mj*k
 vocab = M       # Vocabulary length
 

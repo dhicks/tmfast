@@ -1,11 +1,9 @@
-library(tidyverse)
+# library(tidyverse)
 library(tictoc)
 
-source('R/generators.R')
-source('R/hellinger.R')
-source('R/tmfast.R')
+library(tmfast)
 
-## ~70 sec for each round of the simulation
+## ~70 sec for each round of the simulation w/ default values
 tic()
-journal_specific()
+journal_specific(Mj = 20)
 toc()
