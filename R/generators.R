@@ -108,7 +108,7 @@ journal_specific = function(k = 5,
                                                   scale = topic_scale))) %>%
         do.call(rbind, .)
     theta_df = theta |>
-        tibble::as_tibble(rownames = 'doc') |>
+        tibble::as_tibble(rownames = 'doc', .name_repair = make_colnames) |>
         dplyr::mutate(doc = as.integer(doc)) |>
         tidyr::pivot_longer(tidyselect::starts_with('V'),
                             names_to = 'topic',

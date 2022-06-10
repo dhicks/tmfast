@@ -36,13 +36,13 @@ Hellinger distances, either pairwise within a single tidied topic model datafram
 \examples{
 set.seed(2022-06-09)
 topics1 = rdirichlet(3, rep(5, 5)) |>
-    as_tibble(rownames = 'doc_id') |>
-    pivot_longer(starts_with('V'),
+    tibble::as_tibble(rownames = 'doc_id', .name_repair = make_colnames) |>
+    tidyr::pivot_longer(starts_with('V'),
                  names_to = 'topic',
                  values_to = 'gamma')
 topics2 = rdirichlet(3, rep(5, 5)) |>
-    as_tibble(rownames = 'doc_id') |>
-    pivot_longer(starts_with('V'),
+    tibble::as_tibble(rownames = 'doc_id', .name_repair = make_colnames) |>
+    tidyr::pivot_longer(starts_with('V'),
                  names_to = 'topic',
                  values_to = 'gamma')
 hellinger(topics1, doc_id, prob1 = 'gamma', df = TRUE)

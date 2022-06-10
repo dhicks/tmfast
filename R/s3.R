@@ -48,6 +48,17 @@ rotation.varimaxes = function(x, k) {
 }
 # rotation(fitted, 5)
 
+#' Make colnames
+#'
+#' Helper function to make matrix column names of the form 'V09'
+make_colnames = function(names, prefix = 'V') {
+    n = length(names)
+    1:n |>
+        as.character() |>
+        stringr::str_pad(stringr::str_length(n), pad = '0') %>%
+        stringr::str_c(prefix, .)
+}
+
 #' @export
 tidy = function(x, ...) {
     UseMethod('tidy')
@@ -81,7 +92,7 @@ tidy.tmfast = function(x, k,
             loadings_mx = rotation %*% loadings_mx
         }
         dataf = loadings_mx |>
-            tibble::as_tibble(rownames = 'token') |>
+            tibble::as_tibble(rownames = 'token', .name_repair = make_colnames) |>
             tidyr::pivot_longer(starts_with('V'),
                          names_to = 'topic',
                          values_to = 'beta') |>
@@ -103,7 +114,7 @@ tidy.tmfast = function(x, k,
             scores_mx = scores_mx %*% t(rotation)
         }
         dataf = scores_mx |>
-            tibble::as_tibble(rownames = 'doc') |>
+            tibble::as_tibble(rownames = 'doc', .name_repair = make_colnames) |>
             tidyr::pivot_longer(starts_with('V'),
                          names_to = 'topic',
                          values_to = 'gamma') |>
