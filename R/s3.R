@@ -59,10 +59,10 @@ make_colnames = function(names, prefix = 'V') {
         stringr::str_c(prefix, .)
 }
 
-#' @export
-tidy = function(x, ...) {
-    UseMethod('tidy')
-}
+
+#' @importFrom broom tidy
+NULL
+
 #' Extract beta and gamma matrices from `tmfast` objects
 #'
 #' @param x `tmfast` object

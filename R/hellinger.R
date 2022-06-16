@@ -21,8 +21,7 @@ NULL
 #' mx2 = rdirichlet(3, rep(5, 5))
 #' hellinger(mx1)
 #' hellinger(mx1, mx2)
-hellinger.Matrix <-
-hellinger.matrix <- function(mx1, mx2 = NULL) {
+hellinger.Matrix = function(mx1, mx2 = NULL) {
     if (is.null(mx2)) {
         mx2 = t(mx1)
     } else {
@@ -32,9 +31,11 @@ hellinger.matrix <- function(mx1, mx2 = NULL) {
                 msg = 'Matrices must have same number of columns')
 
     mx1.2 = sqrt(mx1) %*% sqrt(mx2)
-    return(sqrt(1 - mx1.2))
+    return(sqrt(pmax(1 - mx1.2, 0)))
     # return(sqrt(round(1 - mx1.2, 8)))
 }
+#' @export
+hellinger.matrix = function(...) hellinger.Matrix(...)
 
 #' Convert a long dataframe to a wide (sparse) matrix
 #'

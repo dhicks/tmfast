@@ -35,7 +35,7 @@ theta = map(1:k, ~rdirichlet(Mj, peak_alpha(k, .x, peak = .8, scale = 10))) %>%
     do.call(rbind, .)
 
 theta_df = theta |>
-    as_tibble(rownames = 'doc') |>
+    as_tibble(rownames = 'doc', .name_repair = tmfast:::make_colnames) |>
     mutate(doc = as.integer(doc)) |>
     pivot_longer(starts_with('V'),
                  names_to = 'topic',
@@ -113,13 +113,12 @@ toc()
 #     geom_jitter() +
 #     facet_wrap(vars(journal))
 
-## TODO: screeplot
+screeplot(fitted)
 
 ## Variance coverage?
 cumsum(fitted$sdev^2) / fitted$totalvar
 
 ## Scores all have positive skew
-## TODO: easier access to varimax contents
 psych::skew(scores(fitted, k))
 
 
@@ -136,7 +135,7 @@ bind_rows({beta |>
         mutate(type = 'fitted')},
         {phi |>
                 t() |>
-                as_tibble(rownames = 'token') |>
+                as_tibble(rownames = 'token', .name_repair = make_colnames) |>
                 pivot_longer(starts_with('V'),
                              names_to = 'topic',
                              values_to = 'beta') |>
@@ -212,8 +211,8 @@ gamma_df |>
     scale_color_discrete(guide = 'none')
 
 ## Accuracy of topic-doc distributions ----
-doc_compare = hellinger(rename(theta_df, gamma = prob), 'doc',
-          topics2 = gamma_df, id2 = 'doc',
+doc_compare = hellinger(theta_df, doc,
+                        topicsdf2 = gamma_df, id2 = doc, prob2 = gamma,
           df = TRUE)
 
 ggplot(doc_compare, aes(as.integer(doc_x), as.integer(doc_y), fill = 1 - dist)) +
