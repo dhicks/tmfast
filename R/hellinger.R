@@ -83,8 +83,10 @@ build_matrix = function(data, row, column, value, ...) {
 #' hellinger(topics1, doc_id, prob1 = 'gamma', df = TRUE)
 #' hellinger(topics1, doc_id, prob1 = 'gamma',
 #'           topicsdf2 = topics2, id2 = doc_id, prob2 = 'gamma')
-hellinger.data.frame = function(topicsdf1, id1, cat1 = 'topic', prob1 = 'prob',
-                     topicsdf2 = NULL, id2 = NULL, cat2 = 'topic', prob2 = 'prob',
+hellinger.data.frame = function(topicsdf1, id1 = 'document',
+                                cat1 = 'topic', prob1 = 'prob',
+                     topicsdf2 = NULL, id2 = NULL,
+                     cat2 = 'topic', prob2 = 'prob',
                      df = FALSE) {
     id1 = rlang::enquo(id1)
     matrix1 = build_matrix(topicsdf1, {{id1}}, {{cat1}}, {{prob1}})
@@ -118,5 +120,58 @@ hellinger.data.frame = function(topicsdf1, id1, cat1 = 'topic', prob1 = 'prob',
                      names_to = id2,
                      values_to = 'dist')
 }
+
+#' Discursive space
+#'
+#' 2-dimensional "discursive space" representation of relationships between documents using Hellinger distances and t-SNE
+#' @param tm A fitted topic model
+#' @param k  Number of topics (required for `tmfast` objects)
+#' @param doc_ids Vector of document IDs (required for `STM` objects)
+#' @param perplexity Perplexity parameter for t-SNE. By default, minimum of 30 and `floor((ndocs - 1)/3) - 1`.
+#' @param df Return a dataframe with columns `document`, `x`, and `y` (default) or the output of `Rtsne`.
+#' @details Algorithm checks distances to 3*perplexity nearest neighbors.  Rtsne loses rownames (document IDs); these are either extract from the `tmfast` object or passed separately for a `STM`object.  The default method (not exported) takes a tidied gamma (document-topic-gamma) matrix.  Use `set.seed()` before calling this function for reproducibility.
+#' @return See `df`
+#' @examples
+#' ## From the real books vignette
+#' set.seed(42)
+#' tsne(fitted_tmf, k = 4, df = TRUE) |>
+#'     left_join(meta, by = c('document' = 'book')) |>
+#'     ggplot(aes(x, y, color = author)) +
+#'     geom_point()
+#' @export
+tsne = function(x, ...) {
+    UseMethod('tsne')
+}
+tsne.default = function(gamma_df, k, doc_ids,
+                        perplexity = NULL, df = TRUE) {
+    if (is.null(perplexity)) {
+        ndocs = length(doc_ids)
+        perplexity = min(30, floor((ndocs - 1)/3) - 1)
+    }
+    fitted_tsne = gamma_df |>
+        hellinger(id1 = document, prob1 = gamma) |>
+        as.dist() |>
+        Rtsne::Rtsne(perplexity = perplexity)
+    if (!df) {
+        return(fitted_tsne)
+    }
+    fitted_tsne$Y |>
+        magrittr::set_rownames(doc_ids) |>
+        tibble::as_tibble(rownames = 'document',
+                          .name_repair = \(x)(c('x', 'y')))
+}
+#' @export
+tsne.tmfast = function(tm, k, perplexity = NULL, df = TRUE) {
+    doc_ids = rownames(scores(tm, k))
+    gamma_df = tidy(tm, k, matrix = 'gamma')
+    tsne.default(gamma_df, k, doc_ids, perplexity, df)
+}
+#' @export
+tsne.STM = function(tm, doc_ids, perplexity = NULL, df = TRUE) {
+    k = ncol(tm$theta)
+    gamma_df = tidy(tm, matrix = 'gamma')
+    tsne.default(gamma_df, k, doc_ids, perplexity, df)
+}
+
 
 

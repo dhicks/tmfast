@@ -10,14 +10,14 @@ library(tictoc)
 
 ## Build corpus ----
 austen_df = austen_books() |>
-    unnest_tokens(term, text) |>
+    unnest_tokens(term, text, token = 'words') |>
     mutate(author = 'Jane Austen') |>
     count(author, book, term)
 
 bronte = gutenberg_download(c(1260, 768, 969, 9182, 767))
 
 bronte_df = bronte |>
-    unnest_tokens(term, text) |>
+    unnest_tokens(term, text, token = 'words') |>
     mutate(author = 'Brontë sisters') |>
     count(author, book = as.character(gutenberg_id), term)
 
@@ -28,14 +28,14 @@ bronte_df = bronte |>
 dickens = gutenberg_download(c(98, 730, 766, 786))
 
 dickens_df = dickens |>
-    unnest_tokens(term, text) |>
+    unnest_tokens(term, text, token = 'words') |>
     mutate(author = 'Charles Dickens') |>
     count(author, book = as.character(gutenberg_id), term)
 
 hgwells = gutenberg_download(c(35, 36, 5230, 159))
 
 wells_df = hgwells |>
-    unnest_tokens(term, text) |>
+    unnest_tokens(term, text, token = 'words') |>
     mutate(author = 'H.G. Wells') |>
     count(author, book = as.character(gutenberg_id), term)
 
@@ -81,8 +81,8 @@ toc()
 screeplot(fitted_tmf)
 
 tidy(fitted_tmf, 4, matrix = 'gamma') |>
-    left_join(meta, by = c('doc' = 'book')) |>
-    ggplot(aes(doc, gamma, fill = topic)) +
+    left_join(meta, by = c('document' = 'book')) |>
+    ggplot(aes(document, gamma, fill = topic)) +
     geom_col() +
     facet_wrap(vars(author), scales = 'free')
 
@@ -125,16 +125,14 @@ tidy(fitted_stm, matrix = 'beta') |>
     coord_flip()
 
 ## Hellinger distance and tSNE ----
-tsne_tmf = tidy(fitted_tmf, 4, matrix = 'gamma') |>
-    hellinger(id1 = doc, prob1 = gamma) |>
-    as.dist() |>
-    Rtsne::Rtsne(perplexity = floor((nbooks - 1)/3) - 1)
-tsne_tmf$Y |>
-    magrittr::set_rownames(rownames(dtm2)) |>
-    as_tibble(rownames = 'book') |>
-    left_join(meta, by = 'book') |>
-    ggplot(aes(V1, V2, color = author)) +
+set.seed(12345)
+tsne(fitted_tmf, 4) |>
+    left_join(meta, by = c('document' = 'book')) |>
+    ggplot(aes(x, y, color = author)) +
     geom_point()
+
+debug(tsne)
+tsne(fitted_stm, rownames(dtm2))
 
 tsne_stm = tidy(fitted_stm, matrix = 'gamma') |>
     hellinger(id1 = document, prob1 = gamma) |>

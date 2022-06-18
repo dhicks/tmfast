@@ -92,7 +92,8 @@ tidy.tmfast = function(x, k,
             loadings_mx = rotation %*% loadings_mx
         }
         dataf = loadings_mx |>
-            tibble::as_tibble(rownames = 'token', .name_repair = make_colnames) |>
+            tibble::as_tibble(rownames = 'token',
+                              .name_repair = make_colnames) |>
             tidyr::pivot_longer(starts_with('V'),
                          names_to = 'topic',
                          values_to = 'beta') |>
@@ -114,12 +115,13 @@ tidy.tmfast = function(x, k,
             scores_mx = scores_mx %*% t(rotation)
         }
         dataf = scores_mx |>
-            tibble::as_tibble(rownames = 'doc', .name_repair = make_colnames) |>
+            tibble::as_tibble(rownames = 'document',
+                              .name_repair = make_colnames) |>
             tidyr::pivot_longer(starts_with('V'),
                          names_to = 'topic',
                          values_to = 'gamma') |>
             ## Nudge everything so the minimum value is 0, then normalize
-            dplyr::group_by(doc) |>
+            dplyr::group_by(document) |>
             dplyr::mutate(gamma = gamma - min(gamma)) |>
             dplyr::mutate(gamma = gamma / sum(gamma)) |>
             dplyr::ungroup()

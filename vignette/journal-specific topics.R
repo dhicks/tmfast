@@ -225,3 +225,10 @@ doc_compare |>
     filter(doc_x == doc_y) |>
     pull(dist) |>
     summary()
+
+## tSNE visualization ----
+tsne(fitted, k) |>
+    mutate(journal = (as.integer(document)-1) %/% Mj + 1) |>
+    ggplot(aes(x, y, color = as.character(journal))) +
+    geom_point()
+

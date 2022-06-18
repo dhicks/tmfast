@@ -6,7 +6,7 @@
 \usage{
 \method{hellinger}{data.frame}(
   topicsdf1,
-  id1,
+  id1 = "document",
   cat1 = "topic",
   prob1 = "prob",
   topicsdf2 = NULL,
