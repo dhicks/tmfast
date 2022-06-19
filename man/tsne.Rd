@@ -7,13 +7,15 @@
 tsne(x, ...)
 }
 \arguments{
-\item{tm}{A \code{tmfast} fitted topic model}
+\item{tm}{A fitted topic model}
 
-\item{k}{Number of topics}
+\item{k}{Number of topics (required for \code{tmfast} objects)}
+
+\item{doc_ids}{Vector of document IDs (required for \code{STM} objects)}
 
 \item{perplexity}{Perplexity parameter for t-SNE. By default, minimum of 30 and \code{floor((ndocs - 1)/3) - 1}.}
 
-\item{df}{Return a dataframe with columns \code{doc}, \code{x}, and \code{y} (default) or the output of \code{Rtsne}.}
+\item{df}{Return a dataframe with columns \code{document}, \code{x}, and \code{y} (default) or the output of \code{Rtsne}.}
 }
 \value{
 See \code{df}
@@ -22,13 +24,13 @@ See \code{df}
 2-dimensional "discursive space" representation of relationships between documents using Hellinger distances and t-SNE
 }
 \details{
-Algorithm checks distances to 3*perplexity nearest neighbors.  Rtsne loses rownames (document IDs). Use \code{set.seed()} for reproducibility.
+Algorithm checks distances to 3*perplexity nearest neighbors.  Rtsne loses rownames (document IDs); these are either extract from the \code{tmfast} object or passed separately for a \code{STM}object.  The default method (not exported) takes a tidied gamma (document-topic-gamma) matrix.  Use \code{set.seed()} before calling this function for reproducibility.
 }
 \examples{
 ## From the real books vignette
 set.seed(42)
 tsne(fitted_tmf, k = 4, df = TRUE) |>
-    left_join(meta, by = c('doc' = 'book')) |>
+    left_join(meta, by = c('document' = 'book')) |>
     ggplot(aes(x, y, color = author)) +
     geom_point()
 }

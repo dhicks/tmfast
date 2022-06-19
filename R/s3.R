@@ -60,8 +60,9 @@ make_colnames = function(names, prefix = 'V') {
 }
 
 
-#' @importFrom broom tidy
-NULL
+#' @importFrom generics tidy
+#' @export
+generics::tidy
 
 #' Extract beta and gamma matrices from `tmfast` objects
 #'

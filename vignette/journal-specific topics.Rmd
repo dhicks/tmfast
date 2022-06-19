@@ -1,0 +1,380 @@
+---
+title: Fitting topic models (and simulating text data) with `tmfast`
+author: |
+    Dan Hicks
+    <hicks.daniel.j@gmail.com>
+output:
+    html_document:
+        toc: true
+        toc_float: true
+---
+
+In this vignette, we demonstrate a basic workflow using `tmfast`to fit topic models.  We also show how the generators included in the package can be used to create simulated text data.  The vignette assumes you're already familiar with topic models, and specifically the latent dirichlet allocation (LDA) data generation model, along with PCA and varimax.  The `tmfast` package was inspired by @RoheVintageFactorAnalysis2020, who provide the mathematical justification for treating topic modeling as varimax-rotated PCA, but somewhat finicky and incomplete software for actually fitting models using this approach. 
+
+```{r}
+library(tidyverse)
+library(lpSolve)    # For matching fitted and trust topics
+library(tictoc)     # For checking timing
+
+library(tmfast)
+library(stm)        # Used for comparison
+library(tidytext)   # Used for stm tidiers
+```
+
+# Simulated text data
+## Simulation parameters
+
+We create simulated text data following the data-generating process assumed by LDA.  Specifically, each document will be generated from one of several "journals."  Each journal corresponds to a topic, and vice versa, in that documents from journal $j$ will tend to have a much greater mixture (probably) of topic $j$ than the other topics.  
+
+We first specify the number of topics/journals `k`, and the number of documents to draw from each journal `Mj`, for a total of `M = Mj * k` documents in the corpus.  We also specify the length of the vocabulary (total unique words) as a multiple of the total number of documents `M`.  Document lengths are generated using a negative binomial distribution, using the size-mean parameterization.  Per `?NegBinomial`, the standard deviation of document lengths in this parameterization is $\sqrt{\mu + \frac{\mu^2}{\mathrm{size}}}$
+
+```{r}
+k = 5                 # Num. topics / journals
+Mj = 100              # Num. documents per journal
+M = Mj*k
+vocab = M             # Vocabulary length
+
+## Negative binomial distribution of doc lengths
+size = 10             # Size and mean
+mu = 300
+sqrt(mu + mu^2/size)  # Resulting SD of document sizes
+```
+
+Because the simulations involve drawing samplings using a RNG, we first set a seed. 
+```{r}
+set.seed(2022-06-19)
+```
+
+## Draw true topic distributions
+
+We first generate the true topic-document distributions $p(\theta = t | \mathrm{doc}_m)$, often simply called $\theta$ or $\gamma$.  In this vignette we use $\theta$ for the true distribution and $\gamma$ for the fitted distribution in the topic model.  Each document's $\theta$ is sampled from a Dirichlet distribution (`rdirichlet()`), with the parameter $\mathbf{\alpha}$ corresponding to the document's journal $j$.  The variable `theta` is a `M` by `k` matrix; `theta_df` is a tidy representation with columns `doc`, `topic`, and `prob`.  The visualization confirms that documents are generally most strongly associated with the corresponding topics, though with some noise. 
+
+```{r}
+## Journal-specific alpha, with a peak value (.8 by default) and uniform otherwise
+theta = map(1:k, 
+            ~rdirichlet(Mj, peak_alpha(k, .x, 
+                                       peak = .8, 
+                                       scale = 10))) |> 
+    reduce(rbind)
+
+theta_df = theta |>
+    as_tibble(rownames = 'doc', 
+              .name_repair = tmfast:::make_colnames) |>
+    mutate(doc = as.integer(doc)) |>
+    pivot_longer(starts_with('V'),
+                 names_to = 'topic',
+                 values_to = 'prob')
+
+ggplot(theta_df, aes(doc, topic, fill = prob)) +
+    geom_tile()
+```
+
+## Draw true word distributions
+
+Next we generate the true word-topic distributions $p(\phi = w | \theta = t)$, often designed as either $\phi$ or $\beta$.  We use $\phi$ for the true distribution and $\beta$ for the fitted distribution.  We sample these distributions from a symmetric Dirichlet distribution over the length of the vocabulary with $\alpha = .01$.  Tile and Zipfian (probability vs. rank on a log-log scale) plots confirm these distributions are working correctly. 
+
+```{r}
+## phi_j:  Word distribution for topic j
+phi = rdirichlet(k, .1, k = vocab)
+
+## Word distributions
+phi |>
+    as_tibble(rownames = 'topic', 
+              .name_repair = tmfast:::make_colnames) |>
+    pivot_longer(starts_with('V'),
+                 names_to = 'word',
+                 values_to = 'prob') |>
+    ggplot(aes(topic, word, fill = (prob))) +
+    geom_tile() +
+    scale_y_discrete(breaks = NULL)
+
+## Zipf's law
+phi |>
+    as_tibble(rownames = 'topic', 
+              .name_repair = \(x)(str_c('word', 1:vocab))) |>
+    pivot_longer(starts_with('word'),
+                 names_to = 'word',
+                 values_to = 'prob') |>
+    group_by(topic) |>
+    mutate(rank = rank(desc(prob))) |>
+    arrange(topic, rank) |>
+    filter(rank < vocab/2) |>
+    ggplot(aes(rank, prob, color = topic)) +
+    geom_line() +
+    scale_x_log10() +
+    scale_y_log10()
+```
+
+## Document lengths
+
+Again, document lengths are drawn from a negative binomial distribution. 
+
+```{r}
+## N_i:  Length of document i
+N = rnbinom(M, size = size, mu = mu)
+summary(N)
+sd(N)
+hist(N)
+```
+
+## Draw corpus
+
+Finally we draw the corpus, the observed word counts for each document.  This is the most time-consuming step in this script, much slower than actually fitting the topic model.  Experimenting with this simulation, we found that  `log1p()` scaling of the word counts produced better results than other scaling techniques (eg, dividing by the total length of each document, scaling words by their standard deviation) for accounting for radical differences in document length.  
+
+```{r, cache = TRUE}
+tic()
+corpus = draw_corpus(N, theta, phi)
+toc()
+dtm = mutate(corpus, n = log1p(n))
+```
+
+# Fit the topic model
+
+Fitting the topic model is extremely fast.  Note that we can request multiple numbers of topics in a single call.  Under the hood, we first cast the document-term matrix (which is already in a sparse representation) to a sparse matrix.  Then we extract the maximum number of desired principal components using `irlba::prcomp_irlba()`, centering but not scaling the logged word counts.  (Experiments with this simulation indicated that scaling makes it more difficult to construct probability distributions later.)  `irlba` implements [an extremely efficient algorithm](https://cran.r-project.org/web/packages/irlba/vignettes/irlba.pdf) for partial singular value decompositions of large sparse matrices.  Next we use `stats:varimax()` to construct a preliminary varimax rotation of the principal components.  Because the direction of factors is arbitrary as far as varimax is concerned, but meaningful when we convert things to probability distributions, we check the skew of each factor's loadings in the preliminary fit, and reverse the factors with negative skew (long left tails).^[Varimax is more often associated with factor analysis than PCA, because [varimax-rotated basis vectors are no longer orthogonal](https://stats.stackexchange.com/questions/577632/why-arent-varimax-rotated-loadings-orthogonal). Unlike PCA, in topic modeling we don't care about orthogonality.  And unlike factor analysis, we're not interested in dropping features (words) that don't load substantially on exactly one factor (topic).]  
+
+```{r}
+tic()
+fitted = tmfast(dtm, c(2, 3, k, 2*k))
+toc()
+```
+
+The object returned by `tmfast()` has a simple structure.  `totalvar` and `sdev` come from the PCA step, giving the total variance across all feature variables and the standard deviation of each extracted principal component. (Note that these PCs do not generally correspond to the varimax-rotated factors/topics.) `n` contains the sizes (number of factors/topics) fitted for the models, and `varimaxes` contains the varimax fit for each value of `n`. The varimax objects each contain three matrices, the rotated `loadings` (word-topics), the rotation matrix `rotmat`, and the rotated `scores` (document-topics).  
+
+```{r}
+str(fitted, max.level = 2L)
+str(fitted$varimax$`5`)
+```
+
+Because the model contains a `sdev` component, `screeplot()` works out of the box.  Note that the first $k$ PCs have much higher variance than the others, and often the $k$th PC is somewhat lower than the first $k-1$.  This reflects the highly simplified structure of the simulated data.  Real datasets often have a much more gradual decline in the screeplot, likely reflecting the complex hierarchy of topics in actual documents.  
+```{r}
+screeplot(fitted)
+```
+
+It's also straightforward to calculate the share of total variance covered by successive principal components.  Experimenting with this simulation, when some documents are much larger than others, $k$ PCs might cover less than half of the total variance.  In this case it covers about 65%.  Again, note that the rotated varimax factors don't correspond to the principal components; but the total covered variance remains the same.  
+
+```{r}
+## Variance coverage?
+cumsum(fitted$sdev^2) / fitted$totalvar
+
+data.frame(PC = 1:length(fitted$sdev),
+           cum_var = cumsum(fitted$sdev^2) / fitted$totalvar) |> 
+    ggplot(aes(PC, cum_var)) +
+    geom_line() +
+    geom_point()
+```
+
+# Fitting a conventional topic model (stm)
+
+For comparison, we'll also fit a conventional topic model using the `stm` package.  To address the challenge of picking a number of topics, it will conduct a topic estimation process when passed `K = 0`.  With the simulation parameters and the random seed used here, this process takes almost 12 seconds and produces a model with 33 topics.  We therefore do not automatically run the next chunk. 
+
+```{r, eval = FALSE}
+tic()
+corpus |> 
+    cast_sparse(doc, word, n) |> 
+    stm(K = 0, verbose = FALSE)
+toc()
+```
+
+Setting `K = k` gives us a fitted topic model in 1-2 seconds, about an order of magnitude slower than `tmfast()`. 
+
+```{r}
+tic()
+fitted_stm = corpus |> 
+    cast_sparse(doc, word, n) |> 
+    stm(K = k, verbose = FALSE)
+toc()
+```
+
+# Assessing accuracy
+
+Using simulated data with true word-topic and topic-document distributions lets us check the accuracy of varimax-based topic models.  Here we'll develop a method proposed by Malaterre and Lareau (2022), comparing distributions using Hellinger distance.  For discrete probability distributions $p, q$ over the same space $X$, the Hellinger distance is given by
+\[ d(p,q) = \frac{1}{\sqrt{2}} \sqrt{\sum_{x \in X} (\sqrt{p(x)} - \sqrt{q(x)})^2} = \frac{1}{\sqrt{2}} \lVert \sqrt p - \sqrt q \rVert_2.\]
+The last equation means that the Hellinger distance is the Euclidean ($L^2$-norm) distance between the *square roots* of the distributions.  Some authors working with topic models sometimes compare distributions using the $L^2$-norm of the distributions themselves, without the square root.  But this approach is flawed, since probability distributions can have different lengths in the $L^2$ norm.  (For example, the distribution $\left< 1, 0\right>$ has $L^2$ length 1, while $\left< \frac{1}{2}, \frac{1}{2} \right>$ has $L^2$ length approximately 1.19.)^[Cosine similarity is directly related to the $L^2$-norm, and has the same problem.]  
+
+Hellinger distance satisfies the equation
+\[ 1 - d^2(p, q) = \sum_{x \in X} \sqrt{p(x)q(x)}. \]
+When working with topic models, we're interested in pairwise sets of Hellinger distances, either between all pairs of distributions from a single set (for example, the topic distributions for each document, as used in "discursive space" analysis *[cite and xref]*) or two sets (for example, comparing fitted vs. true word-topic distributions, as in this section).  Working with two sets of distributions $P = \{p_i | i \in I\}$ and $Q = \{q_j | j \in J\}$, the right-hand side of the last equation is equivalent to a matrix multiplication.^[For $P$, each row corresponds to the elementwise square root of one distribution $\sqrt p_i$ and each column to one component $x \in X$, i.e., a cell contains the value $\sqrt{p_i(x)}$.  $Q$ is the transpose, with each row corresponding to one component $x \in X$ and each column corresponding to the square root of a distribution $\sqrt q_j$.  The product of these matrices is a $i \times j$ matrix with each cell the desired sum for $p$ and $q$.]  The `hellinger()` function provides S3 methods for calculating Hellinger pairwise distances given a single dataframe, single matrix, or two dataframes or matrices.  
+
+First, however, we need to extract the word-topic distributions.  `tmfast` provides a `tidy()` method, following the pattern of the topicmodel tidiers in `tidytext`.  Unlike other topic models, `tmfast` objects can contain models for multiple different values of $k$ (numbers of topics).  So, in the second argument to `tidy()`, we need to specify which number of topics we want.  The third argument specifies the desired set of distributions, either word-topics (`'beta'`) or topic-documents (`'gamma'`). 
+
+```{r}
+## beta: fitted varimax loadings, transformed to probability distributions
+beta = tidy(fitted, k, 'beta')
+```
+
+Word-topic distributions correspond to the varimax factor loadings.  These loadings can take any real value.  To convert them to probability distributions, within each factor (topic), we trim negative values to 0 and divide each loading by the sum of all loadings.  The Zipfian plot below compares the fitted and true word-topic distributions.  Consistently across experiments with this simulation, fitted distributions started off a little flatter, then dropped sharply after about 100 words.  In other words, the varimax topic model highlights a relatively long list of characteristic words for each topic — the actual distributions have fewer characteristic words — and then ignores the other words.  
+
+```{r}
+## Compare Zipfian distributions
+bind_rows({beta |>
+        mutate(type = 'fitted')},
+        {phi |>
+                t() |>
+                as_tibble(rownames = 'token', 
+                          .name_repair = tmfast:::make_colnames) |>
+                pivot_longer(starts_with('V'),
+                             names_to = 'topic',
+                             values_to = 'beta') |>
+                mutate(type = 'true')}
+) |>
+    group_by(type, topic) |>
+    mutate(rank = rank(desc(beta))) |>
+    arrange(type, topic, rank) |>
+    filter(rank < vocab/2) |>
+    ggplot(aes(rank, beta, color = type, group = interaction(topic, type))) +
+    geom_line() +
+    scale_y_log10() +
+    scale_x_log10()
+```
+The Zipfian distribution doesn't tell us which fitted topics might correspond to which true topics.  For that, following Malaterre and Lareau, we'll use pairwise Hellinger distances.  There's one complication, however.  The parameters chosen for this simulation typically end up not drawing some of the words from the vocabulary, and they don't end up in the same order as the true word-topic matrix `phi`.  Fortunately words are represented as the integers `1:vocab`, so it's relatively painless to put them back in order and fill in the gaps (setting the probability for the missing words to be 0 across all topics).  In the pipe below, we first fix these issues with the words, widen the long dataframe, convert it to a matrix, and then calculate pairwise Hellinger distances with the true word-topic matrix `phi`. 
+
+```{r}
+## Hellinger distance of word-topic distributions
+beta_mx = beta |>
+    ## Fix order of words
+    mutate(token = as.integer(token)) |>
+    arrange(token) |>
+    ## And dropped words
+    complete(token = 1:vocab) |>
+    pivot_wider(names_from = 'topic',
+                values_from = 'beta', values_fill = 0,
+                names_sort = TRUE) |>
+    select(-`NA`) |>
+    ## Coerce to matrix
+    column_to_rownames('token') |>
+    as.matrix()
+
+hellinger(phi, t(beta_mx))
+```
+
+In this distance matrix, the rows are the true topics and the columns are the fitted topics.  Low values include that the topics are closer to each other.  It's clear that the topics don't match up perfectly — typically the minimum in each row is about 0.17 — but there is a clear minimum.  We treat this as a linear assignment problem, which is solved rapidly using the `lpSolve` package.  The solution — which matches true to fitted topics — can then be used as a rotation with both the loadings and scores (topic-document distributions).  After rotating, the true-fitted pairs are on the diagonal of the Hellinger distance matrix, making it easy to extract and summarize the quality of the fit.  
+
+```{r}
+## Use lpSolve to match fitted topics to true topics
+dist = hellinger(phi, t(beta_mx))
+soln = lp.assign(dist)
+soln$solution
+
+hellinger(phi, soln$solution %*% t(beta_mx))
+hellinger(phi, soln$solution %*% t(beta_mx)) |>
+    diag() |>
+    summary()
+```
+
+And we do the same thing with the conventional topic model.  The conventional topic model performs somewhat better, with a median Hellinger distance of about 0.07.  But again, it's significantly slower.  
+
+```{r}
+beta_stm_mx = tidy(fitted_stm, matrix = 'beta') |> 
+    ## Fix order of words
+    mutate(term = as.integer(term)) |>
+    arrange(term) |>
+    ## And dropped words
+    complete(term = 1:vocab) |>
+    pivot_wider(names_from = 'topic',
+                values_from = 'beta', values_fill = 0,
+                names_sort = TRUE) |>
+    select(-`NA`) |>
+    ## Coerce to matrix
+    column_to_rownames('term') |>
+    as.matrix()
+
+hellinger(phi, t(beta_stm_mx))
+
+rotation_stm = hellinger(phi, t(beta_stm_mx)) |> 
+    lp.assign() |> 
+    magrittr::extract2('solution')
+
+hellinger(phi, rotation_stm %*% t(beta_stm_mx)) |>
+    diag() |>
+    summary()
+```
+
+The tidied word-topic distributions can be used in standard ways for further analysis, eg, a Silge plot of the highest probability words for each topic.  But because the "words" in this simulation are just integers, and not semantically meaningful, we don't construct such a plot here.  
+
+# Topic-document distributions 
+
+We extract topic-document distributions using the same `tidy()` function, specifying the matrix `gamma` and including the rotation above to align the fitted and true topics.  Tile and parallel coordinates plots can be used to visualize all of the topic-document distributions.  These show that the varimax topic models successfully recover the overall association of each document's journal with a distinctive topic.  
+
+```{r}
+gamma_df = tidy(fitted, k, 'gamma', rotation = soln$solution)
+
+gamma_df |>
+    mutate(document = as.integer(document)) |>
+    ggplot(aes(document, topic, fill = gamma)) +
+    geom_raster() +
+    scale_x_continuous(breaks = NULL)
+
+gamma_df |>
+    mutate(document = as.integer(document),
+           journal = (document - 1) %/% Mj + 1) |>
+    ggplot(aes(topic, gamma, 
+               group = document, color = as.factor(journal))) +
+    geom_line(alpha = .25) +
+    facet_wrap(vars(journal), scales = 'free_x') +
+    scale_color_discrete(guide = 'none')
+```
+
+Like loadings, document scores can take any real value, so we need to do something about negative scores before normalizing them to form probability distributions.  But (in this particular simulation) about 1% of documents don't have any positive scores. 
+
+```{r}
+scores(fitted, k) %>%
+    {. > 0} |>         # Positive score for this topic? 
+    rowSums() %>%      # How many topics have positive scores? 
+    {. >= 1} |>         # Do you have at least one positive score? 
+    mean()             # Fraction of docs w/ 1+ pos. score
+```
+
+To address this problem, we first nudge all of each document's scores, so that the smallest score is set to 0.^[Surprisingly, experiments with this simulation consistently indicated that trimming gave better results for the loadings/word-topics, while nudging gave better results for scores/topic-docs.]  **This procedure entails that every document has 0% probability for one topic.**  While this is probably reasonable for most applications, it means $k = 2$ is automatically binary (every document has probability 1 for one topic and 0 for the other) and for $k = 3$ documents are forced to the outside of the ternary plot, as shown in the figures below. 
+
+```{r, cache = TRUE}
+library(ggtern)
+
+tidy(fitted, k = 3, matrix = 'gamma') |> 
+    pivot_wider(names_from = topic, 
+                values_from = gamma) |> 
+    ggplot(aes(x = V1, y = V2, z = V3)) +
+    geom_point() +
+    coord_tern()
+
+stm3 = corpus |> 
+    cast_sparse(doc, word, n) |> 
+    stm(K = 3, verbose = FALSE)
+tidy(stm3, matrix = 'gamma') |> 
+    pivot_wider(names_from = topic, 
+                values_from = gamma) |> 
+    ggplot(aes(x = `1`, y = `2`, z = `3`)) +
+    geom_point() +
+    coord_tern()
+```
+
+We can also assess accuracy of the topic-document distributions.  Above we used the `hellinger()` method for two matrices.  The method for two dataframes requires specifying the id, topic, and probability columns.  The tile plot shows that the true and fitted topics are aligned (because we used the rotation when extracting `gamma_df` above), and so again we can get an overall summary from the diagonal. Usually the mean is about 0.17, as with the word-topic distributions; though the particular instance replicated by `set.seed()` at the top does a little better.  
+
+```{r}
+doc_compare = hellinger(theta_df, doc,
+                        topicsdf2 = gamma_df, id2 = document, 
+                        prob2 = gamma, df = TRUE)
+
+ggplot(doc_compare, aes(as.integer(doc), 
+                        as.integer(document), 
+                        fill = 1 - dist)) +
+    geom_raster() +
+    scale_x_discrete(breaks = NULL, name = 'true') +
+    scale_y_discrete(breaks = NULL, name = 'fitted')
+
+## Comparable to word-topics, mean around .17
+doc_compare |>
+    filter(doc == document) |>
+    pull(dist) |>
+    summary()
+```
+
+# Discursive space visualization using t-SNE
+
+*[cite]* proposed using topic models and Hellinger distance to analyze the relative position of documents in "discursive space."  That paper used the t-SNE dimension-reduction algorithm to produce a 2D visualization of Hellinger distances.  `tmfast` provides a function `tsne` to efficiently produce such visualizations.  Note that the t-SNE algorithm involves further random number draws (I believe to set the initial positions of the points), so repeatedly running this next chunk will produce superficially different visualizations. Each shows, however, that the documents tend to cluster near their journal-mates.  
+
+```{r}
+tsne(fitted, k) |>
+    mutate(journal = (as.integer(document)-1) %/% Mj + 1) |>
+    ggplot(aes(x, y, color = as.character(journal))) +
+    geom_point()
+```
