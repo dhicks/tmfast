@@ -54,6 +54,7 @@ varimax_irlba = function(mx,
 #' @param obs_names Names of the observations (eg, data rows)
 #' @param varimax_fn Function to use for varimax rotation
 #' @param varimax_opts Options passed to `varimax_fn`
+#' @param positive_skew Should negative-skewed factors be flipped to have positive skew?
 #' @return List with components
 #'     - `loadings`: Rotated feature loadings
 #'     - `rotmat`:  Rotation matrix
@@ -61,17 +62,23 @@ varimax_irlba = function(mx,
 #' @details After the initial rotation, factors with negative skew (left tails) are flipped
 fit_varimax = function(k, pca,
                        feature_names, obs_names,
-                       varimax_fn, varimax_opts) {
+                       varimax_fn = stats::varimax,
+                       varimax_opts = NULL,
+                       positive_skew = TRUE) {
     raw_loadings = pca$rotation[,1:k] %*% diag(pca$sdev, k, k) |>
         magrittr::set_rownames(feature_names)
     varimax_fit_prelim = do.call(varimax_fn, c(list(x = raw_loadings),
                                                varimax_opts))
 
+    if (positive_skew) {
     ## Reverse factors with negative skew (left tails)
     varimax_fit = purrr::map(varimax_fit_prelim,
                              ~ .x %*% diag(1 - 2*(psych::skew(varimax_fit_prelim$loadings) < 0)))
     assertthat::assert_that(all(psych::skew(varimax_fit$loadings) > 0),
                             msg = 'Varimax loadings do not all have positive skew')
+    } else {
+        varimax_fit = varimax_fit_prelim
+    }
 
     ## Scores
     scores = scale(pca$x[,1:k]) %*% varimax_fit$rotmat |>

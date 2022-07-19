@@ -261,7 +261,7 @@ hellinger(phi, soln$solution %*% t(beta_mx)) |>
     summary()
 ```
 
-And we do the same thing with the conventional topic model.  The conventional topic model performs somewhat better, with a median Hellinger distance of about 0.07.  But again, it's significantly slower.  
+And we do the same thing with the conventional topic model.  It performs somewhat better, with a median Hellinger distance of about 0.07.  But again, it's significantly slower.  
 
 ```{r}
 beta_stm_mx = tidy(fitted_stm, matrix = 'beta') |> 
@@ -289,7 +289,7 @@ hellinger(phi, rotation_stm %*% t(beta_stm_mx)) |>
     summary()
 ```
 
-The tidied word-topic distributions can be used in standard ways for further analysis, eg, a Silge plot of the highest probability words for each topic.  But because the "words" in this simulation are just integers, and not semantically meaningful, we don't construct such a plot here.  
+The tidied word-topic distributions can be used in standard ways for further analysis, such as a [Silge plot](https://juliasilge.com/blog/2018/2018-01-25-sherlock-holmes-stm_files/figure-html/unnamed-chunk-6-1.png) of the highest probability words for each topic.  But because the "words" in this simulation are just integers, and not semantically meaningful, we don't construct such a plot here.  
 
 # Topic-document distributions 
 
@@ -370,7 +370,7 @@ doc_compare |>
 
 # Discursive space visualization using t-SNE
 
-*[cite]* proposed using topic models and Hellinger distance to analyze the relative position of documents in "discursive space."  That paper used the t-SNE dimension-reduction algorithm to produce a 2D visualization of Hellinger distances.  `tmfast` provides a function `tsne` to efficiently produce such visualizations.  Note that the t-SNE algorithm involves further random number draws (I believe to set the initial positions of the points), so repeatedly running this next chunk will produce superficially different visualizations. Each shows, however, that the documents tend to cluster near their journal-mates.  
+Hicks (2021) proposed using topic models and Hellinger distance to analyze the relative position of documents in "discursive space."  That paper used the t-SNE dimension-reduction algorithm to produce a 2D visualization of Hellinger distances.  `tmfast` provides a function `tsne` to efficiently produce such visualizations.  Note that the t-SNE algorithm involves further random number draws (I believe to set the initial positions of the points), so repeatedly running this next chunk will produce superficially different visualizations. Each shows, however, that the documents tend to cluster near their journal-mates.  
 
 ```{r}
 tsne(fitted, k) |>

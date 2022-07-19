@@ -1,7 +1,9 @@
-- stabilize names in tidiers: V01, etc.
-- quick update function: if desired k < PCA k, then just extract it and add to varimaxes
 - S3 class validator:
      - length(sdev) == max(n)
      - names(varimax) == as.character(n)
      - each varimax sol'n has ncol corresponding to name
-- screeplot
+- unit tests
+    - s3
+    - hellinger
+        - data frames
+        - t-SNE

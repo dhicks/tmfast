@@ -1704,7 +1704,7 @@ skew (long left tails).<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</s
 <pre class="r"><code>tic()
 fitted = tmfast(dtm, c(2, 3, k, 2*k))
 toc()</code></pre>
-<pre><code>## 0.253 sec elapsed</code></pre>
+<pre><code>## 0.27 sec elapsed</code></pre>
 <p>The object returned by <code>tmfast()</code> has a simple structure.
 <code>totalvar</code> and <code>sdev</code> come from the PCA step,
 giving the total variance across all feature variables and the standard
@@ -1787,7 +1787,7 @@ fitted_stm = corpus |&gt;
     cast_sparse(doc, word, n) |&gt; 
     stm(K = k, verbose = FALSE)
 toc()</code></pre>
-<pre><code>## 1.866 sec elapsed</code></pre>
+<pre><code>## 1.873 sec elapsed</code></pre>
 </div>
 <div id="assessing-accuracy" class="section level1">
 <h1>Assessing accuracy</h1>
@@ -1932,10 +1932,9 @@ soln$solution</code></pre>
     summary()</code></pre>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ##  0.1748  0.1767  0.1782  0.1810  0.1860  0.1891</code></pre>
-<p>And we do the same thing with the conventional topic model. The
-conventional topic model performs somewhat better, with a median
-Hellinger distance of about 0.07. But again, it’s significantly
-slower.</p>
+<p>And we do the same thing with the conventional topic model. It
+performs somewhat better, with a median Hellinger distance of about
+0.07. But again, it’s significantly slower.</p>
 <pre class="r"><code>beta_stm_mx = tidy(fitted_stm, matrix = &#39;beta&#39;) |&gt; 
     ## Fix order of words
     mutate(term = as.integer(term)) |&gt;
@@ -1967,10 +1966,10 @@ hellinger(phi, rotation_stm %*% t(beta_stm_mx)) |&gt;
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
 ## 0.06518 0.07154 0.07182 0.07330 0.07662 0.08136</code></pre>
 <p>The tidied word-topic distributions can be used in standard ways for
-further analysis, eg, a Silge plot of the highest probability words for
-each topic. But because the “words” in this simulation are just
-integers, and not semantically meaningful, we don’t construct such a
-plot here.</p>
+further analysis, such as a <a href="https://juliasilge.com/blog/2018/2018-01-25-sherlock-holmes-stm_files/figure-html/unnamed-chunk-6-1.png">Silge
+plot</a> of the highest probability words for each topic. But because
+the “words” in this simulation are just integers, and not semantically
+meaningful, we don’t construct such a plot here.</p>
 </div>
 <div id="topic-document-distributions" class="section level1">
 <h1>Topic-document distributions</h1>
@@ -2081,7 +2080,7 @@ doc_compare |&gt;
 </div>
 <div id="discursive-space-visualization-using-t-sne" class="section level1">
 <h1>Discursive space visualization using t-SNE</h1>
-<p><em>[cite]</em> proposed using topic models and Hellinger distance to
+<p>Hicks (2021) proposed using topic models and Hellinger distance to
 analyze the relative position of documents in “discursive space.” That
 paper used the t-SNE dimension-reduction algorithm to produce a 2D
 visualization of Hellinger distances. <code>tmfast</code> provides a

@@ -27,7 +27,7 @@ peak_alpha = function(k, i, peak = .8, scale = 1) {
 #'   rdirichlet(10, c(.8, .1, .1))
 #' @export
 #' @family generators
-rdirichlet<-function (n, alpha, k = NULL)
+rdirichlet = function (n, alpha, k = NULL)
 {
     if (identical(length(alpha), 1L)) {
         alpha = rep(alpha, k)

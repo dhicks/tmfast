@@ -28,7 +28,7 @@ hellinger.Matrix = function(mx1, mx2 = NULL) {
         mx2 = t(mx2)
     }
     assertthat::assert_that(assertthat::are_equal(ncol(mx1), nrow(mx2)),
-                msg = 'Matrices must have same number of columns')
+                            msg = 'Matrices must have same number of columns')
 
     mx1.2 = sqrt(mx1) %*% sqrt(mx2)
     return(sqrt(pmax(1 - mx1.2, 0)))
@@ -83,11 +83,15 @@ build_matrix = function(data, row, column, value, ...) {
 #' hellinger(topics1, doc_id, prob1 = 'gamma', df = TRUE)
 #' hellinger(topics1, doc_id, prob1 = 'gamma',
 #'           topicsdf2 = topics2, id2 = doc_id, prob2 = 'gamma')
-hellinger.data.frame = function(topicsdf1, id1 = 'document',
-                                cat1 = 'topic', prob1 = 'prob',
-                     topicsdf2 = NULL, id2 = NULL,
-                     cat2 = 'topic', prob2 = 'prob',
-                     df = FALSE) {
+hellinger.data.frame = function(topicsdf1,
+                                id1 = 'document',
+                                cat1 = 'topic',
+                                prob1 = 'prob',
+                                topicsdf2 = NULL,
+                                id2 = NULL,
+                                cat2 = 'topic',
+                                prob2 = 'prob',
+                                df = FALSE) {
     id1 = rlang::enquo(id1)
     matrix1 = build_matrix(topicsdf1, {{id1}}, {{cat1}}, {{prob1}})
     id2 = rlang::enquo(id2)
@@ -101,7 +105,6 @@ hellinger.data.frame = function(topicsdf1, id1 = 'document',
     }
 
     hellinger_matrix = hellinger(matrix1, matrix2)
-    # hellinger_matrix = tidyr::replace_na(hellinger_matrix, 0.0)
 
     if (!df) {
         return(hellinger_matrix)
@@ -117,8 +120,8 @@ hellinger.data.frame = function(topicsdf1, id1 = 'document',
         as.matrix() |>
         tibble::as_tibble(rownames = id1) |>
         tidyr::pivot_longer(-one_of(id1),
-                     names_to = id2,
-                     values_to = 'dist')
+                            names_to = id2,
+                            values_to = 'dist')
 }
 
 #' Discursive space

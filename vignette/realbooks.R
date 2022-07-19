@@ -14,30 +14,33 @@ austen_df = austen_books() |>
     mutate(author = 'Jane Austen') |>
     count(author, book, term)
 
-bronte = gutenberg_download(c(1260, 768, 969, 9182, 767))
+bronte = gutenberg_download(c(1260, 768, 969, 9182, 767),
+                            meta_fields = c('title'))
 
 bronte_df = bronte |>
     unnest_tokens(term, text, token = 'words') |>
     mutate(author = 'Brontë sisters') |>
-    count(author, book = as.character(gutenberg_id), term)
+    count(author, book = title, term)
 
 # gutenberg_authors |>
 #     filter(str_detect(author, 'Dickens'))
 # gutenberg_works(gutenberg_author_id == 37) |>
 #     view()
-dickens = gutenberg_download(c(98, 730, 766, 786))
+dickens = gutenberg_download(c(98, 730, 766, 786),
+                             meta_fields = c('title'))
 
 dickens_df = dickens |>
     unnest_tokens(term, text, token = 'words') |>
     mutate(author = 'Charles Dickens') |>
-    count(author, book = as.character(gutenberg_id), term)
+    count(author, book = title, term)
 
-hgwells = gutenberg_download(c(35, 36, 5230, 159))
+hgwells = gutenberg_download(c(35, 36, 5230, 159),
+                             meta_fields = c('title'))
 
 wells_df = hgwells |>
     unnest_tokens(term, text, token = 'words') |>
     mutate(author = 'H.G. Wells') |>
-    count(author, book = as.character(gutenberg_id), term)
+    count(author, book = title, term)
 
 dataf = bind_rows(austen_df, bronte_df, dickens_df, wells_df)
 
@@ -84,7 +87,8 @@ tidy(fitted_tmf, 4, matrix = 'gamma') |>
     left_join(meta, by = c('document' = 'book')) |>
     ggplot(aes(document, gamma, fill = topic)) +
     geom_col() +
-    facet_wrap(vars(author), scales = 'free')
+    facet_wrap(vars(author), scales = 'free') +
+    coord_flip()
 
 tidy(fitted_tmf, 4, matrix = 'beta') |>
     group_by(topic) |>
@@ -111,7 +115,8 @@ tidy(fitted_stm, matrix = 'gamma') |>
     left_join(meta, by = 'book') |>
     ggplot(aes(book, gamma, fill = as.character(topic))) +
     geom_col() +
-    facet_wrap(vars(author), scales = 'free')
+    facet_wrap(vars(author), scales = 'free') +
+    coord_flip()
 
 tidy(fitted_stm, matrix = 'beta') |>
     group_by(topic) |>
@@ -130,9 +135,6 @@ tsne(fitted_tmf, 4) |>
     left_join(meta, by = c('document' = 'book')) |>
     ggplot(aes(x, y, color = author)) +
     geom_point()
-
-debug(tsne)
-tsne(fitted_stm, rownames(dtm2))
 
 tsne_stm = tidy(fitted_stm, matrix = 'gamma') |>
     hellinger(id1 = document, prob1 = gamma) |>
