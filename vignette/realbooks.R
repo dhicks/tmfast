@@ -8,6 +8,8 @@ library(stm)
 
 library(tictoc)
 
+mirror = 'https://gutenberg.pglaf.org/'
+
 ## Build corpus ----
 austen_df = austen_books() |>
     unnest_tokens(term, text, token = 'words') |>
@@ -15,7 +17,8 @@ austen_df = austen_books() |>
     count(author, book, term)
 
 bronte = gutenberg_download(c(1260, 768, 969, 9182, 767),
-                            meta_fields = c('title'))
+                            meta_fields = c('title'),
+                            mirror = mirror)
 
 bronte_df = bronte |>
     unnest_tokens(term, text, token = 'words') |>
@@ -27,7 +30,8 @@ bronte_df = bronte |>
 # gutenberg_works(gutenberg_author_id == 37) |>
 #     view()
 dickens = gutenberg_download(c(98, 730, 766, 786),
-                             meta_fields = c('title'))
+                             meta_fields = c('title'),
+                             mirror = mirror)
 
 dickens_df = dickens |>
     unnest_tokens(term, text, token = 'words') |>
@@ -35,7 +39,8 @@ dickens_df = dickens |>
     count(author, book = title, term)
 
 hgwells = gutenberg_download(c(35, 36, 5230, 159),
-                             meta_fields = c('title'))
+                             meta_fields = c('title'),
+                             mirror = mirror)
 
 wells_df = hgwells |>
     unnest_tokens(term, text, token = 'words') |>
@@ -44,30 +49,30 @@ wells_df = hgwells |>
 
 dataf = bind_rows(austen_df, bronte_df, dickens_df, wells_df)
 
+## The books don't dramatically differ in lengths; at most about 1 magnitude
 meta = dataf |>
     group_by(author, book) |>
     summarize(n = sum(n))
-
-count(dataf, book)
+arrange(meta, desc(n))
 
 nbooks = dataf |>
     pull(book) |>
     n_distinct()
 
 ## Vocabulary selection ----
-H_df = dataf |>
-    group_by(term) |>
-    mutate(p = n / sum(n),
-           H_term = -p*log2(p)) |>
-    summarize(dH = log2(nbooks) - sum(H_term), n = sum(n)) |>
-    mutate(ndH = log10(n)*dH,
-           in_vocab = rank(desc(ndH)) <= 1000) |>
-    arrange(desc(ndH))
+H_df = ndH(dataf, book, term, n)
+R_df = ndR(dataf, book, term, n) |>
+    mutate(in_vocab = rank(desc(ndR)) <= 1000)
 
-ggplot(H_df, aes(log10(n), dH, color = in_vocab)) +
+## Because book lengths don't differ so much, two vocab selection methods don't differ that much
+left_join(H_df, R_df, by = 'term') |>
+    ggplot(aes(ndH, ndR, color = in_vocab)) +
     geom_point()
 
-vocab = H_df |>
+ggplot(R_df, aes(log10(n), dR, color = in_vocab)) +
+    geom_point()
+
+vocab = R_df |>
     filter(in_vocab) |>
     pull(term)
 

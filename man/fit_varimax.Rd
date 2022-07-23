@@ -4,7 +4,15 @@
 \alias{fit_varimax}
 \title{Given a (rank \code{n}) PCA fit, return a rank \code{k < n} varimax fit}
 \usage{
-fit_varimax(k, pca, feature_names, obs_names, varimax_fn, varimax_opts)
+fit_varimax(
+  k,
+  pca,
+  feature_names,
+  obs_names,
+  varimax_fn = stats::varimax,
+  varimax_opts = NULL,
+  positive_skew = TRUE
+)
 }
 \arguments{
 \item{k}{Desired rank of the fitted varimax model}
@@ -18,6 +26,8 @@ fit_varimax(k, pca, feature_names, obs_names, varimax_fn, varimax_opts)
 \item{varimax_fn}{Function to use for varimax rotation}
 
 \item{varimax_opts}{Options passed to \code{varimax_fn}}
+
+\item{positive_skew}{Should negative-skewed factors be flipped to have positive skew?}
 }
 \value{
 List with components
