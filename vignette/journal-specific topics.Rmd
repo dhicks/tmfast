@@ -40,7 +40,7 @@ mu = 300
 sqrt(mu + mu^2/size)  # Resulting SD of document sizes
 ```
 
-Because the simulations involve drawing samplings using a RNG, we first set a seed. 
+Because the simulations involve drawing samples using a RNG, we first set a seed. 
 ```{r}
 set.seed(2022-06-19)
 ```

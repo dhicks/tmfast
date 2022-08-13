@@ -6,6 +6,8 @@ hellinger = function(x, ...) {
 }
 
 #' @importFrom Matrix t
+#' @importFrom Matrix crossprod
+#' @importForm Matrix tcrossprod
 NULL
 
 #' Hellinger distance for matrices
@@ -16,23 +18,22 @@ NULL
 #' @returns Matrix of size \eqn{n_1 \times n_1} or \eqn{n_1 \times n_2}
 #' @export
 #' @examples
-#' set.seed(2022-06-09)
-#' mx1 = rdirichlet(3, rep(5, 5))
-#' mx2 = rdirichlet(3, rep(5, 5))
-#' hellinger(mx1)
-#' hellinger(mx1, mx2)
+# set.seed(2022-06-09)
+# mx1 = rdirichlet(3, rep(5, 5))
+# mx2 = rdirichlet(3, rep(5, 5))
+# debugonce(tmfast:::hellinger.Matrix)
+# hellinger.Matrix(mx1)
+# hellinger(mx1, mx2)
 hellinger.Matrix = function(mx1, mx2 = NULL) {
+    ## Single-argument case
     if (is.null(mx2)) {
-        mx2 = t(mx1)
+        crossed = as.dist(1 - tcrossprod(sqrt(mx1)))
     } else {
-        mx2 = t(mx2)
+        crossed = as.dist(1 - crossprod(sqrt(mx1), sqrt(mx2)))
     }
-    assertthat::assert_that(assertthat::are_equal(ncol(mx1), nrow(mx2)),
-                            msg = 'Matrices must have same number of columns')
-
-    mx1.2 = sqrt(mx1) %*% sqrt(mx2)
-    return(sqrt(pmax(1 - mx1.2, 0)))
-    # return(sqrt(round(1 - mx1.2, 8)))
+    trimmed = replace(crossed, which(crossed < 0), 0)
+    dist = sqrt(trimmed)
+    return(dist)
 }
 #' @export
 hellinger.matrix = function(...) hellinger.Matrix(...)
@@ -45,6 +46,7 @@ hellinger.matrix = function(...) hellinger.Matrix(...)
 #' @param column Column name to use as column names, as string or symbol
 #' @param value Column name to use as matrix values, as string or symbol
 #' @param ... Other arguments, passed to `Matrix::sparseMatrix`
+#' @param sparse Should the matrix be a `Matrix` sparse matrix?
 #' @returns A sparse Matrix object, with one row for each unique value in the row column, one column for each unique value in the column column, and with as many non-zero values as there are rows in data.
 #' @examples
 #' data.frame(id = c(1, 1, 2, 2) + 4,
@@ -52,8 +54,18 @@ hellinger.matrix = function(...) hellinger.Matrix(...)
 #'            vals = 1:4) |>
 #'     build_matrix(row = id, column = 'cols', value = vals)
 #' @export
-build_matrix = function(data, row, column, value, ...) {
-    tidytext::cast_sparse(data, {{row}}, {{column}}, {{value}}, ...)
+build_matrix = function(data, row, column, value, ..., sparse = TRUE) {
+    if (sparse) {
+        tidytext::cast_sparse(data, {{row}}, {{column}}, {{value}}, ...)
+    } else {
+        data |>
+            dplyr::select({{ row }}, {{ column }}, {{ value }}) |>
+            tidyr::pivot_wider(id_cols = {{ row }},
+                               names_from = {{ column }},
+                               values_from = {{ value }}) |>
+            tibble::column_to_rownames(var = rlang::as_name(rlang::enquo(row))) |>
+            as.matrix()
+    }
 }
 
 #' Hellinger distance
@@ -67,22 +79,25 @@ build_matrix = function(data, row, column, value, ...) {
 #' @return matrix or tidy dataframe (default) of Hellinger distances
 #' @export
 #' @examples
-#' set.seed(2022-06-09)
-#' topics1 = rdirichlet(3, rep(5, 5)) |>
-#'     tibble::as_tibble(rownames = 'doc_id', .name_repair = make_colnames) |>
-#'     dplyr::mutate(doc_id = stringr::str_c('doc_', doc_id)) |>
-#'     tidyr::pivot_longer(tidyselect::starts_with('V'),
-#'                         names_to = 'topic',
-#'                         values_to = 'gamma')
-#' topics2 = rdirichlet(3, rep(5, 5)) |>
-#'     tibble::as_tibble(rownames = 'doc_id', .name_repair = make_colnames) |>
-#'     dplyr::mutate(doc_id = stringr::str_c('doc_', as.integer(doc_id) + 5)) |>
-#'     tidyr::pivot_longer(tidyselect::starts_with('V'),
-#'                         names_to = 'topic',
-#'                         values_to = 'gamma')
-#' hellinger(topics1, doc_id, prob1 = 'gamma', df = TRUE)
-#' hellinger(topics1, doc_id, prob1 = 'gamma',
-#'           topicsdf2 = topics2, id2 = doc_id, prob2 = 'gamma')
+# set.seed(2022-06-09)
+# topics1 = rdirichlet(3, rep(5, 5)) |>
+#     tibble::as_tibble(rownames = 'doc_id',
+#                       .name_repair = tmfast:::make_colnames) |>
+#     dplyr::mutate(doc_id = stringr::str_c('doc_', doc_id)) |>
+#     tidyr::pivot_longer(tidyselect::starts_with('V'),
+#                         names_to = 'topic',
+#                         values_to = 'gamma')
+# topics2 = rdirichlet(3, rep(5, 5)) |>
+#     tibble::as_tibble(rownames = 'doc_id',
+#                       .name_repair = tmfast:::make_colnames) |>
+#     dplyr::mutate(doc_id = stringr::str_c('doc_', as.integer(doc_id) + 5)) |>
+#     tidyr::pivot_longer(tidyselect::starts_with('V'),
+#                         names_to = 'topic',
+#                         values_to = 'gamma')
+# debugonce(tmfast:::hellinger.data.frame)
+# hellinger(topics1, doc_id, prob1 = 'gamma', df = TRUE)
+# hellinger(topics1, doc_id, prob1 = 'gamma',
+#           topicsdf2 = topics2, id2 = doc_id, prob2 = 'gamma')
 hellinger.data.frame = function(topicsdf1,
                                 id1 = 'document',
                                 cat1 = 'topic',
@@ -93,7 +108,8 @@ hellinger.data.frame = function(topicsdf1,
                                 prob2 = 'prob',
                                 df = FALSE) {
     id1 = rlang::enquo(id1)
-    matrix1 = build_matrix(topicsdf1, {{id1}}, {{cat1}}, {{prob1}})
+    matrix1 = build_matrix(topicsdf1, {{id1}}, {{cat1}}, {{prob1}},
+                           sparse = FALSE)
     id2 = rlang::enquo(id2)
     if (rlang::quo_is_null(id2)) {
         id2 = {{id1}}
@@ -101,7 +117,8 @@ hellinger.data.frame = function(topicsdf1,
     if (is.null(topicsdf2)) {
         matrix2 = matrix1
     } else {
-        matrix2 = build_matrix(topicsdf2, {{id2}}, {{cat2}}, {{prob2}})
+        matrix2 = build_matrix(topicsdf2, {{id2}}, {{cat2}}, {{prob2}},
+                               sparse = FALSE)
     }
 
     hellinger_matrix = hellinger(matrix1, matrix2)
