@@ -4,7 +4,7 @@
 \alias{build_matrix}
 \title{Convert a long dataframe to a wide (sparse) matrix}
 \usage{
-build_matrix(data, row, column, value, ...)
+build_matrix(data, row, column, value, ..., sparse = TRUE)
 }
 \arguments{
 \item{data}{Dataframe}
@@ -16,9 +16,11 @@ build_matrix(data, row, column, value, ...)
 \item{value}{Column name to use as matrix values, as string or symbol}
 
 \item{...}{Other arguments, passed to \code{Matrix::sparseMatrix}}
+
+\item{sparse}{Should the matrix be a \code{Matrix} sparse matrix?}
 }
 \value{
-A sparse Matrix object, with one row for each unique value in the row column, one column for each unique value in the column column, and with as many non-zero values as there are rows in data.
+A matrix or sparse Matrix object, with one row for each unique value in the row column, one column for each unique value in the column column, and with as many non-zero values as there are rows in data.
 }
 \description{
 An alias for \code{tidytext::cast_sparse}

@@ -368,13 +368,20 @@ doc_compare |>
     summary()
 ```
 
-# Discursive space visualization using t-SNE
+# Discursive space visualization using t-SNE and UMAP
 
-Hicks (2021) proposed using topic models and Hellinger distance to analyze the relative position of documents in "discursive space."  That paper used the t-SNE dimension-reduction algorithm to produce a 2D visualization of Hellinger distances.  `tmfast` provides a function `tsne` to efficiently produce such visualizations.  Note that the t-SNE algorithm involves further random number draws (I believe to set the initial positions of the points), so repeatedly running this next chunk will produce superficially different visualizations. Each shows, however, that the documents tend to cluster near their journal-mates.  
+Hicks (2021) proposed using topic models and Hellinger distance to analyze the relative position of documents in "discursive space."  That paper used the t-SNE dimension-reduction algorithm to produce a 2D visualization of Hellinger distances.  The UMAP algorithm is also popular, and is [believed](https://pair-code.github.io/understanding-umap/) to do better than t-SNE at preserving global structure.  `tmfast` provides functions `tsne()` and `umap()` to efficiently produce such visualizations.  Note that the t-SNE algorithm involves further random number draws (I believe to set the initial positions of the points), so repeatedly running this next chunk will produce superficially different visualizations. 
 
 ```{r}
 tsne(fitted, k) |>
     mutate(journal = (as.integer(document)-1) %/% Mj + 1) |>
     ggplot(aes(x, y, color = as.character(journal))) +
-    geom_point()
+    geom_point() +
+    labs(title = 't-SNE visualization')
+
+umap(fitted, k, df = TRUE) |> 
+    mutate(journal = (as.integer(document)-1) %/% Mj + 1) |>
+    ggplot(aes(x, y, color = as.character(journal))) +
+    geom_point() +
+    labs(title = 'UMAP visualization')
 ```

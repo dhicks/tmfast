@@ -1,4 +1,6 @@
 #' Fitting "topic models" with PCA+varimax
+#'
+#'
 NULL
 
 #' Fit a varimax-rotated PCA using irlba

@@ -186,3 +186,28 @@ tsne_stm$Y |>
     ggplot(aes(V1, V2, color = author)) +
     geom_point()
 
+
+## Umap ---
+library(umap)
+dist = tidy(fitted_tmf, 4, matrix = 'gamma') |>
+    hellinger(document, topic, gamma)
+
+mapped = umap(dist, input = 'dist')
+
+mapped$layout |>
+    as_tibble() |>
+    mutate(document = colnames(dist)) |>
+    left_join(meta, by = c('document' = 'book')) |>
+    ggplot(aes(V1, V2, color = author)) +
+    geom_point()
+
+dist_stm = tidy(fitted_stm, matrix = 'gamma') |>
+    hellinger(id1 = document, prob1 = gamma)
+mapped_stm = umap(dist_stm, input = 'dist')
+
+mapped_stm$layout |>
+    as_tibble() |>
+    mutate(document = colnames(dist)) |>
+    left_join(meta, by = c('document' = 'book')) |>
+    ggplot(aes(V1, V2, color = author)) +
+    geom_point()
