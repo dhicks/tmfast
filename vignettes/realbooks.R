@@ -1,3 +1,11 @@
+#' ---
+#' title: "Fast topic modeling with real books"
+#' output: rmarkdown::html_vignette
+#' vignette: >
+#'   %\VignetteIndexEntry{Fast topic modeling with real books}
+#'   %\VignetteEngine{knitr::rmarkdown}
+#'   %\VignetteEncoding{UTF-8}
+#' ---
 library(tidyverse)
 library(tidytext)
 library(janeaustenr)
@@ -10,7 +18,7 @@ library(tictoc)
 
 mirror = 'https://gutenberg.pglaf.org/'
 
-use_arrow = TRUE
+use_arrow = FALSE
 if (use_arrow) {
     library(arrow)
     corpus_dir = file.path('data', 'realbooks')
