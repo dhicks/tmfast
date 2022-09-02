@@ -11,7 +11,8 @@ fit_varimax(
   obs_names,
   varimax_fn = stats::varimax,
   varimax_opts = NULL,
-  positive_skew = TRUE
+  positive_skew = TRUE,
+  x = NULL
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ fit_varimax(
 \item{varimax_opts}{Options passed to \code{varimax_fn}}
 
 \item{positive_skew}{Should negative-skewed factors be flipped to have positive skew?}
+
+\item{x}{Original data matrix; passed here if not included in \code{pca} (eg, via \code{retx = TRUE})}
 }
 \value{
 List with components

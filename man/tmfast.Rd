@@ -2,7 +2,7 @@
 % Please edit documentation in R/tmfast.R
 \name{tmfast}
 \alias{tmfast}
-\title{Fit a "topic model" using PCA+varimax}
+\title{Fit a topic model using PCA+varimax}
 \usage{
 tmfast(dtm, n, row = doc, column = word, value = n, ...)
 }
@@ -23,7 +23,7 @@ tmfast(dtm, n, row = doc, column = word, value = n, ...)
 As per \code{varimax_irlba}, of class \code{tmfast}
 }
 \description{
-Fit a "topic model" using PCA+varimax
+Fit a topic model using PCA+varimax
 }
 \details{
 If \code{dtm} is not a matrix, will be cast to a sparse matrix using \code{tidytext::case_sparse()}

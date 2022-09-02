@@ -15,6 +15,7 @@ NULL
 #' @return A list of class `varimaxes`, with elements
 #'   - `totalvar`: Total variance, from PCA
 #'   - `sdev`:  Standard deviations of the extracted principal components
+#'   - `rotation`:  Rotation matrix (variable loadings) from PCA
 #'   - `varimaxes`: A list of class `varimaxes`, containing one fitted varimax model for each value of `n`, with further elements
 #'       - `loadings`: Varimax-rotated standardized loadings
 #'       - `rotmat`:  Varimax rotation matrix
@@ -25,7 +26,8 @@ varimax_irlba = function(mx,
                          prcomp_fn = irlba::prcomp_irlba,
                          prcomp_opts = NULL,
                          varimax_fn = stats::varimax,
-                         varimax_opts = NULL) {
+                         varimax_opts = NULL,
+                         retx = FALSE) {
     ## prcomp_irlba loses names
     rows = rownames(mx)
     cols = colnames(mx)
@@ -42,8 +44,15 @@ varimax_irlba = function(mx,
 
     toreturn = list(totalvar = pca_fit$totalvar,
                     sdev = pca_fit$sdev,
+                    rows = rows,
+                    cols = cols,
+                    x = mx,
+                    rotation = pca_fit$rotation,
                     n = n,
                     varimax = varimaxes)
+    if (!retx) {
+        toreturn$x = NULL
+    }
     class(toreturn) = c('varimaxes', class(toreturn))
     return(toreturn)
 }
@@ -57,16 +66,22 @@ varimax_irlba = function(mx,
 #' @param varimax_fn Function to use for varimax rotation
 #' @param varimax_opts Options passed to `varimax_fn`
 #' @param positive_skew Should negative-skewed factors be flipped to have positive skew?
+#' @param x Original data matrix; passed here if not included in `pca` (eg, via `retx = TRUE`)
 #' @return List with components
 #'     - `loadings`: Rotated feature loadings
 #'     - `rotmat`:  Rotation matrix
 #'     - `scores`:  Rotated observation scores
 #' @details After the initial rotation, factors with negative skew (left tails) are flipped
+#' @export
 fit_varimax = function(k, pca,
                        feature_names, obs_names,
                        varimax_fn = stats::varimax,
                        varimax_opts = NULL,
-                       positive_skew = TRUE) {
+                       positive_skew = TRUE,
+                       x = NULL) {
+    if (is.null(pca$x) && is.null(x)) {
+        stop('Data matrix must be passed through either `pca` or `x`')
+    }
     raw_loadings = pca$rotation[,1:k] %*% diag(pca$sdev, k, k) |>
         magrittr::set_rownames(feature_names)
     varimax_fit_prelim = do.call(varimax_fn, c(list(x = raw_loadings),
@@ -83,8 +98,13 @@ fit_varimax = function(k, pca,
     }
 
     ## Scores
-    scores = scale(pca$x[,1:k]) %*% varimax_fit$rotmat |>
-        magrittr::set_rownames(obs_names)
+    if (is.null(x)) {
+        scores = scale(pca$x[,1:k]) %*% varimax_fit$rotmat |>
+            magrittr::set_rownames(obs_names)
+    } else {
+        scores = scale(x[,1:k]) %*% varimax_fit$rotmat |>
+            magrittr::set_rownames(obs_names)
+    }
 
     toreturn = list(loadings = varimax_fit$loadings,
                     rotmat = varimax_fit$rotmat,
@@ -92,7 +112,7 @@ fit_varimax = function(k, pca,
     return(toreturn)
 }
 
-#' Fit a "topic model" using PCA+varimax
+#' Fit a topic model using PCA+varimax
 #'
 #' @param dtm Document-term matrix.  Either an object inheriting from `Matrix` or a long dataframe representation with row column `row`, column column `column`, and value column `n`.
 #' @param n Number of topics to return
@@ -112,3 +132,41 @@ tmfast = function(dtm, n, row = doc, column = word, value = n, ...) {
     return(fitted)
 }
 
+#' Insert a topic model into a fitted `tmfast`
+#'
+#' Apply varimax rotation for a value of k less than the maximum already included in the tmfast.
+#' @param fitted Fitted `tmfast` object
+#' @param k Desired number of topics for new model
+#' @param x Data matrix (document-term matrix), as Matrix object (eg, using `build_matrix()`)
+#' @return `tmfast` object, as `fitted`, with additional topic model inserted
+#' @export
+insert_topics = function(fitted, k, x = NULL) {
+    if (k %in% fitted$n) {
+        return(fitted)
+    }
+    if (k > max(fitted$n)) {
+        stop(glue::glue('Can only insert topic models with at most {max(fitted$n)} topics'))
+    }
+
+    if (length(k) > 1) {
+        stop('Currently can only insert 1 topic model at a time')
+    }
+
+    if (is.null(fitted$x) && is.null(x)) {
+        stop('Data matrix missing; pass using x')
+    }
+
+    if (is.null(x)) {
+        new_varimax = fit_varimax(k, fitted,
+                                  feature_names = fitted$cols,
+                                  obs_names = fitted$rows)
+    } else {
+        new_varimax = fit_varimax(k, fitted,
+                                  feature_names = fitted$cols,
+                                  obs_names = fitted$rows,
+                                  x = x)
+    }
+    fitted_tmf$n = c(fitted_tmf$n, k)
+    fitted_tmf$varimax[[as.character(k)]] = new_varimax
+    return(fitted_tmf)
+}

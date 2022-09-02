@@ -117,7 +117,7 @@ dtm = dataf |>
 
 tic()
 fitted_tmf = tmfast(dtm, n = c(3, 4, 8),
-                    row = book, column = term, value = n)
+                    row = book, column = term, value = n, retx = FALSE)
 toc()
 
 screeplot(fitted_tmf)
@@ -139,6 +139,20 @@ tidy(fitted_tmf, 4, matrix = 'beta') |>
     scale_x_reordered() +
     facet_wrap(vars(topic), scales = 'free_y') +
     coord_flip()
+
+## We can also insert topic models for values of k that weren't originally fitted
+insert_topics(fitted_tmf, 6, x = build_matrix(dtm, book, term, n)) |>
+    tidy(k = 6, matrix = 'beta') |>
+    group_by(topic) |>
+    slice_max(beta, n = 7) |>
+    ungroup() |>
+    ggplot(aes(reorder_within(token, desc(beta), topic), beta)) +
+    geom_point() +
+    geom_linerange(ymin = 0, aes(ymax = beta)) +
+    scale_x_reordered() +
+    facet_wrap(vars(topic), scales = 'free_y') +
+    coord_flip()
+
 
 ## STM ----
 dtm2 = dataf |>

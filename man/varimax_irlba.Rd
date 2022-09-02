@@ -10,7 +10,8 @@ varimax_irlba(
   prcomp_fn = irlba::prcomp_irlba,
   prcomp_opts = NULL,
   varimax_fn = stats::varimax,
-  varimax_opts = NULL
+  varimax_opts = NULL,
+  retx = FALSE
 )
 }
 \arguments{
@@ -31,6 +32,7 @@ A list of class \code{varimaxes}, with elements
 \itemize{
 \item \code{totalvar}: Total variance, from PCA
 \item \code{sdev}:  Standard deviations of the extracted principal components
+\item \code{rotation}:  Rotation matrix (variable loadings) from PCA
 \item \code{varimaxes}: A list of class \code{varimaxes}, containing one fitted varimax model for each value of \code{n}, with further elements
 \itemize{
 \item \code{loadings}: Varimax-rotated standardized loadings
