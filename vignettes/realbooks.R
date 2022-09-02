@@ -130,6 +130,7 @@ toc()
 
 screeplot(fitted_tmf)
 
+## For documentation: ?tidy.tmfast
 tidy(fitted_tmf, 4, matrix = 'gamma') |>
     left_join(meta, by = c('document' = 'book')) |>
     ggplot(aes(document, gamma, fill = topic)) +
