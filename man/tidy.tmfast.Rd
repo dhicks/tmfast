@@ -4,7 +4,7 @@
 \alias{tidy.tmfast}
 \title{Extract beta and gamma matrices from \code{tmfast} objects}
 \usage{
-\method{tidy}{tmfast}(x, k, matrix = c("beta", "gamma"), df = TRUE, rotation = NULL)
+\method{tidy}{tmfast}(x, k, matrix = "beta", df = TRUE, rotation = NULL)
 }
 \arguments{
 \item{x}{\code{tmfast} object}

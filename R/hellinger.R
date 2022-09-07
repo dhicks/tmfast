@@ -60,7 +60,8 @@ build_matrix = function(data, row, column, value, ..., sparse = TRUE) {
             dplyr::select({{ row }}, {{ column }}, {{ value }}) |>
             tidyr::pivot_wider(id_cols = {{ row }},
                                names_from = {{ column }},
-                               values_from = {{ value }}) |>
+                               values_from = {{ value }},
+                               values_fill = 0) |>
             tibble::column_to_rownames(var = rlang::as_name(rlang::enquo(row))) |>
             as.matrix()
     }

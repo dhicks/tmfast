@@ -75,7 +75,7 @@ generics::tidy
 #' @details If `rotation` is not `NULL`, loadings/scores will be rotated.  This might be used to align the fitted topics with known true topics, as in the `journal_specific` simulation.  Loadings are left-multiplied by the given rotation, while scores are right-multiplied by the transpose of the given rotation.
 #' @export
 tidy.tmfast = function(x, k,
-                          matrix = c('beta', 'gamma'),
+                          matrix = 'beta',
                           df = TRUE,
                           rotation = NULL) {
     assertthat::assert_that(k %in% x$n,
@@ -130,3 +130,18 @@ tidy.tmfast = function(x, k,
     }
 }
 # tidy(fitted, 5, 'gamma', df = TRUE)
+
+#' Extract gamma or beta matrices for all topics
+#'
+#' @param x `tmfast` object
+#' @param matrix Desired matrix, `'beta'` or `'gamma'`
+#' @param ... Other arguments, passed to `tidy.tmfast()`
+#' @return A long dataframe, with one row per word-topic or topic-doc combination. Column names depend on the value of `matrix`.
+#' @export
+tidy_all = function(x, matrix = 'beta', ...) {
+    k = x$n |>
+        set_names()
+    map_dfr(k, ~ tidy(x, .x, matrix = matrix, ...), .id = 'k') |>
+        mutate(k = as.integer(k)) |>
+        select(k, everything())
+}
