@@ -8,6 +8,7 @@ hellinger = function(x, ...) {
 #' @importFrom Matrix t
 #' @importFrom Matrix crossprod
 #' @importFrom Matrix tcrossprod
+#' @importFrom Matrix which
 NULL
 
 #' Hellinger distance for matrices
