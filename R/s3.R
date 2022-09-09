@@ -140,8 +140,8 @@ tidy.tmfast = function(x, k,
 #' @export
 tidy_all = function(x, matrix = 'beta', ...) {
     k = x$n |>
-        set_names()
-    map_dfr(k, ~ tidy(x, .x, matrix = matrix, ...), .id = 'k') |>
-        mutate(k = as.integer(k)) |>
-        select(k, everything())
+        rlang::set_names()
+    purrr::map_dfr(k, ~ tidy(x, .x, matrix = matrix, ...), .id = 'k') |>
+        dplyr::mutate(k = as.integer(k)) |>
+        dplyr::select(k, tidyselect::everything())
 }
