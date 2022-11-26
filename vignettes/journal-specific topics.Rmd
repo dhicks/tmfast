@@ -29,9 +29,9 @@ We create simulated text data following the data-generating process assumed by L
 We first specify the number of topics/journals `k`, and the number of documents to draw from each journal `Mj`, for a total of `M = Mj * k` documents in the corpus.  We also specify the length of the vocabulary (total unique words) as a multiple of the total number of documents `M`.  Document lengths are generated using a negative binomial distribution, using the size-mean parameterization.  Per `?NegBinomial`, the standard deviation of document lengths in this parameterization is $\sqrt{\mu + \frac{\mu^2}{\mathrm{size}}}$
 
 ```{r}
-k = 5                 # Num. topics / journals
+k = 10                # Num. topics / journals
 Mj = 100              # Num. documents per journal
-M = Mj*k
+M = Mj*k              # Total corpus size
 vocab = M             # Vocabulary length
 
 ## Negative binomial distribution of doc lengths
@@ -195,11 +195,12 @@ Hellinger distance satisfies the equation
 \[ 1 - d^2(p, q) = \sum_{x \in X} \sqrt{p(x)q(x)}. \]
 When working with topic models, we're interested in pairwise sets of Hellinger distances, either between all pairs of distributions from a single set (for example, the topic distributions for each document, as used in "discursive space" analysis *[cite and xref]*) or two sets (for example, comparing fitted vs. true word-topic distributions, as in this section).  Working with two sets of distributions $P = \{p_i | i \in I\}$ and $Q = \{q_j | j \in J\}$, the right-hand side of the last equation is equivalent to a matrix multiplication.^[For $P$, each row corresponds to the elementwise square root of one distribution $\sqrt p_i$ and each column to one component $x \in X$, i.e., a cell contains the value $\sqrt{p_i(x)}$.  $Q$ is the transpose, with each row corresponding to one component $x \in X$ and each column corresponding to the square root of a distribution $\sqrt q_j$.  The product of these matrices is a $i \times j$ matrix with each cell the desired sum for $p$ and $q$.]  The `hellinger()` function provides S3 methods for calculating Hellinger pairwise distances given a single dataframe, single matrix, or two dataframes or matrices.  
 
-First, however, we need to extract the word-topic distributions.  `tmfast` provides a `tidy()` method, following the pattern of the topicmodel tidiers in `tidytext`.  Unlike other topic models, `tmfast` objects can contain models for multiple different values of $k$ (numbers of topics).  So, in the second argument to `tidy()`, we need to specify which number of topics we want.  The third argument specifies the desired set of distributions, either word-topics (`'beta'`) or topic-documents (`'gamma'`). 
+First, however, we need to extract the word-topic distributions.  `tmfast` provides a `tidy()` method, following the pattern of the topicmodel tidiers in `tidytext`.  Unlike other topic models, `tmfast` objects can contain models for multiple different values of $k$ (numbers of topics).  So, in the second argument to `tidy()`, we need to specify which number of topics we want.  The third argument specifies the desired set of distributions, either word-topics (`'beta'`) or topic-documents (`'gamma'`). *[renormalization]*
 
 ```{r}
 ## beta: fitted varimax loadings, transformed to probability distributions
-beta = tidy(fitted, k, 'beta')
+beta = tidy(fitted, k, 'beta', 
+            target_entropy = tmfast:::expected_entropy(.1, vocab))
 ```
 
 Word-topic distributions correspond to the varimax factor loadings.  These loadings can take any real value.  To convert them to probability distributions, within each factor (topic), we trim negative values to 0 and divide each loading by the sum of all loadings.  The Zipfian plot below compares the fitted and true word-topic distributions.  Consistently across experiments with this simulation, fitted distributions started off a little flatter, then dropped sharply after about 100 words.  In other words, the varimax topic model highlights a relatively long list of characteristic words for each topic — the actual distributions have fewer characteristic words — and then ignores the other words.  
@@ -215,13 +216,15 @@ bind_rows({beta |>
                 pivot_longer(starts_with('V'),
                              names_to = 'topic',
                              values_to = 'beta') |>
+                mutate(beta_rn = beta) |> 
                 mutate(type = 'true')}
 ) |>
     group_by(type, topic) |>
-    mutate(rank = rank(desc(beta))) |>
+    mutate(rank = rank(desc(beta_rn))) |>
     arrange(type, topic, rank) |>
     filter(rank < vocab/2) |>
-    ggplot(aes(rank, beta, color = type, group = interaction(topic, type))) +
+    ggplot(aes(rank, beta_rn, color = type, 
+               group = interaction(topic, type))) +
     geom_line() +
     scale_y_log10() +
     scale_x_log10()
@@ -236,10 +239,11 @@ beta_mx = beta |>
     arrange(token) |>
     ## And dropped words
     complete(token = 1:vocab) |>
+    select(-beta) |> 
     pivot_wider(names_from = 'topic',
-                values_from = 'beta', values_fill = 0,
+                values_from = 'beta_rn', values_fill = 0,
                 names_sort = TRUE) |>
-    select(-`NA`) |>
+    # select(-`NA`) |>
     ## Coerce to matrix
     column_to_rownames('token') |>
     as.matrix()
@@ -261,7 +265,7 @@ hellinger(phi, soln$solution %*% t(beta_mx)) |>
     summary()
 ```
 
-And we do the same thing with the conventional topic model.  It performs somewhat better, with a median Hellinger distance of about 0.07.  But again, it's significantly slower.  
+And we do the same thing with the conventional topic model.  It performs somewhat better, with a median Hellinger distance of about 0.08.  But again, it's significantly slower.  
 
 ```{r}
 beta_stm_mx = tidy(fitted_stm, matrix = 'beta') |> 
@@ -273,7 +277,7 @@ beta_stm_mx = tidy(fitted_stm, matrix = 'beta') |>
     pivot_wider(names_from = 'topic',
                 values_from = 'beta', values_fill = 0,
                 names_sort = TRUE) |>
-    select(-`NA`) |>
+    # select(-`NA`) |>
     ## Coerce to matrix
     column_to_rownames('term') |>
     as.matrix()
@@ -300,14 +304,14 @@ gamma_df = tidy(fitted, k, 'gamma', rotation = soln$solution)
 
 gamma_df |>
     mutate(document = as.integer(document)) |>
-    ggplot(aes(document, topic, fill = gamma)) +
+    ggplot(aes(document, topic, fill = gamma_rn)) +
     geom_raster() +
     scale_x_continuous(breaks = NULL)
 
 gamma_df |>
     mutate(document = as.integer(document),
            journal = (document - 1) %/% Mj + 1) |>
-    ggplot(aes(topic, gamma, 
+    ggplot(aes(topic, gamma_rn, 
                group = document, color = as.factor(journal))) +
     geom_line(alpha = .25) +
     facet_wrap(vars(journal), scales = 'free_x') +
@@ -324,12 +328,12 @@ scores(fitted, k) %>%
     mean()             # Fraction of docs w/ 1+ pos. score
 ```
 
-To address this problem, we first nudge all of each document's scores, so that the smallest score is set to 0.^[Surprisingly, experiments with this simulation consistently indicated that trimming gave better results for the loadings/word-topics, while nudging gave better results for scores/topic-docs.]  **This procedure entails that every document has 0% probability for one topic.**  While this is probably reasonable for most applications, it means $k = 2$ is automatically binary (every document has probability 1 for one topic and 0 for the other) and for $k = 3$ documents are forced to the outside of the ternary plot, as shown in the figures below. 
+To address this problem, we first nudge all of each document's scores, so that the smallest score is set to 0.^[Surprisingly, experiments with this simulation consistently indicated that trimming gave better results for the loadings/word-topics, while nudging gave better results for scores/topic-docs.]  **This procedure entails that every document has 0% probability for one topic.**  While this is probably reasonable for most applications, it means $k = 2$ is automatically binary (every document has probability 1 for one topic and 0 for the other) and for $k = 3$ documents are forced to the outside of the ternary plot, as shown in the figures below.
 
 ```{r, cache = TRUE}
 library(ggtern)
 
-tidy(fitted, k = 3, matrix = 'gamma') |> 
+tidy(fitted, k = 3, matrix = 'gamma', renorm = FALSE) |> 
     pivot_wider(names_from = topic, 
                 values_from = gamma) |> 
     ggplot(aes(x = V1, y = V2, z = V3)) +
@@ -347,12 +351,22 @@ tidy(stm3, matrix = 'gamma') |>
     coord_tern()
 ```
 
-We can also assess accuracy of the topic-document distributions.  Above we used the `hellinger()` method for two matrices.  The method for two dataframes requires specifying the id, topic, and probability columns.  The tile plot shows that the true and fitted topics are aligned (because we used the rotation when extracting `gamma_df` above), and so again we can get an overall summary from the diagonal. Usually the mean is about 0.17, as with the word-topic distributions; though the particular instance replicated by `set.seed()` at the top does a little better.  
+We can also assess accuracy of the topic-document distributions.  Above we used the `hellinger()` method for two matrices.  The method for two dataframes requires specifying the id, topic, and probability columns.  The tile plot shows that the true and fitted topics are aligned (because we used the rotation when extracting `gamma_df` above), and so again we can get an overall summary from the diagonal. *[Usually the mean is about 0.17, as with the word-topic distributions]*; though the particular instance replicated by `set.seed()` at the top does a little better.  
+
+*[renormalization improves this]*
 
 ```{r}
+## w/o renormalization, mean distance is .24
+hellinger(theta_df, doc,
+                        topicsdf2 = gamma_df, id2 = document, 
+                        prob2 = gamma, df = FALSE) |> 
+    diag() |> 
+    summary()
+
+## w/ renormalization, mean distance drops to .13
 doc_compare = hellinger(theta_df, doc,
                         topicsdf2 = gamma_df, id2 = document, 
-                        prob2 = gamma, df = TRUE)
+                        prob2 = gamma_rn, df = TRUE)
 
 ggplot(doc_compare, aes(as.integer(doc), 
                         as.integer(document), 
@@ -361,12 +375,27 @@ ggplot(doc_compare, aes(as.integer(doc),
     scale_x_discrete(breaks = NULL, name = 'true') +
     scale_y_discrete(breaks = NULL, name = 'fitted')
 
-## Comparable to word-topics, mean around .17
+## Comparable to word-topics, mean around .12
 doc_compare |>
     filter(doc == document) |>
     pull(dist) |>
     summary()
 ```
+
+STM has a slightly closer fit, with a mean Hellinger distance of 0.08.  
+
+```{r}
+fitted_stm_gamma = tidy(fitted_stm, matrix = 'gamma') |> 
+    pivot_wider(names_from = 'topic', 
+                values_from = 'gamma') |> 
+    column_to_rownames('document') |> 
+    as.matrix()
+
+hellinger(theta, fitted_stm_gamma %*% t(rotation_stm)) |> 
+    diag() |> 
+    summary()
+```
+
 
 # Discursive space visualization using t-SNE and UMAP
 

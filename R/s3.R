@@ -78,11 +78,11 @@ generics::tidy
 #' @export
 tidy.tmfast = function(x,
                        k,
-                          matrix = 'beta',
-                          df = TRUE,
-                          renorm = TRUE,
-                          target_entropy = NULL,
-                          rotation = NULL) {
+                       matrix = 'beta',
+                       df = TRUE,
+                       renorm = TRUE,
+                       target_entropy = NULL,
+                       rotation = NULL) {
     assertthat::assert_that(k %in% x$n,
                             msg = glue::glue('Rank {k} not in fitted model'))
     assertthat::assert_that(matrix %in% c('beta', 'gamma'),
@@ -101,15 +101,18 @@ tidy.tmfast = function(x,
             tibble::as_tibble(rownames = 'token',
                               .name_repair = make_colnames) |>
             tidyr::pivot_longer(starts_with('V'),
-                         names_to = 'topic',
-                         values_to = 'beta') |>
+                                names_to = 'topic',
+                                values_to = 'beta') |>
             ## Trim at 0, then normalize to sum to 1
             dplyr::group_by(topic) |>
             dplyr::filter(beta > 0) |>
             dplyr::mutate(beta = beta / sum(beta)) |>
             dplyr::ungroup()
         if (renorm) {
-            target_entropy = expected_entropy(.01, n_distinct(dataf$token))
+            if (is.null(target_entropy)) {
+                target_entropy = expected_entropy(.1,
+                                                  n_distinct(dataf$token))
+            }
             dataf = renorm(dataf, topic, beta, target_entropy)
         }
         return(dataf)
@@ -128,17 +131,19 @@ tidy.tmfast = function(x,
             tibble::as_tibble(rownames = 'document',
                               .name_repair = make_colnames) |>
             tidyr::pivot_longer(starts_with('V'),
-                         names_to = 'topic',
-                         values_to = 'gamma') |>
+                                names_to = 'topic',
+                                values_to = 'gamma') |>
             ## Nudge everything so the minimum value is 0, then normalize
             dplyr::group_by(document) |>
             dplyr::mutate(gamma = gamma - min(gamma)) |>
             dplyr::mutate(gamma = gamma / sum(gamma)) |>
             dplyr::ungroup()
         if (renorm) {
-            target_entropy = expected_entropy(
-                peak_alpha(k, 1, peak = .8, scale = 10))
-            dataf = renorm(dataf, topic, beta, target_entropy)
+            if (is.null(target_entropy)) {
+                target_entropy = expected_entropy(
+                    peak_alpha(k, 1, peak = .8, scale = 10))
+            }
+            dataf = renorm(dataf, document, gamma, target_entropy)
         }
         return(dataf)
     }

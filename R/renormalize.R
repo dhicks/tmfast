@@ -33,17 +33,17 @@ expected_entropy = function(alpha, k = NULL) {
 #' @param return_full Return the full uniroot() output?
 solve_power = function(p,
                        target_H,
-                       interval = c(0.5, 10),
+                       interval = c(0.1, 100),
                        return_full = FALSE) {
     ## Entropy of the distribution after transformation
     transformed_entropy = function(p) {
         function(beta) {
-            Z = sum(p^beta)
-            - 1/Z * sum(p^beta * beta * log2(p)) + log2(Z)
+            Z = sum(p^beta, na.rm = TRUE)
+            - 1/Z * sum(p^beta * beta * log2(p), na.rm = TRUE) + log2(Z)
         }
     }
 
-    soln = uniroot(\(beta) transformed_entropy(p)(beta) - target_entropy,
+    soln = uniroot(\(beta) transformed_entropy(p)(beta) - target_H,
             interval)
     if (return_full) {
         return(soln)
@@ -82,7 +82,7 @@ renorm = function(tidy_df, group_col, p_col, target_entropy) {
 # foo = renorm(beta, topic, beta, target_entropy)
 
 
-
+## Development example code
 # library(tmfast)
 # library(tidyverse)
 # # 10 word-topic distributions, 500-word vocabulary
