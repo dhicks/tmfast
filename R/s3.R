@@ -72,6 +72,7 @@ generics::tidy
 #' @param df Return a long dataframe (default) or wide matrix?
 #' @param renorm Renormalize the probabilities to better match a target entropy? Applies only for `df == TRUE`
 #' @param target_entropy Manually set a target entropy for renormalization.  Applies only for `renorm == TRUE`.
+#' @param keep_original If renormalizing, return original (pre-renormalized) probabilities?
 #' @param rotation Optional rotation matrix; see details
 #' @return A long dataframe, with one row per word-topic or topic-doc combination. Column names depend on the value of `matrix`.
 #' @details If `rotation` is not `NULL`, loadings/scores will be rotated.  This might be used to align the fitted topics with known true topics, as in the `journal_specific` simulation.  Loadings are left-multiplied by the given rotation, while scores are right-multiplied by the transpose of the given rotation.
@@ -82,6 +83,7 @@ tidy.tmfast = function(x,
                        df = TRUE,
                        renorm = TRUE,
                        target_entropy = NULL,
+                       keep_original = FALSE,
                        rotation = NULL) {
     assertthat::assert_that(k %in% x$n,
                             msg = glue::glue('Rank {k} not in fitted model'))
@@ -113,7 +115,7 @@ tidy.tmfast = function(x,
                 target_entropy = expected_entropy(.1,
                                                   n_distinct(dataf$token))
             }
-            dataf = renorm(dataf, topic, beta, target_entropy)
+            dataf = renorm(dataf, topic, beta, target_entropy, keep_original)
         }
         return(dataf)
     }
@@ -143,7 +145,7 @@ tidy.tmfast = function(x,
                 target_entropy = expected_entropy(
                     peak_alpha(k, 1, peak = .8, scale = 10))
             }
-            dataf = renorm(dataf, document, gamma, target_entropy)
+            dataf = renorm(dataf, document, gamma, target_entropy, keep_original)
         }
         return(dataf)
     }

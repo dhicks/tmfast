@@ -200,7 +200,8 @@ First, however, we need to extract the word-topic distributions.  `tmfast` provi
 ```{r}
 ## beta: fitted varimax loadings, transformed to probability distributions
 beta = tidy(fitted, k, 'beta', 
-            target_entropy = tmfast:::expected_entropy(.1, vocab))
+            target_entropy = tmfast:::expected_entropy(.1, vocab), 
+            keep_original = TRUE)
 ```
 
 Word-topic distributions correspond to the varimax factor loadings.  These loadings can take any real value.  To convert them to probability distributions, within each factor (topic), we trim negative values to 0 and divide each loading by the sum of all loadings.  The Zipfian plot below compares the fitted and true word-topic distributions.  Consistently across experiments with this simulation, fitted distributions started off a little flatter, then dropped sharply after about 100 words.  In other words, the varimax topic model highlights a relatively long list of characteristic words for each topic — the actual distributions have fewer characteristic words — and then ignores the other words.  
@@ -300,7 +301,9 @@ The tidied word-topic distributions can be used in standard ways for further ana
 We extract topic-document distributions using the same `tidy()` function, specifying the matrix `gamma` and including the rotation above to align the fitted and true topics.  Tile and parallel coordinates plots can be used to visualize all of the topic-document distributions.  These show that the varimax topic models successfully recover the overall association of each document's journal with a distinctive topic.  
 
 ```{r}
-gamma_df = tidy(fitted, k, 'gamma', rotation = soln$solution)
+gamma_df = tidy(fitted, k, 'gamma', 
+                rotation = soln$solution, 
+                keep_original = TRUE)
 
 gamma_df |>
     mutate(document = as.integer(document)) |>
@@ -333,7 +336,7 @@ To address this problem, we first nudge all of each document's scores, so that t
 ```{r, cache = TRUE}
 library(ggtern)
 
-tidy(fitted, k = 3, matrix = 'gamma', renorm = FALSE) |> 
+tidy(fitted, k = 3, matrix = 'gamma') |> 
     pivot_wider(names_from = topic, 
                 values_from = gamma) |> 
     ggplot(aes(x = V1, y = V2, z = V3)) +

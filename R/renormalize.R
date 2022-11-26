@@ -61,8 +61,13 @@ solve_power = function(p,
 #' @param group_col Grouping column, RHS of the conditional probability distribution, eg, topics for word-topic distributions
 #' @param p_col Column containing the probability for each category (eg, word) conditional on the group (eg, topic)
 #' @param target_entropy Target entropy
-#' @returns A dataframe with an added column of the form `p_col_rn` containing the renormalized probabilities and an `exponent` attribute containing the exponent used for renormalization.
-renorm = function(tidy_df, group_col, p_col, target_entropy) {
+#' @param keep_original Keep original probabilities?
+#' @returns A dataframe with an added column of the form `p_col_rn` containing the renormalized probabilities (if `keep_original` is `TRUE`) or renormalized values in `p_col` (if `keep_original` is `FALSE`) and an `exponent` attribute containing the exponent used for renormalization.
+renorm = function(tidy_df,
+                  group_col,
+                  p_col,
+                  target_entropy,
+                  keep_original = FALSE) {
     ## 1. Get the exponent for each distribution
     ## 2. Get the median exponent
     exponent = tidy_df |>
@@ -73,13 +78,18 @@ renorm = function(tidy_df, group_col, p_col, target_entropy) {
         median()
 
     ## 3. Apply to all distributions
+    if (keep_original) {
+        newcol = rlang::englue('{{ p_col }}_rn')
+    } else {
+        newcol = rlang::englue('{{ p_col }}')
+    }
     tidy_df |>
         dplyr::group_by({{ group_col }}) |>
-        dplyr::mutate('{{ p_col }}_rn' := {{ p_col }}^exponent / sum({{ p_col }}^exponent)) |>
+        dplyr::mutate({{ newcol }} := {{ p_col }}^exponent / sum({{ p_col }}^exponent)) |>
         dplyr::ungroup() |>
         magrittr::set_attr('exponent', exponent)
 }
-# foo = renorm(beta, topic, beta, target_entropy)
+# renorm(beta, topic, beta, target_entropy)
 
 
 ## Development example code
@@ -99,9 +109,9 @@ renorm = function(tidy_df, group_col, p_col, target_entropy) {
 #     summarize(H = sum(H_term))
 #
 # # target entropy is about 3
-# target_entropy = expected_entropy(.01, n_distinct(beta$word))
+# target_entropy = tmfast:::expected_entropy(.01, n_distinct(beta$word))
 #
-# renorm(beta, topic, beta, target_entropy) |>
+# renorm(beta, topic, beta, target_entropy, keep_original = TRUE) |>
 #     group_by(topic) |>
 #     summarize(H = sum(-beta * log2(beta)),
 #               H_rn = sum(-beta_rn * log2(beta_rn)))
