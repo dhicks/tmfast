@@ -164,13 +164,17 @@ insert_topics(fitted_tmf, 6, x = build_matrix(dtm, book, term, n)) |>
 
 
 ## STM ----
+## STM requires integer (non-logged) term counts, and throws a cryptic error about vocabulary indices if you give it continuous values.
 dtm2 = dataf |>
     filter(term %in% vocab) |>
     cast_sparse(book, term, n)
 tic()
-fitted_stm = stm(dtm2, K = 4, data = meta)
+## This method suggests 98 topics
 # fitted_stm = stm(dtm2, K = 0, init.type = 'Spectral')
+fitted_stm = stm(dtm2, K = 4, data = meta)
 toc()
+
+
 
 tidy(fitted_stm, matrix = 'gamma') |>
     mutate(book = rownames(dtm2)[document]) |>
