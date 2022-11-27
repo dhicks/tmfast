@@ -33,7 +33,6 @@ expected_entropy = function(alpha, k = NULL) {
 #' @param return_full Return the full uniroot() output?
 solve_power = function(p,
                        target_H,
-                       interval = c(0.1, 100),
                        return_full = FALSE) {
     ## Entropy of the distribution after transformation
     transformed_entropy = function(p) {
@@ -43,9 +42,12 @@ solve_power = function(p,
         }
     }
 
-    soln = uniroot(\(beta) transformed_entropy(p)(beta) - target_H,
-            interval)
-    if (return_full) {
+    soln = purrr::possibly(uniroot, otherwise = NA_real_)(
+        \(beta) {transformed_entropy(p)(beta) - target_H},
+        interval = c(.1, 10),
+        extendInt = 'yes',
+        maxiter = 3000)
+    if (return_full || is.na(soln)) {
         return(soln)
     } else {
         return(soln$root)
@@ -73,9 +75,9 @@ renorm = function(tidy_df,
     exponent = tidy_df |>
         dplyr::group_by({{ group_col }}) |>
         dplyr::summarize(exponent = solve_power({{ p_col }},
-                                         target_entropy)) |>
+                                                target_entropy)) |>
         dplyr::pull(exponent) |>
-        median()
+        median(na.rm = TRUE)
 
     ## 3. Apply to all distributions
     if (keep_original) {

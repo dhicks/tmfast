@@ -112,7 +112,7 @@ tidy.tmfast = function(x,
             dplyr::ungroup()
         if (renorm) {
             if (is.null(target_entropy)) {
-                target_entropy = expected_entropy(.1,
+                target_entropy = expected_entropy(0.1,
                                                   n_distinct(dataf$token))
             }
             dataf = renorm(dataf, topic, beta, target_entropy, keep_original)
