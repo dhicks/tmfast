@@ -4,7 +4,16 @@
 \alias{tidy.tmfast}
 \title{Extract beta and gamma matrices from \code{tmfast} objects}
 \usage{
-\method{tidy}{tmfast}(x, k, matrix = "beta", df = TRUE, rotation = NULL)
+\method{tidy}{tmfast}(
+  x,
+  k,
+  matrix = "beta",
+  df = TRUE,
+  renorm = TRUE,
+  target_entropy = NULL,
+  keep_original = FALSE,
+  rotation = NULL
+)
 }
 \arguments{
 \item{x}{\code{tmfast} object}
@@ -14,6 +23,12 @@
 \item{matrix}{Desired matrix, either word-topic (\code{beta}) or topic-doc distributions (\code{gamma})}
 
 \item{df}{Return a long dataframe (default) or wide matrix?}
+
+\item{renorm}{Renormalize the probabilities to better match a target entropy? Applies only for \code{df == TRUE}}
+
+\item{target_entropy}{Manually set a target entropy for renormalization.  Applies only for \code{renorm == TRUE}.}
+
+\item{keep_original}{If renormalizing, return original (pre-renormalized) probabilities?}
 
 \item{rotation}{Optional rotation matrix; see details}
 }

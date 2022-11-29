@@ -13,6 +13,7 @@
 #'   apply(1, \(p)(sum(-p*log2(p), na.rm = TRUE))) |>
 #'   mean()
 #' expected_entropy(alpha)
+#' @export
 expected_entropy = function(alpha, k = NULL) {
     if (identical(length(alpha), 1L)) {
         assertthat::assert_that(!is.null(k),
@@ -64,7 +65,7 @@ solve_power = function(p,
 #' @param p_col Column containing the probability for each category (eg, word) conditional on the group (eg, topic)
 #' @param target_entropy Target entropy
 #' @param keep_original Keep original probabilities?
-#' @returns A dataframe with an added column of the form `p_col_rn` containing the renormalized probabilities (if `keep_original` is `TRUE`) or renormalized values in `p_col` (if `keep_original` is `FALSE`) and an `exponent` attribute containing the exponent used for renormalization.
+#' @returns A dataframe with (if `keep_original` is `TRUE`) an added column of the form `p_col_rn` containing the renormalized probabilities or (if `keep_original` is `FALSE`) renormalized values in `p_col`, and an `exponent` attribute containing the exponent used for renormalization.
 renorm = function(tidy_df,
                   group_col,
                   p_col,
