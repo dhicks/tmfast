@@ -9,8 +9,7 @@
   k,
   matrix = "beta",
   df = TRUE,
-  renorm = TRUE,
-  target_entropy = NULL,
+  exponent = NULL,
   keep_original = FALSE,
   rotation = NULL
 )
@@ -24,9 +23,7 @@
 
 \item{df}{Return a long dataframe (default) or wide matrix?}
 
-\item{renorm}{Renormalize the probabilities to better match a target entropy? Applies only for \code{df == TRUE}}
-
-\item{target_entropy}{Manually set a target entropy for renormalization.  Applies only for \code{renorm == TRUE}.}
+\item{exponent}{Renormalize the probabilities using a given exponent  Applies only for \code{df == TRUE}}
 
 \item{keep_original}{If renormalizing, return original (pre-renormalized) probabilities?}
 

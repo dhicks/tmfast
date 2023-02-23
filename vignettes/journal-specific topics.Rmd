@@ -38,6 +38,12 @@ vocab = M             # Vocabulary length
 size = 10             # Size and mean
 mu = 300
 sqrt(mu + mu^2/size)  # Resulting SD of document sizes
+
+## Dirichlet distributions for topic-docs and word-topics
+topic_peak = .8
+topic_scale = 10
+
+word_beta = 0.1
 ```
 
 Because the simulations involve drawing samples using a RNG, we first set a seed. 
@@ -53,8 +59,8 @@ We first generate the true topic-document distributions $p(\theta = t | \mathrm{
 ## Journal-specific alpha, with a peak value (.8 by default) and uniform otherwise
 theta = map(1:k, 
             ~rdirichlet(Mj, peak_alpha(k, .x, 
-                                       peak = .8, 
-                                       scale = 10))) |> 
+                                       peak = topic_peak, 
+                                       scale = topic_scale))) |> 
     reduce(rbind)
 
 theta_df = theta |>
@@ -75,7 +81,7 @@ Next we generate the true word-topic distributions $p(\phi = w | \theta = t)$, o
 
 ```{r}
 ## phi_j:  Word distribution for topic j
-phi = rdirichlet(k, .1, k = vocab)
+phi = rdirichlet(k, word_beta, k = vocab)
 
 ## Word distributions
 phi |>
@@ -199,9 +205,7 @@ First, however, we need to extract the word-topic distributions.  `tmfast` provi
 
 ```{r}
 ## beta: fitted varimax loadings, transformed to probability distributions
-beta = tidy(fitted, k, 'beta', 
-            target_entropy = tmfast:::expected_entropy(.1, vocab), 
-            keep_original = TRUE)
+beta = tidy(fitted, k, 'beta')
 ```
 
 Word-topic distributions correspond to the varimax factor loadings.  These loadings can take any real value.  To convert them to probability distributions, within each factor (topic), we trim negative values to 0 and divide each loading by the sum of all loadings.  The Zipfian plot below compares the fitted and true word-topic distributions.  Consistently across experiments with this simulation, fitted distributions started off a little flatter, then dropped sharply after about 100 words.  In other words, the varimax topic model highlights a relatively long list of characteristic words for each topic — the actual distributions have fewer characteristic words — and then ignores the other words.  
@@ -221,10 +225,10 @@ bind_rows({beta |>
                 mutate(type = 'true')}
 ) |>
     group_by(type, topic) |>
-    mutate(rank = rank(desc(beta_rn))) |>
+    mutate(rank = rank(desc(beta))) |>
     arrange(type, topic, rank) |>
     filter(rank < vocab/2) |>
-    ggplot(aes(rank, beta_rn, color = type, 
+    ggplot(aes(rank, beta, color = type, 
                group = interaction(topic, type))) +
     geom_line() +
     scale_y_log10() +
@@ -239,10 +243,9 @@ beta_mx = beta |>
     mutate(token = as.integer(token)) |>
     arrange(token) |>
     ## And dropped words
-    complete(token = 1:vocab) |>
-    select(-beta) |> 
+    complete(token = 1:vocab, topic, fill = list(beta = 0)) |>
     pivot_wider(names_from = 'topic',
-                values_from = 'beta_rn', values_fill = 0,
+                values_from = 'beta', values_fill = 0,
                 names_sort = TRUE) |>
     # select(-`NA`) |>
     ## Coerce to matrix
@@ -274,7 +277,7 @@ beta_stm_mx = tidy(fitted_stm, matrix = 'beta') |>
     mutate(term = as.integer(term)) |>
     arrange(term) |>
     ## And dropped words
-    complete(term = 1:vocab) |>
+    complete(term = 1:vocab, topic, fill = list(beta = 0)) |>
     pivot_wider(names_from = 'topic',
                 values_from = 'beta', values_fill = 0,
                 names_sort = TRUE) |>
@@ -302,24 +305,91 @@ We extract topic-document distributions using the same `tidy()` function, specif
 
 ```{r}
 gamma_df = tidy(fitted, k, 'gamma', 
-                rotation = soln$solution, 
-                keep_original = TRUE)
+                rotation = soln$solution)
 
 gamma_df |>
     mutate(document = as.integer(document)) |>
-    ggplot(aes(document, topic, fill = gamma_rn)) +
+    ggplot(aes(document, topic, fill = gamma)) +
     geom_raster() +
     scale_x_continuous(breaks = NULL)
 
 gamma_df |>
     mutate(document = as.integer(document),
            journal = (document - 1) %/% Mj + 1) |>
-    ggplot(aes(topic, gamma_rn, 
+    ggplot(aes(topic, gamma, 
                group = document, color = as.factor(journal))) +
     geom_line(alpha = .25) +
     facet_wrap(vars(journal), scales = 'free_x') +
     scale_color_discrete(guide = 'none')
 ```
+
+However, the fitted topic-document distributions are flatter than the true ones.  Consider the true and fitted distributions for document 1.  Compared to the true distribution, the fitted distribution has a somewhat lower probability for topic `V01` and a somewhat higher probability for the other topics.  
+
+```{r}
+ggplot(mapping = aes(topic, group = 1L)) +
+    geom_line(mapping = aes(y = theta, color = 'true'), 
+              data = tibble(theta = theta[1,], 
+                            topic = tmfast:::make_colnames(1:k))) +
+    geom_line(mapping = aes(y = gamma, color = 'fitted'), 
+              data = filter(gamma_df, document == '1'))
+```
+
+This flatter distribution corresponds to greater entropy.  In this simulation, the entropy of the fitted distributions are about 1 bit greater than those of the true distributions.  This discrepancy tends to become worse with greater values of $k$.  
+
+```{r}
+theta |> 
+    apply(1, entropy) |> 
+    summary()
+
+tidy(fitted, k, 'gamma') |> 
+    group_by(document) |> 
+    summarize(H = entropy(gamma)) |> 
+    pull(H) |> 
+    summary()
+```
+
+To mitigate this problem, we add an optional renormalization step when converting document scores to topic-document distributions.  Given a discrete probability distribution $P$ with components $p_i$ and entropy $H$, and a parameter $\beta$, we can define a new distribution $P'$ with components
+
+$$ p'_i = \frac{p_i^\beta}{\sum_i p_i^\beta} = \frac{p_i^\beta}{Z}$$
+
+which has entropy
+
+$$ H' = \frac{1}{Z} \sum_i [p_i^\beta \beta \log p_i] - \log Z.$$
+
+That is, we can choose a parameter $\beta$ that renormalizes $P$ to achieve a target entropy $H'$.  In LDA, the target entropy is the expected entropy for topic-document distributions drawn from the Dirichlet prior.  `tmfast` provides convenience functions for calculating this expected entropy; compare this to the mean entropy of the distributions in `theta` above.  **In actual applications, where the Dirichlet prior is an idealization, choosing $\alpha$ to set the target entropy is an important researcher degree of freedom.**  It is equivalent to choosing prior parameters in other topic modeling packages.  
+
+```{r}
+peak_alpha(k, 1, topic_peak, topic_scale)
+expected_entropy(peak_alpha(k, 1, topic_peak, topic_scale))
+```
+
+Since solving the equation for $H'$ for $\beta$ requires numerical optimization, it's inefficient to do this every time we call `tidy()`, especially with large corpora.  Instead, `tmfast::target_power()` is used to run this optimization once, and then return the mean value across all documents.  We then use this single value of $\beta$ in all future calls to `tidy()`.  
+
+```{r}
+gamma_power = tidy(fitted, k, 'gamma') |> 
+    target_power(document, gamma, 
+                 expected_entropy(peak_alpha(k, 
+                                             1, 
+                                             topic_peak, 
+                                             topic_scale)))
+gamma_power
+```
+
+The renormalized topic-document distributions have closer entropy to theta.  The `keep_original` argument lets us compare the original and renormalized distributions. 
+
+```{r}
+gamma_df = tidy(fitted, k, 'gamma', 
+                rotation = soln$solution, 
+                exponent = gamma_power, 
+                keep_original = TRUE)
+
+gamma_df |> 
+    group_by(document) |> 
+    summarize(across(c(gamma, gamma_rn), entropy)) |> 
+    summarize(across(c(gamma, gamma_rn), mean))
+```
+
+
 
 Like loadings, document scores can take any real value, so we need to do something about negative scores before normalizing them to form probability distributions.  But (in this particular simulation) about 1% of documents don't have any positive scores. 
 
@@ -368,8 +438,13 @@ hellinger(theta_df, doc,
 
 ## w/ renormalization, mean distance drops to .13
 doc_compare = hellinger(theta_df, doc,
-                        topicsdf2 = gamma_df, id2 = document, 
-                        prob2 = gamma_rn, df = TRUE)
+          topicsdf2 = gamma_df, id2 = document, 
+          prob2 = gamma_rn, df = TRUE)
+
+doc_compare |> 
+    filter(doc == document) |> 
+    pull(dist) |> 
+    summary()
 
 ggplot(doc_compare, aes(as.integer(doc), 
                         as.integer(document), 
@@ -377,12 +452,6 @@ ggplot(doc_compare, aes(as.integer(doc),
     geom_raster() +
     scale_x_discrete(breaks = NULL, name = 'true') +
     scale_y_discrete(breaks = NULL, name = 'fitted')
-
-## Comparable to word-topics, mean around .12
-doc_compare |>
-    filter(doc == document) |>
-    pull(dist) |>
-    summary()
 ```
 
 STM has a slightly closer fit, with a mean Hellinger distance of 0.08.  
