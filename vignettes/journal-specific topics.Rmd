@@ -181,7 +181,7 @@ corpus |>
 toc()
 ```
 
-Setting `K = k` gives us a fitted topic model in 1-2 seconds, about an order of magnitude slower than `tmfast()`. 
+Setting `K = k` gives us a fitted topic model in a few seconds, about an order of magnitude slower than `tmfast()`. 
 
 ```{r}
 tic()
@@ -201,7 +201,7 @@ Hellinger distance satisfies the equation
 \[ 1 - d^2(p, q) = \sum_{x \in X} \sqrt{p(x)q(x)}. \]
 When working with topic models, we're interested in pairwise sets of Hellinger distances, either between all pairs of distributions from a single set (for example, the topic distributions for each document, as used in "discursive space" analysis *[cite and xref]*) or two sets (for example, comparing fitted vs. true word-topic distributions, as in this section).  Working with two sets of distributions $P = \{p_i | i \in I\}$ and $Q = \{q_j | j \in J\}$, the right-hand side of the last equation is equivalent to a matrix multiplication.^[For $P$, each row corresponds to the elementwise square root of one distribution $\sqrt p_i$ and each column to one component $x \in X$, i.e., a cell contains the value $\sqrt{p_i(x)}$.  $Q$ is the transpose, with each row corresponding to one component $x \in X$ and each column corresponding to the square root of a distribution $\sqrt q_j$.  The product of these matrices is a $i \times j$ matrix with each cell the desired sum for $p$ and $q$.]  The `hellinger()` function provides S3 methods for calculating Hellinger pairwise distances given a single dataframe, single matrix, or two dataframes or matrices.  
 
-First, however, we need to extract the word-topic distributions.  `tmfast` provides a `tidy()` method, following the pattern of the topicmodel tidiers in `tidytext`.  Unlike other topic models, `tmfast` objects can contain models for multiple different values of $k$ (numbers of topics).  So, in the second argument to `tidy()`, we need to specify which number of topics we want.  The third argument specifies the desired set of distributions, either word-topics (`'beta'`) or topic-documents (`'gamma'`). *[renormalization]*
+First, however, we need to extract the word-topic distributions.  `tmfast` provides a `tidy()` method, following the pattern of the topicmodel tidiers in `tidytext`.  Unlike other topic models, `tmfast` objects can contain models for multiple different values of $k$ (numbers of topics).  So, in the second argument to `tidy()`, we need to specify which number of topics we want.  The third argument specifies the desired set of distributions, either word-topics (`'beta'`) or topic-documents (`'gamma'`). 
 
 ```{r}
 ## beta: fitted varimax loadings, transformed to probability distributions
@@ -301,7 +301,7 @@ The tidied word-topic distributions can be used in standard ways for further ana
 
 # Topic-document distributions 
 
-We extract topic-document distributions using the same `tidy()` function, specifying the matrix `gamma` and including the rotation above to align the fitted and true topics.  Tile and parallel coordinates plots can be used to visualize all of the topic-document distributions.  These show that the varimax topic models successfully recover the overall association of each document's journal with a distinctive topic.  
+We extract topic-document distributions using the same `tidy()` function, specifying the matrix `gamma` and including the rotation above to align the fitted and true topics.^[As with the word-topic distributions/loadings above, the scores must be transformed to treat them as topic-document distributions.  Experiments with this simulation found that nudging the scores — setting the smallest score in each document to zero — and then dividing by the total was the most effective approach.  Note that this means that each document has probability exactly zero for one topic.]  Tile and parallel coordinates plots can be used to visualize all of the topic-document distributions.  These show that the varimax topic models successfully recover the overall association of each document's journal with a distinctive topic.  
 
 ```{r}
 gamma_df = tidy(fitted, k, 'gamma', 
@@ -390,43 +390,7 @@ gamma_df |>
 ```
 
 
-
-Like loadings, document scores can take any real value, so we need to do something about negative scores before normalizing them to form probability distributions.  But (in this particular simulation) about 1% of documents don't have any positive scores. 
-
-```{r}
-scores(fitted, k) %>%
-    {. > 0} |>         # Positive score for this topic? 
-    rowSums() %>%      # How many topics have positive scores? 
-    {. >= 1} |>         # Do you have at least one positive score? 
-    mean()             # Fraction of docs w/ 1+ pos. score
-```
-
-To address this problem, we first nudge all of each document's scores, so that the smallest score is set to 0.^[Surprisingly, experiments with this simulation consistently indicated that trimming gave better results for the loadings/word-topics, while nudging gave better results for scores/topic-docs.]  **This procedure entails that every document has 0% probability for one topic.**  While this is probably reasonable for most applications, it means $k = 2$ is automatically binary (every document has probability 1 for one topic and 0 for the other) and for $k = 3$ documents are forced to the outside of the ternary plot, as shown in the figures below.
-
-```{r, cache = TRUE}
-library(ggtern)
-
-tidy(fitted, k = 3, matrix = 'gamma') |> 
-    pivot_wider(names_from = topic, 
-                values_from = gamma) |> 
-    ggplot(aes(x = V1, y = V2, z = V3)) +
-    geom_point() +
-    coord_tern()
-
-stm3 = corpus |> 
-    cast_sparse(doc, word, n) |> 
-    stm(K = 3, verbose = FALSE)
-tidy(stm3, matrix = 'gamma') |> 
-    pivot_wider(names_from = topic, 
-                values_from = gamma) |> 
-    ggplot(aes(x = `1`, y = `2`, z = `3`)) +
-    geom_point() +
-    coord_tern()
-```
-
-We can also assess accuracy of the topic-document distributions.  Above we used the `hellinger()` method for two matrices.  The method for two dataframes requires specifying the id, topic, and probability columns.  The tile plot shows that the true and fitted topics are aligned (because we used the rotation when extracting `gamma_df` above), and so again we can get an overall summary from the diagonal. *[Usually the mean is about 0.17, as with the word-topic distributions]*; though the particular instance replicated by `set.seed()` at the top does a little better.  
-
-*[renormalization improves this]*
+We can now assess accuracy of the topic-document distributions.  Above we used the `hellinger()` method for two matrices.  The method for two dataframes requires specifying the id, topic, and probability columns.  The tile plot shows that the true and fitted topics are aligned (because we used the rotation when extracting `gamma_df` above), and so again we can get an overall summary from the diagonal.  Without renormalization, in the current simulation the mean Hellinger distance is 0.24 — not too bad, but perhaps larger than one would like.  With larger values of $k$, this accuracy increases significantly.  Renormalization keeps the mean distance around 0.13, slightly better the the word-topic distributions.  
 
 ```{r}
 ## w/o renormalization, mean distance is .24
