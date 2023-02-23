@@ -69,9 +69,11 @@ draw_words = function(Ni, theta, phi) {
 #' @export
 #' @family generators
 draw_corpus = function(N, theta, phi) {
-    purrr::map_dfr(1:length(N),
-                   ~draw_words(N[.x], theta[.x,], phi),
-                   .id = 'doc') |>
+    furrr::future_map_dfr(1:length(N),
+                   ~ draw_words(N[.x], theta[.x,], phi),
+                   .id = 'doc',
+                   .options = furrr::furrr_options(seed = TRUE),
+                   .progress = TRUE)|>
         dplyr::mutate(doc = as.integer(doc))
 }
 

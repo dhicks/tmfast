@@ -15,6 +15,9 @@ solve_power(p, target_H, return_full = FALSE)
 
 \item{interval}{Range of exponents within which to search}
 }
+\value{
+Numeric value of the desired exponent
+}
 \description{
 After \url{https://stats.stackexchange.com/questions/521582/controlling-the-entropy-of-a-distribution}
 }

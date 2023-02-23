@@ -4,7 +4,7 @@
 \alias{renorm}
 \title{Renormalize tidied distributions}
 \usage{
-renorm(tidy_df, group_col, p_col, target_entropy, keep_original = FALSE)
+renorm(tidy_df, group_col, p_col, power, keep_original = FALSE)
 }
 \arguments{
 \item{tidy_df}{The tidied distribution dataframe}
@@ -13,13 +13,13 @@ renorm(tidy_df, group_col, p_col, target_entropy, keep_original = FALSE)
 
 \item{p_col}{Column containing the probability for each category (eg, word) conditional on the group (eg, topic)}
 
-\item{target_entropy}{Target entropy}
+\item{power}{Exponent to use in renormalization}
 
 \item{keep_original}{Keep original probabilities?}
 }
 \value{
-A dataframe with (if \code{keep_original} is \code{TRUE}) an added column of the form \code{p_col_rn} containing the renormalized probabilities or (if \code{keep_original} is \code{FALSE}) renormalized values in \code{p_col}, and an \code{exponent} attribute containing the exponent used for renormalization.
+A dataframe with (if \code{keep_original} is \code{TRUE}) an added column of the form \code{p_col_rn} containing the renormalized probabilities or (if \code{keep_original} is \code{FALSE}) renormalized values in \code{p_col}.
 }
 \description{
-Given a tidied dataframe of topic-doc or word-topic distributions and a target entropy, first finds the exponent needed to adjust the temperature of each distribution separately to (approximately) match the target entropy (\code{solve_power()}).  Applies the median such exponent to every distribution.
+Given a tidied dataframe of topic-doc or word-topic distributions and a power, renormalizes the distributions.
 }

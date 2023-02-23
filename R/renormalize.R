@@ -32,6 +32,8 @@ expected_entropy = function(alpha, k = NULL) {
 #' @param target_H Desired entropy for the transformed distribution
 #' @param interval Range of exponents within which to search
 #' @param return_full Return the full uniroot() output?
+#' @return Numeric value of the desired exponent
+#' @export
 solve_power = function(p,
                        target_H,
                        return_full = FALSE) {
@@ -57,30 +59,45 @@ solve_power = function(p,
 # doc1 = beta$beta[1:500]
 # solve_power(doc1, target_entropy)
 
+#' Find target power for renormalization
+#'
+#' Given a tidied dataframe of topic-doc or word-topic distributions and a target entropy, find the mean exponent needed to adjust the temperature of each distribution to approximately match the target entropy.
+#' @param tidy_df The tidied distribution dataframe
+#' @param Grouping column, RHS of the conditional probability distribution, eg, topics for word-topic distributions
+#' @param p_col Column containing the probability for each category (eg, word) conditional on the group (eg, topic)
+#' @param target_entropy Target entropy
+#' @returns Mean exponent to renormalize to the target entropy
+#' @export
+target_power = function(tidy_df,
+                        group_col,
+                        p_col,
+                        target_entropy) {
+    powers = tidy_df |>
+        group_by({{ group_col }}) |>
+        summarize(H = sum(-{{ p_col }} * log2({{ p_col }})),
+                  power = solve_power({{ p_col }}, target_entropy)) |>
+        pull(power)
+    if (sum(is.na(powers)) > 0.1 * length(powers)) {
+        warning('More than 10% of powers could not be calculated')
+    }
+    mean(powers, na.rm = TRUE)
+}
+
 #' Renormalize tidied distributions
 #'
-#' Given a tidied dataframe of topic-doc or word-topic distributions and a target entropy, first finds the exponent needed to adjust the temperature of each distribution separately to (approximately) match the target entropy (`solve_power()`).  Applies the median such exponent to every distribution.
+#' Given a tidied dataframe of topic-doc or word-topic distributions and a exponent, renormalizes the distributions.
 #' @param tidy_df The tidied distribution dataframe
 #' @param group_col Grouping column, RHS of the conditional probability distribution, eg, topics for word-topic distributions
 #' @param p_col Column containing the probability for each category (eg, word) conditional on the group (eg, topic)
-#' @param target_entropy Target entropy
+#' @param exponent Exponent to use in renormalization
 #' @param keep_original Keep original probabilities?
-#' @returns A dataframe with (if `keep_original` is `TRUE`) an added column of the form `p_col_rn` containing the renormalized probabilities or (if `keep_original` is `FALSE`) renormalized values in `p_col`, and an `exponent` attribute containing the exponent used for renormalization.
+#' @returns A dataframe with (if `keep_original` is `TRUE`) an added column of the form `p_col_rn` containing the renormalized probabilities or (if `keep_original` is `FALSE`) renormalized values in `p_col`.
+#' @export
 renorm = function(tidy_df,
                   group_col,
                   p_col,
-                  target_entropy,
+                  exponent,
                   keep_original = FALSE) {
-    ## 1. Get the exponent for each distribution
-    ## 2. Get the median exponent
-    exponent = tidy_df |>
-        dplyr::group_by({{ group_col }}) |>
-        dplyr::summarize(exponent = solve_power({{ p_col }},
-                                                target_entropy)) |>
-        dplyr::pull(exponent) |>
-        median(na.rm = TRUE)
-
-    ## 3. Apply to all distributions
     if (keep_original) {
         newcol = rlang::englue('{{ p_col }}_rn')
     } else {
@@ -89,36 +106,7 @@ renorm = function(tidy_df,
     tidy_df |>
         dplyr::group_by({{ group_col }}) |>
         dplyr::mutate({{ newcol }} := {{ p_col }}^exponent / sum({{ p_col }}^exponent)) |>
-        dplyr::ungroup() |>
-        magrittr::set_attr('exponent', exponent)
+        dplyr::ungroup()
 }
 # renorm(beta, topic, beta, target_entropy)
 
-
-## Development example code
-# library(tmfast)
-# library(tidyverse)
-# # 10 word-topic distributions, 500-word vocabulary
-# beta = rdirichlet(50, .05, k = 2000) |>
-#     tibble:::as.tibble() |>
-#     dplyr::mutate(topic = dplyr::row_number()) |>
-#     tidyr::pivot_longer(-topic,
-#                         names_to = 'word',
-#                         values_to = 'beta')
-# # "raw" entropy is ~5.5
-# beta |>
-#     group_by(topic) |>
-#     mutate(H_term = -beta*log2(beta)) |>
-#     summarize(H = sum(H_term))
-#
-# # target entropy is about 3
-# target_entropy = tmfast:::expected_entropy(.01, n_distinct(beta$word))
-#
-# renorm(beta, topic, beta, target_entropy, keep_original = TRUE) |>
-#     group_by(topic) |>
-#     summarize(H = sum(-beta * log2(beta)),
-#               H_rn = sum(-beta_rn * log2(beta_rn)))
-#     # ggplot(aes(x = word)) +
-#     # geom_linerange(aes(ymin = beta, ymax = beta_rn)) +
-#     # geom_point(aes(y = beta_rn), size = .2) +
-#     # facet_wrap(vars(topic))

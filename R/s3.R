@@ -70,8 +70,7 @@ generics::tidy
 #' @param k Index (number of topics/factors)
 #' @param matrix Desired matrix, either word-topic (`beta`) or topic-doc distributions (`gamma`)
 #' @param df Return a long dataframe (default) or wide matrix?
-#' @param renorm Renormalize the probabilities to better match a target entropy? Applies only for `df == TRUE`
-#' @param target_entropy Manually set a target entropy for renormalization.  Applies only for `renorm == TRUE`.
+#' @param exponent Renormalize the probabilities using a given exponent  Applies only for `df == TRUE`
 #' @param keep_original If renormalizing, return original (pre-renormalized) probabilities?
 #' @param rotation Optional rotation matrix; see details
 #' @return A long dataframe, with one row per word-topic or topic-doc combination. Column names depend on the value of `matrix`.
@@ -81,8 +80,7 @@ tidy.tmfast = function(x,
                        k,
                        matrix = 'beta',
                        df = TRUE,
-                       renorm = TRUE,
-                       target_entropy = NULL,
+                       exponent = NULL,
                        keep_original = FALSE,
                        rotation = NULL) {
     assertthat::assert_that(k %in% x$n,
@@ -110,12 +108,8 @@ tidy.tmfast = function(x,
             dplyr::filter(beta > 0) |>
             dplyr::mutate(beta = beta / sum(beta)) |>
             dplyr::ungroup()
-        if (renorm) {
-            if (is.null(target_entropy)) {
-                target_entropy = expected_entropy(0.1,
-                                                  n_distinct(dataf$token))
-            }
-            dataf = renorm(dataf, topic, beta, target_entropy, keep_original)
+        if (!is.null(exponent)) {
+            dataf = renorm(dataf, topic, beta, exponent, keep_original)
         }
         return(dataf)
     }
@@ -140,12 +134,9 @@ tidy.tmfast = function(x,
             dplyr::mutate(gamma = gamma - min(gamma)) |>
             dplyr::mutate(gamma = gamma / sum(gamma)) |>
             dplyr::ungroup()
-        if (renorm) {
-            if (is.null(target_entropy)) {
-                target_entropy = expected_entropy(
-                    peak_alpha(k, 1, peak = .8, scale = 10))
-            }
-            dataf = renorm(dataf, document, gamma, target_entropy, keep_original)
+        if (!is.null(exponent)) {
+            dataf = renorm(dataf, document, gamma,
+                           exponent, keep_original)
         }
         return(dataf)
     }
