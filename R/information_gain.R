@@ -28,9 +28,8 @@ ndH = function(dataf, doc_col, term_col, count_col) {
 
     dataf |>
         dplyr::group_by({{ term_col }}) |>
-        dplyr::mutate(p = {{ count_col }} / sum({{ count_col }}),
-                      H_term = -p*log2(p)) |>
-        dplyr::summarize(H = sum(H_term),
+        dplyr::mutate(p = {{ count_col }} / sum({{ count_col }})) |>
+        dplyr::summarize(H = entropy(p),
                          dH = log2(n_docs) - H,
                          n = sum({{ count_col }})) |>
         dplyr::ungroup() |>
@@ -50,10 +49,9 @@ ndH.ArrowObject = function(dataset, doc_col, term_col, count_col) {
     result = dataset |>
         dplyr::left_join(totals,
                          by = rlang::as_label(enquo(term_col))) |>
-        dplyr::mutate(p = {{ count_col }} / n_tot,
-               H_term = -p * log2(p)) |>
         dplyr::group_by({{ term_col }}) |>
-        dplyr::summarize(H = sum(H_term),
+        dplyr::mutate(p = {{ count_col }} / n_tot) |>
+        dplyr::summarize(H = entropy(p),
                   {{ count_col }} := sum({{ count_col }})) |>
         dplyr::ungroup() |>
         dplyr::mutate(dH = log2(n_docs) - H,

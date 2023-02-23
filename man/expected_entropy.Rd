@@ -24,7 +24,7 @@ After \url{https://math.stackexchange.com/questions/2266285/expected-entropy-bas
 alpha = peak_alpha(50, 1)
 set.seed(1357)
 rdirichlet(500, alpha) |>
-  apply(1, \(p)(sum(-p*log2(p), na.rm = TRUE))) |>
+  apply(1, entropy) |>
   mean()
 expected_entropy(alpha)
 }
