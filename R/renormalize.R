@@ -41,7 +41,9 @@ solve_power = function(p,
     transformed_entropy = function(p) {
         function(beta) {
             Z = sum(p^beta, na.rm = TRUE)
-            - 1/Z * sum(p^beta * beta * log2(p), na.rm = TRUE) + log2(Z)
+            - 1/Z *
+                sum(p^beta * beta * log2(p), na.rm = TRUE) +
+                log2(Z)
         }
     }
 
@@ -80,7 +82,7 @@ target_power = function(tidy_df,
     if (sum(is.na(powers)) > 0.1 * length(powers)) {
         warning('More than 10% of powers could not be calculated')
     }
-    mean(powers, na.rm = TRUE)
+    median(powers, na.rm = TRUE)
 }
 
 #' Renormalize tidied distributions

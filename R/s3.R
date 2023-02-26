@@ -55,7 +55,8 @@ make_colnames = function(names, prefix = 'V') {
     n = length(names)
     1:n |>
         as.character() |>
-        stringr::str_pad(stringr::str_length(n), pad = '0') %>%
+        stringr::str_pad(stringr::str_length(n),
+                         pad = '0') %>%
         stringr::str_c(prefix, .)
 }
 
