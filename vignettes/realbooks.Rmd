@@ -1,0 +1,335 @@
+---
+title: "Fast topic modeling with real books"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Fast topic modeling with real books}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+Our second example will analyze a corpus of works from the long nineteenth century, attempting to recover the author of each one.  
+
+
+```{r}
+library(tidyverse)            # infrastructure
+theme_set(theme_minimal())
+library(ggbeeswarm)
+library(memoise)
+library(tictoc)
+
+library(gutenbergr)           # text retrieval and manipulation
+library(tidytext)
+library(tmfast)               # topic modeling
+library(stm)                  # topic modeling
+
+get_author = function(author_id) {
+    gutenberg_works(gutenberg_author_id == author_id, 
+                    has_text) |> 
+    gutenberg_download(meta_fields = c('author', 'title'), 
+                       mirror = 'http://aleph.gutenberg.org')
+}
+get_author = memoise(get_author, 
+                     cache = cache_filesystem('realbooks'))
+```
+
+## Corpus assembly
+
+We first retrieve all works in Project Gutenberg by our target authors: Jane Austen, Charlotte and Emily Brontë, Louisa May Alcott, George Eliot, Charles Dickens, and HG Wells.  We use the `memoise` package with the helper function `get_author()` to cache these results; the cache ends up at about 286 MB.  
+
+```{r}
+## Jane Austen is author 68
+gutenberg_authors |> 
+    filter(str_detect(author, 'Austen'))
+austen_df = get_author(68)
+```
+
+```{r}
+## Anne Brontë is 404
+filter(gutenberg_authors, str_detect(author, 'Brontë'))
+a_bronte_df = get_author(404)
+```
+
+```{r}
+## Charlotte Brontë is 408
+filter(gutenberg_authors, str_detect(author, 'Brontë'))
+c_bronte_df = get_author(408)
+```
+
+```{r}
+## Emily Brontë is 405
+filter(gutenberg_authors, str_detect(author, 'Brontë'))
+e_bronte_df = get_author(405)
+```
+
+```{r}
+## Louisa May Alcott is 102
+filter(gutenberg_authors, str_detect(author, 'Alcott'))
+alcott_df = get_author(102)
+```
+
+```{r}
+## George Eliot is 90
+filter(gutenberg_authors, str_detect(author, 'Eliot'))
+eliot_df = get_author(90)
+```
+
+```{r}
+## Mary Wollstonecraft Shelley is 61
+filter(gutenberg_authors, str_detect(author, 'Shelley'))
+shelley_df = get_author(61)
+```
+
+```{r}
+## Charles Dickens is 37
+filter(gutenberg_authors, str_detect(author, 'Dickens'))
+dickens_df = get_author(37)
+```
+
+```{r}
+## HG Wells is 30
+filter(gutenberg_authors, str_detect(author, 'Wells'))
+wells_df = get_author(30)
+```
+
+```{r}
+## HP Lovecraft is 34724
+filter(gutenberg_authors, str_detect(author, 'Lovecraft'))
+lovecraft_df = get_author(34724)
+```
+
+
+We combine these results, and use `tidytext::unnest_tokens()` to convert the result into a long-format document-term matrix.  We also construct a dataframe to link titles to authors in the topic model output. 
+
+```{r}
+#| cache: true
+dataf = bind_rows(austen_df, 
+          a_bronte_df, 
+          c_bronte_df, 
+          e_bronte_df, 
+          alcott_df, 
+          eliot_df,
+          shelley_df,
+          dickens_df, 
+          wells_df, 
+          lovecraft_df) |> 
+    unnest_tokens(term, text, token = 'words') |> 
+    count(gutenberg_id, author, title, term)
+
+dataf
+
+meta_df = distinct(dataf, author, title)
+```
+
+The number of works by each author varies widely, as does the total token count. 
+
+```{r}
+distinct(dataf, author, title) |> 
+    count(author)
+
+with(dataf, n_distinct(author, title))
+```
+
+
+
+```{r}
+dataf |> 
+    group_by(author, title) |> 
+    summarize(n = sum(n)) |> 
+    summarize(min = min(n), 
+              median = median(n), 
+              max = max(n), 
+              total = sum(n)) |> 
+    arrange(desc(total))
+
+dataf |> 
+    group_by(author, title) |> 
+    summarize(n = sum(n)) |> 
+    ggplot(aes(author, n, color = author)) +
+    geom_boxplot() +
+    geom_beeswarm() +
+    scale_color_discrete(guide = 'none') +
+    coord_flip()
+```
+
+
+
+
+
+## Vocabulary selection
+
+In line with a common rule of thumb in topic modeling, we aim for a vocabulary of about 10 times as many terms as documents in the corpus.  
+
+```{r}
+vocab_size = n_distinct(dataf$author, dataf$title) * 10
+vocab_size
+```
+
+`tmfast` provides two information-theoretic methods for vocabulary selection.  Both are based on the idea of a two-player guessing game.  I pick one of the documents from the corpus, then one of the terms from the document.  I tell you the term, and you have to guess which document I picked.  More informative terms have greater information gain (calculated as the Kullback-Leibler divergence) relative to a "baseline" distribution based purely on the process used to pick the document.  The difference between the two methods is in the document-picking process.  The `ndH` method assumes the document was picked uniformly at random from the corpus, so that no document is more likely to be picked than any other.  The `ndR` method assumes document probability is proportional to the document length, so that shorter documents are less likely to be picked.  This method implies that terms that are distinctive of shorter documents have high information gain, since they indicate "surprising" short documents.  
+
+On either method, the most informative terms are often typographical or OCR errors, since these only occur in a single document.  To balance this, we multiply the information gain ($\Delta H$ for the uniform process, $\Delta R$ for the length-weighted process) by the log frequency of the term across the entire corpus ($\log n$).  So `ndH` is shorthand for $\log(n) \Delta H$ while `ndR` is shorthand for $\log(n) \Delta R$. 
+
+```{r}
+tic()
+H_df = ndH(dataf, title, term, n)
+R_df = ndR(dataf, title, term, n) |>
+    mutate(in_vocab = rank(desc(ndR)) <= vocab_size)
+toc()
+H_df
+R_df
+``` 
+
+The resulting term ranking of the two methods tend to be similar, but `ndR` is preferable in the current case because of the additional weight it gives to distinctive terms from shorter documents.  
+
+```{r}
+inner_join(H_df, R_df, by = 'term') |> 
+    ggplot(aes(ndH, ndR, color = in_vocab)) +
+    geom_point(aes(alpha = rank(desc(ndH)) <= vocab_size))
+
+inner_join(H_df, R_df, by = 'term') |> 
+    mutate(ndH_rank = rank(desc(ndH)), 
+           ndR_rank = rank(desc(ndR))) |> 
+    ggplot(aes(ndH_rank, ndR_rank, color = in_vocab)) +
+    geom_point(aes(alpha = ndH_rank <= vocab_size)) +
+    scale_x_log10() + 
+    scale_y_log10()
+```
+
+```{r}
+vocab = R_df |> 
+    filter(in_vocab) |> 
+    pull(term)
+head(vocab, 50)
+```
+
+```{r}
+dataf |> 
+    filter(term %in% vocab) |> 
+    group_by(author, title) |> 
+    summarize(n = sum(n)) |> 
+    ggplot(aes(author, n, color = author)) +
+    geom_boxplot() +
+    geom_beeswarm() +
+    scale_color_discrete(guide = 'none') +
+    coord_flip()
+```
+
+
+## Fit topic models
+
+```{r}
+dtm = dataf |> 
+    filter(term %in% vocab) |> 
+    mutate(n = log1p(n))
+
+n_authors = n_distinct(dataf$author)
+
+tic()
+fitted_tmf = tmfast(dtm, n = c(5,
+                              n_authors, 
+                              n_authors + 5),
+                    row = title, column = term, value = n)
+toc()
+
+screeplot(fitted_tmf, npcs = n_authors + 5)
+```
+
+
+## Topic exploration
+
+Without renormalization, most of the works are spread across a few topics, and the topics don't clearly correspond to authors.  
+
+```{r}
+tidy(fitted_tmf, n_authors, 'gamma') |> 
+    left_join(meta_df, by = c('document' = 'title')) |> 
+    ggplot(aes(document, gamma, fill = topic)) +
+    geom_col() +
+    facet_wrap(vars(author), scales = 'free_x') +
+    scale_x_discrete(guide = 'none') +
+    scale_fill_viridis_d()
+```
+
+To renormalize, we need to choose a theoretical Dirichlet distribution. 
+
+```{r}
+alpha = peak_alpha(n_authors, 1, peak = .8, scale = 10)
+target_entropy = expected_entropy(alpha)
+target_entropy
+
+exponent = tidy(fitted_tmf, n_authors, 'gamma') |> 
+    target_power(document, gamma, target_entropy)
+exponent
+
+tidy(fitted_tmf, n_authors, 'gamma', exponent = exponent) |> 
+    left_join(meta_df, by = c('document' = 'title')) |> 
+    ggplot(aes(document, gamma, fill = topic)) +
+    geom_col() +
+    facet_wrap(vars(author), scales = 'free_x') +
+    scale_x_discrete(guide = 'none') +
+    scale_fill_viridis_d()
+
+tidy(fitted_tmf, n_authors, 'gamma', exponent = exponent) |> 
+    left_join(meta_df, by = c('document' = 'title')) |> 
+    ggplot(aes(document, topic, fill = gamma)) +
+    geom_raster() +
+    facet_grid(cols = vars(author), 
+               scales = 'free_x', 
+               switch = 'x') +
+    scale_x_discrete(guide = 'none')
+```
+
+After renormalization, there are distinctive topics for Alcott (4) and Wells (1 and 9).  Austen, Anne Brontë, Emily Brontë, and some of Shelley's works appear together in topic 3.  Charlotte Brontë and some of Eliot's and Shelley's works split topic 5.  Eliot and Lovecraft share topic 10.  And Dickens' works are spread across multiple topics, with 2, 6, and 8 appearing to be distinctive to him.  
+
+To aid interpretation, we create a crosswalk dataframe connecting topics to authors. 
+```{r}
+topic_author = tribble(
+   ~ topic, ~ authors,
+   'V01', 'Wells', 
+   'V02', 'Dickens', 
+   'V03', 'Austin, A & E Brontë', 
+   'V04', 'Alcott', 
+   'V05', 'Dickens', 
+   'V06', 'Dickens', 
+   'V07', 'C Brontë, Eliot, Shelley', 
+   'V08', 'Dickens', 
+   'V09', 'Wells', 
+   'V10', 'Eliot, Lovecraft'
+)
+```
+
+To explore these topics further, we turn to the word-topic distribution.  These distributions could be renormalized, as with the topic-doc distributions.  But the exponent for the word-topic distributions is usually quite close to 1, meaning renormalization doesn't change these distributions very much.  
+
+```{r}
+target_entropy_term = expected_entropy(.1, k = vocab_size)
+target_entropy_term
+
+exponent_term = tidy(fitted_tmf, n_authors, 'beta') |> 
+    target_power(topic, beta, target_entropy_term)
+exponent_term
+```
+
+We therefore skip renormalization and move directly to a Silge plot, showing the top 10 terms for each topic.  `tidytext::reorder_within()` and `tidytext::scale_x_reordered()` are useful for constructing this plot. 
+
+```{r}
+beta_df = tidy(fitted_tmf, n_authors, 'beta')
+
+top_terms = beta_df |> 
+    group_by(topic) |> 
+    arrange(topic, desc(beta)) |> 
+    top_n(15, beta) |> 
+    left_join(topic_author, by = 'topic')
+top_terms
+
+top_terms |> 
+    mutate(token = reorder_within(token, 
+                                  by = beta, 
+                                  within = topic)) |> 
+    ggplot(aes(token, beta)) +
+    geom_point() +
+    geom_segment(aes(xend = token), yend = 0) +
+    facet_wrap(vars(topic, authors), scales = 'free_y') +
+    coord_flip() +
+    scale_x_reordered()
+```
+
+Most topics (2, 3, 4, 5, 6, 8, 9) focus on character names, with three of the four Dickens topics corresponding to *The Pickwick Papers* (topic 2), *Oliver Twist* (5), and *David Copperfield* (8).  Wells' topics appear to distinguish non-fiction essays (topic 1) from fiction (9).  Topic 7 groups together Charlotte Brontë, Eliot, and Shelley based on the use of French. Topic 10 has a mix of character names with months of the year; it appears to be a "miscellaneous" topic, often created by topic models to accommodate documents that don't fit elsewhere.  
+

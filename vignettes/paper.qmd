@@ -35,8 +35,8 @@ Topic modeling is typically framed using a generative model.  A corpus $C$ is de
 1. Draw the total length $N_d$ of $d$ from a Poisson distribution, $N_ds \sim \textrm{Poisson}(\lambda)$ (other distributions over the whole numbers might be used here, eg, negative binomial)
 2. Draw a ($k$-element) topic distribution $\theta_d$ from the Dirichlet distribution defined by $\alpha$, $\theta_d \sim \textrm{Dir}(\alpha)$
 3. For each token $t_i$ ($i = 1, \ldots, N$), 
-    a. Draw a topic $b_i \sim \textrm{Multinomial}(\theta_d)$
-    b. Draw a term from the topic, $t_i \sim b_i$ [@BleiLatentDirichletAllocation2003 996]. 
+a. Draw a topic $b_i \sim \textrm{Multinomial}(\theta_d)$
+b. Draw a term from the topic, $t_i \sim b_i$ [@BleiLatentDirichletAllocation2003 996]. 
 
 This generative model is used to define a joint probability distribution that is then fit to the data (observed document lengths and token counts) using numerical methods such as variational Bayes.  
 
@@ -78,12 +78,13 @@ We first load the `tidyverse` suite, the `lpSolve` package to match fitted and t
 ```{r}
 #| message: false
 #| warning: false
-library(tidyverse)
-library(lpSolve)
-library(tictoc)
-library(tmfast)
-library(stm)
-library(tidytext)
+library(tidyverse)          # infrastructure
+theme_set(theme_minimal())  # make plots not look bad
+library(lpSolve)            # used to match fitted and true topics
+library(tictoc)             # timing
+library(tmfast)             # fit topic models fast! 
+library(stm)                # standard topic model package
+library(tidytext)           # tidiers for stm models
 ```
 
 ## Simulation parameters
@@ -102,29 +103,36 @@ vocab = M             # Vocabulary length
 size = 10             # Size and mean
 mu = 300
 sqrt(mu + mu^2/size)  # Resulting SD of document sizes
+```
 
+Topic-document and word-topic distributions are both sampled from Dirichlet distributions.  For topic-docs, we use an asymmetric Dirichlet distribution^[The $k$-component Dirichlet distribution is parameterized by a $k$-component vector $\mathbf{\alpha} = \alpha (n_1, \ldots, n_k)$, where $\alpha$ is a scalar and $\sum_i n_i = 1$. Using this parameterization, the expected value for component $i$ is $n_i$ with variance $\frac{n_i(1-n_i)}{\alpha + 1}$.  So increasing the scaling factor $\alpha$ means samples from the Dirichlet distribution will be more likely to look like $(n_1, \ldots, n_k)$.] where one component will have (in expectation) most of the probability mass (eg, 80%) and the remaining probability mass will be (in expectation) distributed evenly over the remaining components (eg, $0.2/(k-1)$).  For word-topics we use a symmetric Dirichlet distribution (parametized only by the scaling factor).  `tmfast` includes utility functions for constructing and drawing both kinds of Dirichlet distributions.
+
+```{r}
 ## Dirichlet distributions for topic-docs and word-topics
 topic_peak = .8
 topic_scale = 10
+peak_alpha(k, 1, peak = topic_peak, scale = topic_scale)
+peak_alpha(k, 2, peak = topic_peak, scale = topic_scale)
 
 word_beta = 0.1
 ```
 
-Because the simulations involve drawing samples using a RNG, we first set a seed. 
+Because the simulations involve drawing samples using a RNG, we set a seed. 
 ```{r}
 set.seed(2022-06-19)
 ```
 
 ## Draw true topic distributions
 
-We generate the true topic-document distributions $p(\theta = t | \mathrm{doc}_m)$, often simply called $\theta$ or $\gamma$.  In this vignette we use $\theta$ for the true distribution and $\gamma$ for the fitted distribution in the topic model.  Each document's $\theta$ is sampled from a Dirichlet distribution (`rdirichlet()`), with the parameter $\mathbf{\alpha}$ corresponding to the document's journal $j$.  The variable `theta` is a `M` by `k` matrix; `theta_df` is a tidy representation with columns `doc`, `topic`, and `prob`.  The visualization confirms that documents are generally most strongly associated with the corresponding topics, though with some noise. 
+We generate the true topic-document distributions $p(\theta = t | \mathrm{doc}_m)$, often simply called $\theta$ or $\gamma$.  In this vignette we use $\theta$ for the true distribution and $\gamma$ for the fitted distribution in the topic model.  Each document's $\theta$ is sampled from a Dirichlet distribution (`rdirichlet()`), with the parameter $\mathbf{\alpha}$ corresponding to the document's journal $j$.  The variable `theta` is a `M` by `k` matrix; `theta_df` is a tidy representation with columns `doc`, `topic`, and `prob`.  The visualization confirms that documents are generally most strongly associated with the corresponding topics, though with some noise:  in the median document, 82% of its topic probability mass is associated with the single dominant topic.  
 
 ```{r}
-## Journal-specific alpha, with a peak value (.8 by default) and uniform otherwise
+## Journal-specific alpha, with a peak value (80%) and uniform otherwise
 theta = map(1:k, 
-            ~rdirichlet(Mj, peak_alpha(k, .x, 
-                                       peak = topic_peak, 
-                                       scale = topic_scale))) |> 
+            ~rdirichlet(Mj, 
+                        peak_alpha(k, .x, 
+                                   peak = topic_peak, 
+                                   scale = topic_scale))) |> 
     reduce(rbind)
 
 theta_df = theta |>
@@ -133,10 +141,16 @@ theta_df = theta |>
     mutate(doc = as.integer(doc)) |>
     pivot_longer(starts_with('V'),
                  names_to = 'topic',
-                 values_to = 'prob')
+                 values_to = 'theta')
 
-ggplot(theta_df, aes(doc, topic, fill = prob)) +
+ggplot(theta_df, aes(doc, topic, fill = theta)) +
     geom_tile()
+
+theta_df |> 
+    group_by(doc) |> 
+    summarize(max = max(theta)) |> 
+    pull(max) |> 
+    summary()
 ```
 
 ## Draw true word distributions
@@ -147,29 +161,26 @@ Next we generate the true word-topic distributions $p(\phi = w | \theta = t)$, o
 ## phi_j:  Word distribution for topic j
 phi = rdirichlet(k, word_beta, k = vocab)
 
-## Word distributions
-phi |>
-    as_tibble(rownames = 'topic', 
+phi_df = phi |>
+    t() |> 
+    as_tibble(rownames = 'token', 
               .name_repair = tmfast:::make_colnames) |>
     pivot_longer(starts_with('V'),
-                 names_to = 'word',
-                 values_to = 'prob') |>
-    ggplot(aes(topic, word, fill = (prob))) +
+                 names_to = 'topic',
+                 values_to = 'phi')
+
+## Word distributions
+ggplot(phi_df, aes(topic, token, fill = (phi))) +
     geom_tile() +
     scale_y_discrete(breaks = NULL)
 
 ## Zipf's law
-phi |>
-    as_tibble(rownames = 'topic', 
-              .name_repair = \(x)(str_c('word', 1:vocab))) |>
-    pivot_longer(starts_with('word'),
-                 names_to = 'word',
-                 values_to = 'prob') |>
+phi_df |>
     group_by(topic) |>
-    mutate(rank = rank(desc(prob))) |>
+    mutate(rank = rank(desc(phi))) |>
     arrange(topic, rank) |>
     filter(rank < vocab/2) |>
-    ggplot(aes(rank, prob, color = topic)) +
+    ggplot(aes(rank, phi, color = topic)) +
     geom_line() +
     scale_x_log10() +
     scale_y_log10()
@@ -206,7 +217,7 @@ Under the hood, we cast the document-term matrix to a sparse matrix class if nec
 
 ```{r}
 tic()
-fitted = tmfast(dtm, c(2, 3, k, 2*k))
+fitted = tmfast(dtm, c(3, 5, k, 2*k))
 toc()
 ```
 
@@ -214,18 +225,17 @@ The object returned by `tmfast()` has a simple structure.  `totalvar` and `sdev`
 
 ```{r}
 str(fitted, max.level = 2L)
-str(fitted$varimax$`5`)
+str(fitted$varimax$k)
 ```
 
 Because the model contains a `sdev` component, `screeplot()` works out of the box.  Note that the first $k$ PCs have much higher variance than the others, and often the $k$th PC is somewhat lower than the first $k-1$.  This reflects the highly simplified structure of the simulated data.  Real datasets often have a much more gradual decline in the screeplot, likely reflecting the complex hierarchy of topics in actual documents.  
 ```{r}
-screeplot(fitted)
+screeplot(fitted, npcs = k + 5)
 ```
 
-It's also straightforward to calculate the share of total variance covered by successive principal components.  Experimenting with this simulation, when some documents are much larger than others, $k$ principal components might cover less than half of the total variance.  In this case it covers about 65%.  Again, note that the rotated varimax factors don't correspond to the principal components, but the total covered variance remains the same.  
+It's also straightforward to calculate the share of total variance covered by successive principal components.  Experimenting with this simulation, it's common for $k$ principal components to cover less than half of the total variance.  Again, note that the rotated varimax factors don't correspond to the principal components, but the total covered variance remains the same.  
 
 ```{r}
-## Variance coverage?
 cumsum(fitted$sdev^2) / fitted$totalvar
 
 data.frame(PC = 1:length(fitted$sdev),
@@ -247,7 +257,7 @@ corpus |>
 toc()
 ```
 
-Setting `K = k` gives us a fitted topic model in a few seconds, about an order of magnitude slower than `tmfast()`. 
+Setting `K = k` gives us a fitted topic model in a few seconds, about an order of magnitude slower than `tmfast()`. Profiling experiments indicated that `tmfast()` is about 20x faster than `stm()`. 
 
 ```{r, cache = TRUE}
 tic()
@@ -281,22 +291,17 @@ Word-topic distributions correspond to the varimax factor loadings.  These loadi
 
 ```{r}
 ## Compare Zipfian distributions
-bind_rows({beta |>
-        mutate(type = 'fitted')},
-        {phi |>
-                t() |>
-                as_tibble(rownames = 'token', 
-                          .name_repair = tmfast:::make_colnames) |>
-                pivot_longer(starts_with('V'),
-                             names_to = 'topic',
-                             values_to = 'beta') |>
-                mutate(type = 'true')}
-) |>
+bind_rows(mutate(beta, type = 'fitted'), 
+          {phi_df |> 
+                  rename(beta = phi) |> 
+                  mutate(type = 'true')}) |>
     group_by(type, topic) |>
     mutate(rank = rank(desc(beta))) |>
     arrange(type, topic, rank) |>
     filter(rank < vocab/2) |>
-    ggplot(aes(rank, beta, color = type, group = interaction(topic, type))) +
+    ggplot(aes(rank, beta, 
+               color = type, 
+               group = interaction(topic, type))) +
     geom_line() +
     scale_y_log10() +
     scale_x_log10()
@@ -311,12 +316,7 @@ beta_mx = beta |>
     arrange(token) |>
     ## And dropped words
     complete(token = 1:vocab, topic, fill = list(beta = 0)) |>
-    pivot_wider(names_from = 'topic',
-                values_from = 'beta', values_fill = 0,
-                names_sort = TRUE) |>
-    ## Coerce to matrix
-    column_to_rownames('token') |>
-    as.matrix()
+    build_matrix(token, topic, beta, sparse = FALSE)
 
 hellinger(phi, t(beta_mx))
 ```
@@ -326,12 +326,12 @@ In this distance matrix, the rows are the true topics and the columns are the fi
 ```{r}
 ## Use lpSolve to match fitted topics to true topics
 dist = hellinger(phi, t(beta_mx))
-soln = lp.assign(dist)
-soln$solution
+rotation = lp.assign(dist)$solution
+rotation
 
 ## Hellinger distance comparison using the lpSolve matching
-hellinger(phi, soln$solution %*% t(beta_mx))
-hellinger(phi, soln$solution %*% t(beta_mx)) |>
+hellinger(phi, rotation %*% t(beta_mx))
+hellinger(phi, rotation %*% t(beta_mx)) |>
     diag() |>
     summary()
 ```
@@ -344,13 +344,9 @@ beta_stm_mx = tidy(fitted_stm, matrix = 'beta') |>
     mutate(term = as.integer(term)) |>
     arrange(term) |>
     ## And dropped words
-    complete(term = 1:vocab, topic, fill = list(beta = 0)) |>
-    pivot_wider(names_from = 'topic',
-                values_from = 'beta', values_fill = 0,
-                names_sort = TRUE) |>
-    ## Coerce to matrix
-    column_to_rownames('term') |>
-    as.matrix()
+    complete(term = 1:vocab, topic, 
+             fill = list(beta = 0)) |>
+    build_matrix(term, topic, beta, sparse = FALSE)
 
 hellinger(phi, t(beta_stm_mx))
 
@@ -365,28 +361,28 @@ hellinger(phi, rotation_stm %*% t(beta_stm_mx)) |>
 
 The tidied word-topic distributions can be used in standard ways for further analysis, such as a [Silge plot](https://juliasilge.com/blog/2018/2018-01-25-sherlock-holmes-stm_files/figure-html/unnamed-chunk-6-1.png) of the highest probability words for each topic.  But because the "words" in this simulation are just integers, and not semantically meaningful, we don't construct such a plot here.  
 
-## Topic-document distributions 
+## Renormalization: Topic-document distributions 
 
 Finally, we compare fitted and true topic-document distributions.  We extract topic-document distributions using the same `tidy()` function, specifying the matrix `gamma` and including the rotation above to align the fitted and true topics.  Tile and parallel coordinates plots can be used to visualize all of the topic-document distributions.  These show that the `tmfast` models successfully recover the overall association of each document's journal with a distinctive topic.  
 
 ```{r}
 gamma_df = tidy(fitted, k, 'gamma', 
-                rotation = soln$solution)
+                rotation = rotation) |> 
+    mutate(document = as.integer(document),
+           journal = (document - 1) %/% Mj + 1)
 
-gamma_df |>
-    mutate(document = as.integer(document)) |>
-    ggplot(aes(document, topic, fill = gamma)) +
+ggplot(gamma_df, aes(document, topic, fill = gamma)) +
     geom_raster() +
     scale_x_continuous(breaks = NULL)
 
-gamma_df |>
-    mutate(document = as.integer(document),
-           journal = (document - 1) %/% Mj + 1) |>
-    ggplot(aes(topic, gamma, 
-               group = document, color = as.factor(journal))) +
+ggplot(gamma_df, 
+       aes(topic, gamma, 
+           group = document, 
+           color = as.factor(journal))) +
     geom_line(alpha = .25) +
-    facet_wrap(vars(journal), scales = 'free_x') +
-    scale_color_discrete(guide = 'none')
+    facet_wrap(vars(journal)) +
+    scale_color_discrete(guide = 'none') +
+    scale_x_discrete(guide = 'none')
 ```
 
 However, the fitted topic-document distributions are flatter than the true ones.  Consider the true and fitted distributions for document 1.  Compared to the true distribution, the fitted distribution has a somewhat lower probability for topic `V01` and a somewhat higher probability for the other topics.  
@@ -394,8 +390,7 @@ However, the fitted topic-document distributions are flatter than the true ones.
 ```{r}
 ggplot(mapping = aes(topic, group = 1L)) +
     geom_line(mapping = aes(y = theta, color = 'true'), 
-              data = tibble(theta = theta[1,], 
-                            topic = tmfast:::make_colnames(1:k))) +
+              data = filter(theta_df, doc == '1')) +
     geom_line(mapping = aes(y = gamma, color = 'fitted'), 
               data = filter(gamma_df, document == '1'))
 ```
@@ -403,11 +398,13 @@ ggplot(mapping = aes(topic, group = 1L)) +
 This flatter distribution corresponds to greater entropy.  In this simulation, the entropy of the fitted distributions are about 1 bit greater than those of the true distributions.  This discrepancy tends to become worse with greater values of $k$.  
 
 ```{r}
-theta |> 
-    apply(1, entropy) |> 
+theta_df |> 
+    group_by(doc) |> 
+    summarize(H = entropy(theta)) |> 
+    pull(H) |> 
     summary()
 
-tidy(fitted, k, 'gamma') |> 
+gamma_df |> 
     group_by(document) |> 
     summarize(H = entropy(gamma)) |> 
     pull(H) |> 
@@ -422,10 +419,9 @@ which has entropy
 
 $$ H' = \frac{1}{Z} \sum_i [p_i^\beta \beta \log p_i] - \log Z.$$
 
-That is, we can choose a parameter $\beta$ that renormalizes $P$ to achieve a target entropy $H'$.  In LDA, the target entropy is the expected entropy for topic-document distributions drawn from the Dirichlet prior.  `tmfast` provides convenience functions for calculating this expected entropy; compare this to the mean entropy of the distributions in `theta` above.  **In actual applications, where the Dirichlet prior is an idealization, choosing $\alpha$ to set the target entropy is an important researcher degree of freedom.**  It is equivalent to choosing prior parameters in other topic modeling packages.  
+That is, we can choose a parameter $\beta$ that renormalizes $P$ to achieve a target entropy $H'$.  In LDA, the target entropy is the expected entropy for topic-document distributions drawn from the asymmetric Dirichlet prior.  `tmfast` provides convenience functions for calculating this expected entropy; compare this to the mean entropy of the distributions in `theta` above.  **In actual applications, where the Dirichlet prior is an idealization, choosing $\alpha$ to set the target entropy is an important researcher degree of freedom.**  It is equivalent to choosing prior parameters in other topic modeling packages.  
 
 ```{r}
-peak_alpha(k, 1, topic_peak, topic_scale)
 expected_entropy(peak_alpha(k, 1, topic_peak, topic_scale))
 ```
 
@@ -441,13 +437,15 @@ gamma_power = tidy(fitted, k, 'gamma') |>
 gamma_power
 ```
 
-The renormalized topic-document distributions have closer entropy to theta.  The `keep_original` argument lets us compare the original and renormalized distributions. 
+The renormalized topic-document distributions have closer entropy to $\theta$.  The `keep_original` argument lets us compare the original and renormalized distributions. 
 
 ```{r}
 gamma_df = tidy(fitted, k, 'gamma', 
-                rotation = soln$solution, 
+                rotation = rotation, 
                 exponent = gamma_power, 
-                keep_original = TRUE)
+                keep_original = TRUE) |> 
+    mutate(document = as.integer(document),
+           journal = (document - 1) %/% Mj + 1)
 
 gamma_df |> 
     group_by(document) |> 
@@ -460,25 +458,28 @@ We can now assess accuracy of the topic-document distributions.  Above we used t
 
 ```{r}
 ## w/o renormalization, mean distance is .24
-hellinger(theta_df, doc,
-                        topicsdf2 = gamma_df, id2 = document, 
-                        prob2 = gamma, df = FALSE) |> 
+hellinger(theta_df, doc, prob1 = theta,
+          topicsdf2 = gamma_df, 
+          id2 = document, 
+          prob2 = gamma, df = FALSE) |> 
     diag() |> 
     summary()
 
 ## w/ renormalization, mean distance drops to .13
-doc_compare = hellinger(theta_df, doc,
-          topicsdf2 = gamma_df, id2 = document, 
-          prob2 = gamma_rn, df = TRUE)
+doc_compare = hellinger(theta_df, doc, prob1 = theta,
+                        topicsdf2 = gamma_df, 
+                        id2 = document, 
+                        prob2 = gamma_rn, df = TRUE)
 
 doc_compare |> 
     filter(doc == document) |> 
     pull(dist) |> 
     summary()
 
-ggplot(doc_compare, aes(as.integer(doc), 
-                        as.integer(document), 
-                        fill = 1 - dist)) +
+ggplot(doc_compare, 
+       aes(as.integer(doc), 
+           as.integer(document), 
+           fill = 1 - dist)) +
     geom_raster() +
     scale_x_discrete(breaks = NULL, name = 'true') +
     scale_y_discrete(breaks = NULL, name = 'fitted')
@@ -488,10 +489,7 @@ STM has a slightly closer fit, with a mean Hellinger distance of 0.08.
 
 ```{r}
 fitted_stm_gamma = tidy(fitted_stm, matrix = 'gamma') |> 
-    pivot_wider(names_from = 'topic', 
-                values_from = 'gamma') |> 
-    column_to_rownames('document') |> 
-    as.matrix()
+    build_matrix(document, topic, gamma, sparse = FALSE)
 
 hellinger(theta, fitted_stm_gamma %*% t(rotation_stm)) |> 
     diag() |> 
@@ -499,5 +497,336 @@ hellinger(theta, fitted_stm_gamma %*% t(rotation_stm)) |>
 ```
 
 
-# Example 2: Victorian fiction
+# Example 2: Fiction from the long nineteenth century
+
+**[figure widths]**
+
+Our second example will analyze a corpus of works from the long nineteenth century, attempting to recover the author of each document. 
+
+
+```{r}
+library(tidyverse)            # infrastructure
+theme_set(theme_minimal())
+library(ggbeeswarm)
+library(memoise)
+library(tictoc)
+
+library(gutenbergr)           # text retrieval and manipulation
+library(tidytext)
+library(tmfast)               # topic modeling
+library(stm)                  # topic modeling
+
+get_author = function(author_id) {
+    gutenberg_works(gutenberg_author_id == author_id, 
+                    has_text) |> 
+    gutenberg_download(meta_fields = c('author', 'title'), 
+                       mirror = 'http://aleph.gutenberg.org')
+}
+get_author = memoise(get_author, 
+                     cache = cache_filesystem('realbooks'))
+```
+
+## Corpus assembly
+
+We first retrieve all works in Project Gutenberg by our target authors: Jane Austen, Charlotte and Emily Brontë, Louisa May Alcott, George Eliot, Charles Dickens, and HG Wells.  We use the `memoise` package with the helper function `get_author()` to cache these results; the cache ends up at about 286 MB.  
+
+```{r}
+## Jane Austen is author 68
+gutenberg_authors |> 
+    filter(str_detect(author, 'Austen'))
+austen_df = get_author(68)
+```
+
+```{r}
+## Anne Brontë is 404
+filter(gutenberg_authors, str_detect(author, 'Brontë'))
+a_bronte_df = get_author(404)
+```
+
+```{r}
+## Charlotte Brontë is 408
+filter(gutenberg_authors, str_detect(author, 'Brontë'))
+c_bronte_df = get_author(408)
+```
+
+```{r}
+## Emily Brontë is 405
+filter(gutenberg_authors, str_detect(author, 'Brontë'))
+e_bronte_df = get_author(405)
+```
+
+```{r}
+## Louisa May Alcott is 102
+filter(gutenberg_authors, str_detect(author, 'Alcott'))
+alcott_df = get_author(102)
+```
+
+```{r}
+## George Eliot is 90
+filter(gutenberg_authors, str_detect(author, 'Eliot'))
+eliot_df = get_author(90)
+```
+
+```{r}
+## Mary Wollstonecraft Shelley is 61
+filter(gutenberg_authors, str_detect(author, 'Shelley'))
+shelley_df = get_author(61)
+```
+
+```{r}
+## Charles Dickens is 37
+filter(gutenberg_authors, str_detect(author, 'Dickens'))
+dickens_df = get_author(37)
+```
+
+```{r}
+## HG Wells is 30
+filter(gutenberg_authors, str_detect(author, 'Wells'))
+wells_df = get_author(30)
+```
+
+```{r}
+## HP Lovecraft is 34724
+filter(gutenberg_authors, str_detect(author, 'Lovecraft'))
+lovecraft_df = get_author(34724)
+```
+
+
+We combine these results, and use `tidytext::unnest_tokens()` to convert the result into a long-format document-term matrix.  Note that token extraction can take a long moment.  We also construct a dataframe to link titles to authors in the topic model output. 
+
+```{r}
+#| cache: true
+dataf = bind_rows(austen_df, 
+          a_bronte_df, 
+          c_bronte_df, 
+          e_bronte_df, 
+          alcott_df, 
+          eliot_df,
+          shelley_df,
+          dickens_df, 
+          wells_df, 
+          lovecraft_df) |> 
+    unnest_tokens(term, text, token = 'words') |> 
+    count(gutenberg_id, author, title, term)
+
+dataf
+
+meta_df = distinct(dataf, author, title)
+```
+
+The number of works by each author varies widely, as does the total token count. 
+
+```{r}
+distinct(dataf, author, title) |> 
+    count(author)
+
+with(dataf, n_distinct(author, title))
+```
+
+
+
+```{r}
+dataf |> 
+    group_by(author, title) |> 
+    summarize(n = sum(n)) |> 
+    summarize(min = min(n), 
+              median = median(n), 
+              max = max(n), 
+              total = sum(n)) |> 
+    arrange(desc(total))
+
+dataf |> 
+    group_by(author, title) |> 
+    summarize(n = sum(n)) |> 
+    ggplot(aes(author, n, color = author)) +
+    geom_boxplot() +
+    geom_beeswarm() +
+    scale_color_discrete(guide = 'none') +
+    coord_flip()
+```
+
+
+
+
+
+## Vocabulary selection
+
+In line with a common rule of thumb in topic modeling, we aim for a vocabulary of about 10 times as many terms as documents in the corpus.  
+
+```{r}
+vocab_size = n_distinct(dataf$author, dataf$title) * 10
+vocab_size
+```
+
+`tmfast` provides two information-theoretic methods for vocabulary selection.  Both are based on the idea of a two-player guessing game.  I pick one of the documents from the corpus, then one of the terms from the document.  I tell you the term, and you have to guess which document I picked.  More informative terms have greater information gain (calculated as the Kullback-Leibler divergence) relative to a "baseline" distribution based purely on the process used to pick the document.  The difference between the two methods is in the document-picking process.  The `ndH` method assumes the document was picked uniformly at random from the corpus, so that no document is more likely to be picked than any other.  The `ndR` method assumes document probability is proportional to the document length, so that shorter documents are less likely to be picked.  This method implies that terms that are distinctive of shorter documents have high information gain, since they indicate "surprising" short documents.  
+
+On either method, the most informative terms are often typographical or OCR errors, since these only occur in a single document.  To balance this, we multiply the information gain ($\Delta H$ for the uniform process, $\Delta R$ for the length-weighted process) by the log frequency of the term across the entire corpus ($\log n$).  So `ndH` is shorthand for $\log(n) \Delta H$ while `ndR` is shorthand for $\log(n) \Delta R$. 
+
+```{r}
+tic()
+H_df = ndH(dataf, title, term, n)
+R_df = ndR(dataf, title, term, n) |>
+    mutate(in_vocab = rank(desc(ndR)) <= vocab_size)
+toc()
+H_df
+R_df
+``` 
+
+The resulting term ranking of the two methods tend to be similar, but `ndR` is preferable in the current case because of the additional weight it gives to distinctive terms from shorter documents.  
+
+```{r}
+inner_join(H_df, R_df, by = 'term') |> 
+    ggplot(aes(ndH, ndR, color = in_vocab)) +
+    geom_point(aes(alpha = rank(desc(ndH)) <= vocab_size))
+
+inner_join(H_df, R_df, by = 'term') |> 
+    mutate(ndH_rank = rank(desc(ndH)), 
+           ndR_rank = rank(desc(ndR))) |> 
+    ggplot(aes(ndH_rank, ndR_rank, color = in_vocab)) +
+    geom_point(aes(alpha = ndH_rank <= vocab_size)) +
+    scale_x_log10() + 
+    scale_y_log10()
+```
+
+```{r}
+vocab = R_df |> 
+    filter(in_vocab) |> 
+    pull(term)
+head(vocab, 50)
+```
+
+```{r}
+dataf |> 
+    filter(term %in% vocab) |> 
+    group_by(author, title) |> 
+    summarize(n = sum(n)) |> 
+    ggplot(aes(author, n, color = author)) +
+    geom_boxplot() +
+    geom_beeswarm() +
+    scale_color_discrete(guide = 'none') +
+    coord_flip()
+```
+
+
+## Fit topic models
+
+```{r}
+dtm = dataf |> 
+    filter(term %in% vocab) |> 
+    mutate(n = log1p(n))
+
+n_authors = n_distinct(dataf$author)
+
+tic()
+fitted_tmf = tmfast(dtm, n = c(5,
+                              n_authors, 
+                              n_authors + 5),
+                    row = title, column = term, value = n)
+toc()
+
+screeplot(fitted_tmf, npcs = n_authors + 5)
+```
+
+
+## Topic exploration
+
+Without renormalization, most of the works are spread across a few topics, and the topics don't clearly correspond to authors.  
+
+```{r}
+tidy(fitted_tmf, n_authors, 'gamma') |> 
+    left_join(meta_df, by = c('document' = 'title')) |> 
+    ggplot(aes(document, gamma, fill = topic)) +
+    geom_col() +
+    facet_wrap(vars(author), scales = 'free_x') +
+    scale_x_discrete(guide = 'none') +
+    scale_fill_viridis_d()
+```
+
+To renormalize, we need to choose a theoretical Dirichlet distribution. 
+
+```{r}
+alpha = peak_alpha(n_authors, 1, peak = .8, scale = 10)
+target_entropy = expected_entropy(alpha)
+target_entropy
+
+exponent = tidy(fitted_tmf, n_authors, 'gamma') |> 
+    target_power(document, gamma, target_entropy)
+exponent
+
+tidy(fitted_tmf, n_authors, 'gamma', exponent = exponent) |> 
+    left_join(meta_df, by = c('document' = 'title')) |> 
+    ggplot(aes(document, gamma, fill = topic)) +
+    geom_col() +
+    facet_wrap(vars(author), scales = 'free_x') +
+    scale_x_discrete(guide = 'none') +
+    scale_fill_viridis_d()
+
+tidy(fitted_tmf, n_authors, 'gamma', exponent = exponent) |> 
+    left_join(meta_df, by = c('document' = 'title')) |> 
+    ggplot(aes(document, topic, fill = gamma)) +
+    geom_raster() +
+    facet_grid(cols = vars(author), 
+               scales = 'free_x', 
+               switch = 'x') +
+    scale_x_discrete(guide = 'none')
+```
+
+After renormalization, there are distinctive topics for Alcott (4) and Wells (1 and 9).  Austen, Anne Brontë, Emily Brontë, and some of Shelley's works appear together in topic 3.  Charlotte Brontë and some of Eliot's and Shelley's works split topic 5.  Eliot and Lovecraft share topic 10.  And Dickens' works are spread across multiple topics, with 2, 6, and 8 appearing to be distinctive to him.  
+
+To aid interpretation, we create a crosswalk dataframe connecting topics to authors. 
+```{r}
+topic_author = tribble(
+   ~ topic, ~ authors,
+   'V01', 'Wells', 
+   'V02', 'Dickens', 
+   'V03', 'Austin, A & E Brontë', 
+   'V04', 'Alcott', 
+   'V05', 'Dickens', 
+   'V06', 'Dickens', 
+   'V07', 'C Brontë, Eliot, Shelley', 
+   'V08', 'Dickens', 
+   'V09', 'Wells', 
+   'V10', 'Eliot, Lovecraft'
+)
+```
+
+To explore these topics further, we turn to the word-topic distribution.  These distributions could be renormalized, as with the topic-doc distributions.  But the exponent for the word-topic distributions is usually quite close to 1, meaning renormalization doesn't change these distributions very much.  
+
+```{r}
+target_entropy_term = expected_entropy(.1, k = vocab_size)
+target_entropy_term
+
+exponent_term = tidy(fitted_tmf, n_authors, 'beta') |> 
+    target_power(topic, beta, target_entropy_term)
+exponent_term
+```
+
+We therefore skip renormalization and move directly to a Silge plot, showing the top 10 terms for each topic.  `tidytext::reorder_within()` and `tidytext::scale_x_reordered()` are useful for constructing this plot. 
+
+```{r}
+beta_df = tidy(fitted_tmf, n_authors, 'beta')
+
+top_terms = beta_df |> 
+    group_by(topic) |> 
+    arrange(topic, desc(beta)) |> 
+    top_n(15, beta) |> 
+    left_join(topic_author, by = 'topic')
+top_terms
+
+top_terms |> 
+    mutate(token = reorder_within(token, 
+                                  by = beta, 
+                                  within = topic)) |> 
+    ggplot(aes(token, beta)) +
+    geom_point() +
+    geom_segment(aes(xend = token), yend = 0) +
+    facet_wrap(vars(topic, authors), scales = 'free_y') +
+    coord_flip() +
+    scale_x_reordered()
+```
+
+Most topics (2, 3, 4, 5, 6, 8, 9) focus on character names, with three of the four Dickens topics corresponding to *The Pickwick Papers* (topic 2), *Oliver Twist* (5), and *David Copperfield* (8).  Wells' topics appear to distinguish non-fiction essays (topic 1) from fiction (9).  Topic 7 groups together Charlotte Brontë, Eliot, and Shelley based on the use of French. Topic 10 has a mix of character names with months of the year; it appears to be a "miscellaneous" topic, often created by topic models to accommodate documents that don't fit elsewhere.  
+
+
+
 
