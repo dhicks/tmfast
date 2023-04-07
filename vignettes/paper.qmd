@@ -17,7 +17,13 @@ affiliations:
       postal-code: "95343"
 date: 2023-02-16
 toc: true
+number-sections: true
+format:
+    pdf:
+        code-block-bg: '#FAFAFA'
 ---
+
+*[bibliography]*
 
 # Introduction
 
@@ -225,7 +231,7 @@ The object returned by `tmfast()` has a simple structure.  `totalvar` and `sdev`
 
 ```{r}
 str(fitted, max.level = 2L)
-str(fitted$varimax$k)
+str(fitted$varimax[as.character(k)])
 ```
 
 Because the model contains a `sdev` component, `screeplot()` works out of the box.  Note that the first $k$ PCs have much higher variance than the others, and often the $k$th PC is somewhat lower than the first $k-1$.  This reflects the highly simplified structure of the simulated data.  Real datasets often have a much more gradual decline in the screeplot, likely reflecting the complex hierarchy of topics in actual documents.  
@@ -499,8 +505,6 @@ hellinger(theta, fitted_stm_gamma %*% t(rotation_stm)) |>
 
 # Example 2: Fiction from the long nineteenth century
 
-**[figure widths]**
-
 Our second example will analyze a corpus of works from the long nineteenth century, attempting to recover the author of each document. 
 
 
@@ -510,6 +514,7 @@ theme_set(theme_minimal())
 library(ggbeeswarm)
 library(memoise)
 library(tictoc)
+library(glue)
 
 library(gutenbergr)           # text retrieval and manipulation
 library(tidytext)
@@ -519,11 +524,21 @@ library(stm)                  # topic modeling
 get_author = function(author_id) {
     gutenberg_works(gutenberg_author_id == author_id, 
                     has_text) |> 
-    gutenberg_download(meta_fields = c('author', 'title'), 
-                       mirror = 'http://aleph.gutenberg.org')
+        gutenberg_download(meta_fields = c('author', 'title'), 
+                           mirror = 'http://aleph.gutenberg.org')
 }
 get_author = memoise(get_author, 
                      cache = cache_filesystem('realbooks'))
+```
+
+```{r fig_scale, include=FALSE}
+height = 4
+aspect_ratio = 1.5
+scale = 1.5
+knitr::opts_chunk$set(fig.height = height * scale,
+                      fig.width = height * aspect_ratio * scale,
+                      out.height = glue('{height}in'),
+                      out.width = glue('{height * aspect_ratio}in'))
 ```
 
 ## Corpus assembly
@@ -532,62 +547,62 @@ We first retrieve all works in Project Gutenberg by our target authors: Jane Aus
 
 ```{r}
 ## Jane Austen is author 68
-gutenberg_authors |> 
-    filter(str_detect(author, 'Austen'))
+# gutenberg_authors |> 
+#     filter(str_detect(author, 'Austen'))
 austen_df = get_author(68)
 ```
 
 ```{r}
 ## Anne Brontë is 404
-filter(gutenberg_authors, str_detect(author, 'Brontë'))
+# filter(gutenberg_authors, str_detect(author, 'Brontë'))
 a_bronte_df = get_author(404)
 ```
 
 ```{r}
 ## Charlotte Brontë is 408
-filter(gutenberg_authors, str_detect(author, 'Brontë'))
+# filter(gutenberg_authors, str_detect(author, 'Brontë'))
 c_bronte_df = get_author(408)
 ```
 
 ```{r}
 ## Emily Brontë is 405
-filter(gutenberg_authors, str_detect(author, 'Brontë'))
+# filter(gutenberg_authors, str_detect(author, 'Brontë'))
 e_bronte_df = get_author(405)
 ```
 
 ```{r}
 ## Louisa May Alcott is 102
-filter(gutenberg_authors, str_detect(author, 'Alcott'))
+# filter(gutenberg_authors, str_detect(author, 'Alcott'))
 alcott_df = get_author(102)
 ```
 
 ```{r}
 ## George Eliot is 90
-filter(gutenberg_authors, str_detect(author, 'Eliot'))
+# filter(gutenberg_authors, str_detect(author, 'Eliot'))
 eliot_df = get_author(90)
 ```
 
 ```{r}
 ## Mary Wollstonecraft Shelley is 61
-filter(gutenberg_authors, str_detect(author, 'Shelley'))
+# filter(gutenberg_authors, str_detect(author, 'Shelley'))
 shelley_df = get_author(61)
 ```
 
 ```{r}
 ## Charles Dickens is 37
-filter(gutenberg_authors, str_detect(author, 'Dickens'))
+# filter(gutenberg_authors, str_detect(author, 'Dickens'))
 dickens_df = get_author(37)
 ```
 
 ```{r}
 ## HG Wells is 30
-filter(gutenberg_authors, str_detect(author, 'Wells'))
+# filter(gutenberg_authors, str_detect(author, 'Wells'))
 wells_df = get_author(30)
 ```
 
 ```{r}
 ## HP Lovecraft is 34724
-filter(gutenberg_authors, str_detect(author, 'Lovecraft'))
+# filter(gutenberg_authors, str_detect(author, 'Lovecraft'))
 lovecraft_df = get_author(34724)
 ```
 
@@ -597,15 +612,15 @@ We combine these results, and use `tidytext::unnest_tokens()` to convert the res
 ```{r}
 #| cache: true
 dataf = bind_rows(austen_df, 
-          a_bronte_df, 
-          c_bronte_df, 
-          e_bronte_df, 
-          alcott_df, 
-          eliot_df,
-          shelley_df,
-          dickens_df, 
-          wells_df, 
-          lovecraft_df) |> 
+                  a_bronte_df, 
+                  c_bronte_df, 
+                  e_bronte_df, 
+                  alcott_df, 
+                  eliot_df,
+                  shelley_df,
+                  dickens_df, 
+                  wells_df, 
+                  lovecraft_df) |> 
     unnest_tokens(term, text, token = 'words') |> 
     count(gutenberg_id, author, title, term)
 
@@ -719,8 +734,8 @@ n_authors = n_distinct(dataf$author)
 
 tic()
 fitted_tmf = tmfast(dtm, n = c(5,
-                              n_authors, 
-                              n_authors + 5),
+                               n_authors, 
+                               n_authors + 5),
                     row = title, column = term, value = n)
 toc()
 
@@ -760,12 +775,16 @@ tidy(fitted_tmf, n_authors, 'gamma', exponent = exponent) |>
     facet_wrap(vars(author), scales = 'free_x') +
     scale_x_discrete(guide = 'none') +
     scale_fill_viridis_d()
+```
 
+```{r}
+#| fig-width: !expr height * 2.5 * scale
 tidy(fitted_tmf, n_authors, 'gamma', exponent = exponent) |> 
     left_join(meta_df, by = c('document' = 'title')) |> 
     ggplot(aes(document, topic, fill = gamma)) +
     geom_raster() +
-    facet_grid(cols = vars(author), 
+    facet_grid(cols = vars(str_wrap(author, 
+                                    width = 20)), 
                scales = 'free_x', 
                switch = 'x') +
     scale_x_discrete(guide = 'none')
@@ -776,17 +795,17 @@ After renormalization, there are distinctive topics for Alcott (4) and Wells (1 
 To aid interpretation, we create a crosswalk dataframe connecting topics to authors. 
 ```{r}
 topic_author = tribble(
-   ~ topic, ~ authors,
-   'V01', 'Wells', 
-   'V02', 'Dickens', 
-   'V03', 'Austin, A & E Brontë', 
-   'V04', 'Alcott', 
-   'V05', 'Dickens', 
-   'V06', 'Dickens', 
-   'V07', 'C Brontë, Eliot, Shelley', 
-   'V08', 'Dickens', 
-   'V09', 'Wells', 
-   'V10', 'Eliot, Lovecraft'
+    ~ topic, ~ authors,
+    'V01', 'Wells', 
+    'V02', 'Dickens', 
+    'V03', 'Austin, A & E Brontë', 
+    'V04', 'Alcott', 
+    'V05', 'Dickens', 
+    'V06', 'Dickens', 
+    'V07', 'C Brontë, Eliot, Shelley', 
+    'V08', 'Dickens', 
+    'V09', 'Wells', 
+    'V10', 'Eliot, Lovecraft'
 )
 ```
 
@@ -803,7 +822,10 @@ exponent_term
 
 We therefore skip renormalization and move directly to a Silge plot, showing the top 10 terms for each topic.  `tidytext::reorder_within()` and `tidytext::scale_x_reordered()` are useful for constructing this plot. 
 
+
 ```{r}
+#| dev: cairo_pdf
+#| fig-height: !expr height * scale * 1.25
 beta_df = tidy(fitted_tmf, n_authors, 'beta')
 
 top_terms = beta_df |> 

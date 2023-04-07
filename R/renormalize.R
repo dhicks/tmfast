@@ -75,10 +75,10 @@ target_power = function(tidy_df,
                         p_col,
                         target_entropy) {
     powers = tidy_df |>
-        group_by({{ group_col }}) |>
-        summarize(H = entropy({{ p_col }}),
+        dplyr::group_by({{ group_col }}) |>
+        dplyr::summarize(H = entropy({{ p_col }}),
                   power = solve_power({{ p_col }}, target_entropy)) |>
-        pull(power)
+        dplyr::pull(power)
     if (sum(is.na(powers)) > 0.1 * length(powers)) {
         warning('More than 10% of powers could not be calculated')
     }
