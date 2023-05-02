@@ -209,14 +209,14 @@
   urlcolor={Blue},
   pdfcreator={LaTeX via pandoc}}
 
-\renewcommand{\today}{2023-05-01}
+\renewcommand{\today}{2023-05-02}
 \newcommand{\runninghead}{A Preprint }
 \title{\texttt{tmfast} fits topic models fast}
 \author{
-\textbf{Daniel J. Hicks}~\orcidlink{0000-0001-7945-4416}\\\\University
-of California,
-Merced\\Merced,\ 95343\\\href{mailto:dhicks4@ucmerced.edu}{dhicks4@ucmerced.edu}}
-\date{2023-05-01}
+\textbf{Daniel J. Hicks}~\orcidlink{0000-0001-7945-4416}\\Department of
+Philosophy\\University of California, Merced\\Merced,
+CA,\ 95343\\\href{mailto:dhicks4@ucmerced.edu}{dhicks4@ucmerced.edu}}
+\date{2023-05-02}
 \begin{document}
 \maketitle
 \begin{abstract}
@@ -227,7 +227,7 @@ simulated corpus and aggregated works of a selection of authors from the
 long nineteenth century, and compare the quality of the fitted models to
 a standard topic modeling package.
 \end{abstract}
-\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[breakable, boxrule=0pt, frame hidden, colback={shadecolor}, enhanced]}{\end{tcolorbox}}\fi
+\ifdefined\Shaded\renewenvironment{Shaded}{\begin{tcolorbox}[breakable, enhanced, colback={shadecolor}, boxrule=0pt, frame hidden]}{\end{tcolorbox}}\fi
 
 \renewcommand*\contentsname{Table of contents}
 {
@@ -818,7 +818,7 @@ left tails with relatively large negative values).
 \end{Shaded}
 
 \begin{verbatim}
-0.58 sec elapsed
+0.576 sec elapsed
 \end{verbatim}
 
 The object returned by \texttt{tmfast()} has a simple structure (pun
@@ -1504,8 +1504,8 @@ and so again we can get an overall summary from the diagonal. Without
 renormalization, in the current simulation the mean Hellinger distance
 is 0.24 --- not too bad, but perhaps larger than one would like. With
 larger values of \(k\), this accuracy increases significantly.
-Renormalization keeps the mean distance around 0.13, slightly better the
-the word-topic distributions.
+Renormalization keeps the mean distance around 0.13, comparable to the
+word-topic distributions.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1583,11 +1583,15 @@ STM has a slightly closer fit, with a mean Hellinger distance of 0.08.
 \end{verbatim}
 
 \hypertarget{sec-realbooks}{%
-\section{Example 2: Fiction from the long nineteenth
+\section{Example 2: Literature from the long nineteenth
 century}\label{sec-realbooks}}
 
-Our second example will analyze a corpus of works from the long
+Our second example will analyze a literary corpus from the long
 nineteenth century, attempting to recover the author of each document.
+In order to reduce the number of requests sent to Project Gutenberg, we
+construct a convenience function to identify and retrieve fulltext works
+given an author's Gutenberg ID, and wrap this in
+\texttt{memoise::memoise()} to create a local cache.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1619,9 +1623,8 @@ nineteenth century, attempting to recover the author of each document.
 
 We first retrieve all works in Project Gutenberg by our target authors:
 Jane Austen, Charlotte and Emily Brontë, Louisa May Alcott, George
-Eliot, Charles Dickens, HG Wells, and HP Lovecraft. We use the
-\texttt{memoise} package with the helper function \texttt{get\_author()}
-to cache these results; the cache ends up at about 286 MB.
+Eliot, Charles Dickens, HG Wells, and HP Lovecraft. For these authors,
+the \texttt{memoise} local cache ends up at about 286 MB.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -1899,7 +1902,7 @@ shorthand for \(\log(n) \Delta R\).
 \end{Shaded}
 
 \begin{verbatim}
-13.905 sec elapsed
+17.518 sec elapsed
 \end{verbatim}
 
 \begin{Shaded}
@@ -2066,7 +2069,7 @@ Warning: Using alpha for a discrete variable is not advised.
 \end{Shaded}
 
 \begin{verbatim}
-0.732 sec elapsed
+0.801 sec elapsed
 \end{verbatim}
 
 \begin{Shaded}
@@ -2324,7 +2327,7 @@ fit elsewhere.
  collate  en_US.UTF-8
  ctype    en_US.UTF-8
  tz       America/Los_Angeles
- date     2023-05-01
+ date     2023-05-02
  pandoc   2.16.2 @ /usr/local/bin/ (via rmarkdown)
 
 - Packages -------------------------------------------------------------------

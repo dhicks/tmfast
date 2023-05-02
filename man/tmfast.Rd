@@ -4,7 +4,7 @@
 \alias{tmfast}
 \title{Fit a topic model using PCA+varimax}
 \usage{
-tmfast(dtm, n, row = doc, column = word, value = n, ...)
+tmfast(dtm, n, row = doc, column = word, value = n, verbose = FALSE, ...)
 }
 \arguments{
 \item{dtm}{Document-term matrix.  Either an object inheriting from \code{Matrix} or a long dataframe representation with row column \code{row}, column column \code{column}, and value column \code{n}.}
@@ -16,6 +16,8 @@ tmfast(dtm, n, row = doc, column = word, value = n, ...)
 \item{column}{In dataframe \code{dtm}, column column}
 
 \item{value}{In dataframe \code{dtm}, value column}
+
+\item{verbose}{Should \code{irlba()} be \code{verbose}?}
 
 \item{...}{Other arguments, passed to \code{varimax_irlba}}
 }

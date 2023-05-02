@@ -121,15 +121,25 @@ fit_varimax = function(k, pca,
 #' @param row In dataframe `dtm`, row column
 #' @param column In dataframe `dtm`, column column
 #' @param value In dataframe `dtm`, value column
+#' @param verbose Should `irlba()` be `verbose`?
 #' @param ... Other arguments, passed to `varimax_irlba`
 #' @return As per `varimax_irlba`, of class `tmfast`
 #' @details If `dtm` is not a matrix, will be cast to a sparse matrix using `tidytext::case_sparse()`
 #' @export
-tmfast = function(dtm, n, row = doc, column = word, value = n, ...) {
+tmfast = function(dtm,
+                  n,
+                  row = doc, column = word, value = n,
+                  verbose = FALSE,
+                  ...) {
     if (!inherits(dtm, 'Matrix')) {
+        if (verbose) message('Casting dtm to sparse matrix')
         dtm = tidytext::cast_sparse(dtm, {{row}}, {{column}}, {{value}})
     }
-    fitted = varimax_irlba(dtm, n, prcomp_opts = list(.scale = FALSE), ...)
+    fitted = varimax_irlba(dtm,
+                           n,
+                           prcomp_opts = list(.scale = FALSE,
+                                              verbose = verbose),
+                           ...)
     class(fitted) = c('tmfast', class(fitted))
     return(fitted)
 }
