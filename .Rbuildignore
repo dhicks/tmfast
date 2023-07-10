@@ -1,2 +1,6 @@
 ^tmfast\.Rproj$
 ^\.Rproj\.user$
+^vignettes/paper_cache$
+^vignettes/realbooks_cache$
+^vignettes/realbooks$
+^data$

@@ -21,7 +21,9 @@ Imports:
     tidyselect,
     irlba,
     tidytext,
-    glue
+    glue,
+    Matrix,
+    generics
 Suggests: 
     testthat (>= 3.0.0),
     Rtsne,
