@@ -4,4 +4,3 @@ This package implements an approach to quickly fitting topic models, combining p
 
 Beyond fitting the topic models, the package includes (a) functions for [my information-theoretic approach to vocabulary selection](https://direct.mit.edu/qss/article/2/3/990/106952/Productivity-and-interdisciplinary-impacts-of); (b) tidiers, for extracting both word-topic and topic-document matrices into a tidyverse workflow; (c) Hellinger distance calculations and t-SNE and UMAP visualization for [my "discursive space" analysis](https://direct.mit.edu/qss/article/2/3/990/106952/Productivity-and-interdisciplinary-impacts-of); and (d) samplers to construct simulated corpora. 
 
-Function-level documentation is nearly complete, but vignettes are a work in progress.  See especially `vignettes/realbooks.R` for a quick-running anaysis of a small corpus of real books, and `vignettes/journal-specific-topics` for a more complete but somewhat slower simulation analysis. 

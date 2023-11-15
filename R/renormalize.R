@@ -52,7 +52,7 @@ solve_power = function(p,
         interval = c(.1, 10),
         extendInt = 'yes',
         maxiter = 3000)
-    if (return_full || is.na(soln)) {
+    if ((return_full || identical(soln, NA_real_)) || is.na(soln$root)) {
         return(soln)
     } else {
         return(soln$root)

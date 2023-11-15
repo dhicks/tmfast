@@ -4,3 +4,8 @@
 ^vignettes/realbooks_cache$
 ^vignettes/realbooks$
 ^data$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^\.github$
+^LICENSE\.md$

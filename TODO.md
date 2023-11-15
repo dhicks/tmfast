@@ -1,3 +1,6 @@
+- pkgdown
+    - realbooks builds correctly? 
+    - rest of build_site()
 - S3 class validator:
      - length(sdev) == max(n)
      - names(varimax) == as.character(n)

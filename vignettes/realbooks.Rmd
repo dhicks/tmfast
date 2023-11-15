@@ -1,13 +1,15 @@
 ---
 title: "Fast topic modeling with real books"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Fast topic modeling with real books}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+author: |
+    Dan Hicks
+    <hicks.daniel.j@gmail.com>
+output:
+    html_document:
+        toc: true
+        toc_float: true
 ---
 
-Our second example will analyze a corpus of works from the long nineteenth century, attempting to recover the author of each one.  
+In this vignette, we analyze a corpus of works from the long nineteenth century, attempting to recover the author of each one.  
 
 
 ```{r}
