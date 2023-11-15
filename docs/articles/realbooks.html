@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">tmfast</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.2023-04-15</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.2023-11-15</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,7 +50,14 @@
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
 </form>
 
-      <ul class="navbar-nav"></ul>
+      <ul class="navbar-nav">
+<li class="nav-item">
+  <a class="external-link nav-link" href="https://github.com/dhicks/tmfast/" aria-label="github">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
 
     
@@ -67,7 +74,7 @@
 <p>Dan Hicks <a href="mailto:hicks.daniel.j@gmail.com" class="email">hicks.daniel.j@gmail.com</a></p>
             
       
-      
+      <small class="dont-index">Source: <a href="https://github.com/dhicks/tmfast/blob/HEAD/vignettes/realbooks.Rmd" class="external-link"><code>vignettes/realbooks.Rmd</code></a></small>
       <div class="d-none name"><code>realbooks.Rmd</code></div>
     </div>
 
@@ -391,7 +398,7 @@ for <span class="math inline">\(\log(n) \Delta H\)</span> while
 <span><span class="va">R_df</span> <span class="op">=</span> <span class="fu"><a href="../reference/ndR.html">ndR</a></span><span class="op">(</span><span class="va">dataf</span>, <span class="va">title</span>, <span class="va">term</span>, <span class="va">n</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>in_vocab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rank.html" class="external-link">rank</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">ndR</span><span class="op">)</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="va">vocab_size</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## 16.786 sec elapsed</span></span></code></pre>
+<pre><code><span><span class="co">## 18.072 sec elapsed</span></span></code></pre>
 <div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">H_df</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 116,449 × 5</span></span></span>
@@ -489,7 +496,7 @@ documents.</p>
 <span>                              <span class="va">n_authors</span> <span class="op">+</span> <span class="fl">5</span><span class="op">)</span>,</span>
 <span>                    row <span class="op">=</span> <span class="va">title</span>, column <span class="op">=</span> <span class="va">term</span>, value <span class="op">=</span> <span class="va">n</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## 0.936 sec elapsed</span></span></code></pre>
+<pre><code><span><span class="co">## 0.95 sec elapsed</span></span></code></pre>
 <div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/screeplot.html" class="external-link">screeplot</a></span><span class="op">(</span><span class="va">fitted_tmf</span>, npcs <span class="op">=</span> <span class="va">n_authors</span> <span class="op">+</span> <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
 <p><img src="realbooks_files/figure-html/unnamed-chunk-20-1.png" width="700"></p>
@@ -634,7 +641,7 @@ documents that don’t fit elsewhere.</p>
 
     <footer><div class="pkgdown-footer-left">
   <p></p>
-<p>Developed by Dan Hicks.</p>
+<p>Developed by <a href="https://dhicks.github.io" class="external-link">Dan Hicks</a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">

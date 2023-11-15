@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">tmfast</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.2023-04-15</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.2023-11-15</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -31,7 +31,13 @@
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
-      <ul class="navbar-nav"></ul></div>
+      <ul class="navbar-nav"><li class="nav-item">
+  <a class="external-link nav-link" href="https://github.com/dhicks/tmfast/" aria-label="github">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul></div>
 
     
   </div>
@@ -39,7 +45,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Discursive space with UMAP given a distance matrix</h1>
-      
+      <small class="dont-index">Source: <a href="https://github.com/dhicks/tmfast/blob/HEAD/R/space.R" class="external-link"><code>R/space.R</code></a></small>
       <div class="d-none name"><code>umap.matrix.Rd</code></div>
     </div>
 
@@ -86,11 +92,11 @@
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">gamma</span><span class="op">)</span> <span class="op">=</span> <span class="va">letters</span></span></span>
 <span class="r-in"><span><span class="va">h_gamma</span> <span class="op">=</span> <span class="fu"><a href="hellinger.html">hellinger</a></span><span class="op">(</span><span class="va">gamma</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">embedded</span> <span class="op">=</span> <span class="fu"><a href="umap.html">umap</a></span><span class="op">(</span><span class="va">h_gamma</span>, df <span class="op">=</span> <span class="cn">TRUE</span>, verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [2023-11-15 07:36:35.928337]  starting umap</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [2023-11-15 07:36:35.959781]  creating graph of nearest neighbors</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [2023-11-15 07:36:35.976248]  creating initial embedding</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [2023-11-15 07:36:35.983167]  optimizing embedding</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [2023-11-15 07:36:36.032774]  done</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [2023-11-15 08:24:50.33582]  starting umap</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [2023-11-15 08:24:50.369645]  creating graph of nearest neighbors</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [2023-11-15 08:24:50.388917]  creating initial embedding</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [2023-11-15 08:24:50.398499]  optimizing embedding</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [2023-11-15 08:24:50.513047]  done</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
@@ -98,7 +104,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p><p>Developed by Dan Hicks.</p>
+  <p></p><p>Developed by <a href="https://dhicks.github.io" class="external-link">Dan Hicks</a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">

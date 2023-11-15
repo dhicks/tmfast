@@ -1,10 +1,16 @@
 url: https://dhicks.github.io/tmfast/
+
+authors:
+  Dan Hicks:
+    href: https://dhicks.github.io
+
 template:
   bootstrap: 5
+
 reference:
 - title: Generators
   desc: Generate a simulated text corpus
-- contents:
+  contents:
   - peak_alpha
   - expected_entropy
   - rdirichlet
@@ -14,39 +20,39 @@ reference:
   - journal_specific
 - title: Information gain
   desc: Tools for information-theoretic vocabulary selection
-- contents:
+  contents:
   - ndH
   - ndR
 - title: tmfast
   desc: Fitting "topic models" with PCA+varimax
-- contents:
+  contents:
   - tmfast
   - insert_topics
   - varimax_irlba
   - fit_varimax
 - title: Tidiers
   desc: Extract beta and gamma matrices from `tmfast` objects
-- contents:
+  contents:
   - starts_with('tidy')
 - title: Renormalization
   desc:  Renormalize a distribution to match a desired expected entropy
-- contents:
+  contents:
   - solve_power
   - target_power
   - renorm
 - title: Hellinger distances
   desc:  Calculate Hellinger distances between distributions
-- contents:
+  contents:
   - starts_with('hellinger')
 
 - title: Discursive space visualizations
-- contents:
+  contents:
   - starts_with('tsne')
   - starts_with('umap')
 
 - title: Utilities
   desc: Utility functions
-- contents:
+  contents:
   - build_matrix
   - entropy
   - starts_with('loadings')
