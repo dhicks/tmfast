@@ -395,7 +395,7 @@ while <code>ndR</code> is shorthand for
 <span><span class="va">R_df</span> <span class="op">=</span> <span class="fu"><a href="../reference/ndR.html">ndR</a></span><span class="op">(</span><span class="va">dataf</span>, <span class="va">title</span>, <span class="va">term</span>, <span class="va">n</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>in_vocab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rank.html" class="external-link">rank</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">ndR</span><span class="op">)</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="va">vocab_size</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## 8.087 sec elapsed</span></span></code></pre>
+<pre><code><span><span class="co">## 8.508 sec elapsed</span></span></code></pre>
 <div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">H_df</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 116,449 × 5</span></span></span>
@@ -493,7 +493,7 @@ documents.</p>
 <span>                              <span class="va">n_authors</span> <span class="op">+</span> <span class="fl">5</span><span class="op">)</span>,</span>
 <span>                    row <span class="op">=</span> <span class="va">title</span>, column <span class="op">=</span> <span class="va">term</span>, value <span class="op">=</span> <span class="va">n</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## 0.4 sec elapsed</span></span></code></pre>
+<pre><code><span><span class="co">## 0.58 sec elapsed</span></span></code></pre>
 <div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/screeplot.html" class="external-link">screeplot</a></span><span class="op">(</span><span class="va">fitted_tmf</span>, npcs <span class="op">=</span> <span class="va">n_authors</span> <span class="op">+</span> <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
 <p><img src="realbooks_files/figure-html/unnamed-chunk-20-1.png" alt="" width="700"></p>
@@ -637,7 +637,7 @@ documents that don’t fit elsewhere.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by <a href="https://dhicks.github.io" class="external-link">Dan Hicks</a>.</p>
+  <p>Developed by <a href="https://dhicks.github.io" class="external-link">D. Hicks</a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">

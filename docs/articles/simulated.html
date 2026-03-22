@@ -129,7 +129,7 @@ of the total number of documents <code>M</code>. Document lengths are
 generated using a negative binomial distribution, using the size-mean
 parameterization. Per <code><a href="https://rdrr.io/r/stats/NegBinomial.html" class="external-link">?NegBinomial</a></code>, the standard deviation
 of document lengths in this parameterization is
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msqrt><mrow><mi>μ</mi><mo>+</mo><mfrac><msup><mi>μ</mi><mn>2</mn></msup><mstyle mathvariant="normal"><mi>s</mi><mi>i</mi><mi>z</mi><mi>e</mi></mstyle></mfrac></mrow></msqrt><annotation encoding="application/x-tex">\sqrt{\mu + \frac{\mu^2}{\mathrm{size}}}</annotation></semantics></math></p>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msqrt><mrow><mi>μ</mi><mo>+</mo><mfrac><msup><mi>μ</mi><mn>2</mn></msup><mrow><mi mathvariant="normal">s</mi><mi mathvariant="normal">i</mi><mi mathvariant="normal">z</mi><mi mathvariant="normal">e</mi></mrow></mfrac></mrow></msqrt><annotation encoding="application/x-tex">\sqrt{\mu + \frac{\mu^2}{\mathrm{size}}}</annotation></semantics></math></p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">k</span> <span class="op">=</span> <span class="fl">10</span>                <span class="co"># Num. topics / journals</span></span>
 <span><span class="va">Mj</span> <span class="op">=</span> <span class="fl">100</span>              <span class="co"># Num. documents per journal</span></span>
@@ -156,7 +156,7 @@ set a seed.</p>
 <h3 id="draw-true-topic-distributions">Draw true topic distributions<a class="anchor" aria-label="anchor" href="#draw-true-topic-distributions"></a>
 </h3>
 <p>We first generate the true topic-document distributions
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo>=</mo><mi>t</mi><mo stretchy="false" form="prefix">|</mo><msub><mstyle mathvariant="normal"><mi>d</mi><mi>o</mi><mi>c</mi></mstyle><mi>m</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(\theta = t | \mathrm{doc}_m)</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo>=</mo><mi>t</mi><mo stretchy="false" form="prefix">|</mo><msub><mrow><mi mathvariant="normal">d</mi><mi mathvariant="normal">o</mi><mi mathvariant="normal">c</mi></mrow><mi>m</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(\theta = t | \mathrm{doc}_m)</annotation></semantics></math>,
 often simply called
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math>
 or
@@ -169,7 +169,7 @@ for the fitted distribution in the topic model. Each document’s
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math>
 is sampled from a Dirichlet distribution (<code><a href="../reference/rdirichlet.html">rdirichlet()</a></code>),
 with the parameter
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mstyle mathvariant="bold"><mi>𝛂</mi></mstyle><annotation encoding="application/x-tex">\mathbf{\alpha}</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>𝛂</mi><annotation encoding="application/x-tex">\mathbf{\alpha}</annotation></semantics></math>
 corresponding to the document’s journal
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>.
 The variable <code>theta</code> is a <code>M</code> by <code>k</code>
@@ -315,7 +315,7 @@ substantially on exactly one factor (topic).&lt;/p&gt;'><sup>1</sup></a></p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">tic</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">fitted</span> <span class="op">=</span> <span class="fu"><a href="../reference/tmfast.html">tmfast</a></span><span class="op">(</span><span class="va">dtm</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span>, <span class="va">k</span>, <span class="fl">2</span><span class="op">*</span><span class="va">k</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## 0.228 sec elapsed</span></span></code></pre>
+<pre><code><span><span class="co">## 0.234 sec elapsed</span></span></code></pre>
 <p>The object returned by <code><a href="../reference/tmfast.html">tmfast()</a></code> has a simple structure.
 <code>totalvar</code> and <code>sdev</code> come from the PCA step,
 giving the total variance across all feature variables and the standard
@@ -411,7 +411,7 @@ seconds, about an order of magnitude slower than
 <span>    <span class="fu"><a href="https://juliasilge.github.io/tidytext/reference/cast_sparse.html" class="external-link">cast_sparse</a></span><span class="op">(</span><span class="va">doc</span>, <span class="va">word</span>, <span class="va">n</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/stm/man/stm.html" class="external-link">stm</a></span><span class="op">(</span>K <span class="op">=</span> <span class="va">k</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## 1.917 sec elapsed</span></span></code></pre>
+<pre><code><span><span class="co">## 1.915 sec elapsed</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 id="assessing-accuracy">Assessing accuracy<a class="anchor" aria-label="anchor" href="#assessing-accuracy"></a>
@@ -425,7 +425,7 @@ probability distributions
 over the same space
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>X</mi><annotation encoding="application/x-tex">X</annotation></semantics></math>,
 the Hellinger distance is given by
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>p</mi><mo>,</mo><mi>q</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mfrac><mn>1</mn><msqrt><mn>2</mn></msqrt></mfrac><msqrt><mrow><munder><mo>∑</mo><mrow><mi>x</mi><mo>∈</mo><mi>X</mi></mrow></munder><msup><mrow><mo stretchy="true" form="prefix">(</mo><msqrt><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msqrt><mo>−</mo><msqrt><mrow><mi>q</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msqrt><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt><mo>=</mo><mfrac><mn>1</mn><msqrt><mn>2</mn></msqrt></mfrac><mo stretchy="false" form="prefix">∥</mo><msqrt><mi>p</mi></msqrt><mo>−</mo><msqrt><mi>q</mi></msqrt><msub><mo stretchy="false" form="postfix">∥</mo><mn>2</mn></msub><mi>.</mi></mrow><annotation encoding="application/x-tex"> d(p,q) = \frac{1}{\sqrt{2}} \sqrt{\sum_{x \in X} (\sqrt{p(x)} - \sqrt{q(x)})^2} = \frac{1}{\sqrt{2}} \lVert \sqrt p - \sqrt q \rVert_2.</annotation></semantics></math>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>p</mi><mo>,</mo><mi>q</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mfrac><mn>1</mn><msqrt><mn>2</mn></msqrt></mfrac><msqrt><mrow><munder><mo>∑</mo><mrow><mi>x</mi><mo>∈</mo><mi>X</mi></mrow></munder><msup><mrow><mo stretchy="true" form="prefix">(</mo><msqrt><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msqrt><mo>−</mo><msqrt><mrow><mi>q</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msqrt><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt><mo>=</mo><mfrac><mn>1</mn><msqrt><mn>2</mn></msqrt></mfrac><msub><mrow><mo stretchy="true" form="prefix">‖</mo><msqrt><mi>p</mi></msqrt><mo>−</mo><msqrt><mi>q</mi></msqrt><mo stretchy="true" form="postfix">‖</mo></mrow><mn>2</mn></msub><mi>.</mi></mrow><annotation encoding="application/x-tex"> d(p,q) = \frac{1}{\sqrt{2}} \sqrt{\sum_{x \in X} (\sqrt{p(x)} - \sqrt{q(x)})^2} = \frac{1}{\sqrt{2}} \lVert \sqrt p - \sqrt q \rVert_2.</annotation></semantics></math>
 The last equation means that the Hellinger distance is the Euclidean
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>L</mi><mn>2</mn></msup><annotation encoding="application/x-tex">L^2</annotation></semantics></math>-norm)
 distance between the <em>square roots</em> of the distributions. Some
@@ -935,7 +935,7 @@ produce superficially different visualizations.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by <a href="https://dhicks.github.io" class="external-link">Dan Hicks</a>.</p>
+  <p>Developed by <a href="https://dhicks.github.io" class="external-link">D. Hicks</a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">

@@ -10,7 +10,9 @@
       "Bash(rm -rf \"vignettes/paper_cache\")",
       "Bash(quarto render:*)",
       "Bash(Rscript -e \"install.packages\\(''''stm'''', repos=''''https://cloud.r-project.org''''\\)\")",
-      "Bash(Rscript -e \"install.packages\\(''''gutenbergr'''', repos=''''https://cloud.r-project.org''''\\)\")"
+      "Bash(Rscript -e \"install.packages\\(''''gutenbergr'''', repos=''''https://cloud.r-project.org''''\\)\")",
+      "Bash(Rscript -e \"devtools::document\\(\\)\")",
+      "Bash(Rscript -e \"pkgdown::build_site\\(\\)\")"
     ]
   }
 }
