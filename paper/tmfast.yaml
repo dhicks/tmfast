@@ -1,0 +1,339 @@
+---
+references:
+- id: BaglamaAugmentedImplicitlyRestarted2005
+  abstract: >-
+    The bidiagonalization Lanczos method can be used for computing a few of the
+    largest or smallest singular values and corresponding singular vectors of a
+    large matrix, but the method may encounter some convergence problems. In
+    this paper the convergence of the method is analyzed, showing why it may
+    converge erratically and perhaps fail to converge. To correct this possible
+    nonconvergence and improve the method, a refined bidiagonalization Lanczos
+    method is proposed. The implicitly restarting technique due to Sorensen is
+    applied to the method, and an implicitly restarted refined bidiagonalization
+    Lanczos algorithm (IRRBL) is developed. A new selection of shifts is
+    proposed for use within IRRBL, called refined shifts, and a reliable and
+    efficient algorithm is developed for computing the refined shifts. Numerical
+    experiments show that IRRBL can perform better than the implicitly restarted
+    bidiagonalization Lanczos algorithm (IRBL) proposed by Larsen, in particular
+    when the smallest singular triplets are desired.
+  accessed:
+    - year: 2023
+      month: 2
+      day: 20
+  author:
+    - family: Baglama
+      given: James
+    - family: Reichel
+      given: Lothar
+  citation-key: BaglamaAugmentedImplicitlyRestarted2005
+  container-title: SIAM Journal on Scientific Computing
+  container-title-short: SIAM J. Sci. Comput.
+  DOI: 10.1137/04060593X
+  ISSN: 1064-8275
+  issue: '1'
+  issued:
+    - year: 2005
+      month: 1
+  page: 19-42
+  publisher: Society for Industrial and Applied Mathematics
+  source: epubs.siam.org (Atypon)
+  title: Augmented Implicitly Restarted Lanczos Bidiagonalization Methods
+  type: article-journal
+  URL: https://epubs.siam.org/doi/abs/10.1137/04060593X
+  volume: '27'
+
+- id: BaglamaIrlbaFastTruncated2022
+  abstract: >-
+    Fast and memory efficient methods for truncated singular value decomposition
+    and principal components analysis of large sparse and dense matrices.
+  accessed:
+    - year: 2023
+      month: 5
+      day: 1
+  author:
+    - family: Baglama
+      given: Jim
+    - family: Reichel
+      given: Lothar
+    - family: Lewis
+      given: B. W.
+  citation-key: BaglamaIrlbaFastTruncated2022
+  issued:
+    - year: 2022
+      month: 10
+      day: 3
+  license: GPL-3
+  source: R-Packages
+  title: >-
+    irlba: Fast Truncated Singular Value Decomposition and Principal Components
+    Analysis for Large Dense and Sparse Matrices
+  title-short: irlba
+  type: software
+  URL: https://cran.r-project.org/web/packages/irlba/index.html
+  version: 2.3.5.1
+
+- id: BleiLatentDirichletAllocation2003
+  accessed:
+    - year: 2016
+      month: 2
+      day: 24
+  author:
+    - family: Blei
+      given: David M.
+    - family: Ng
+      given: Andrew Y.
+    - family: Jordan
+      given: Michael I.
+  citation-key: BleiLatentDirichletAllocation2003
+  container-title: the Journal of machine Learning research
+  issued:
+    - year: 2003
+  page: 993–1022
+  source: Google Scholar
+  title: Latent dirichlet allocation
+  type: article-journal
+  URL: http://dl.acm.org/citation.cfm?id=944937
+  volume: '3'
+
+- id: GelmanGardenForkingPaths2013
+  accessed:
+    - year: 2015
+      month: 1
+      day: 18
+  author:
+    - family: Gelman
+      given: Andrew
+    - family: Loken
+      given: Eric
+  citation-key: GelmanGardenForkingPaths2013
+  container-title: Downloaded January
+  issued:
+    - year: 2013
+  page: '2014'
+  source: Google Scholar
+  title: >-
+    The garden of forking paths: Why multiple comparisons can be a problem, even
+    when there is no “fishing expedition” or “p-hacking” and the research
+    hypothesis was posited ahead of time
+  title-short: The garden of forking paths
+  type: article-journal
+  URL: http://www.stat.columbia.edu/~gelman/research/unpublished/p_hacking.pdf
+  volume: '30'
+
+- id: HicksProductivityInterdisciplinaryImpacts2021
+  abstract: >-
+    Organized Research Units (ORUs) are nondepartmental units utilized by U.S.
+    research universities to support interdisciplinary research initiatives,
+    among other goals. This study examined the impacts of ORUs at one large
+    public research university, the University of California, Davis (UC Davis),
+    using a large corpus of journal article metadata and abstracts for both
+    faculty affiliated with UCD ORUs and a comparison set of other faculty.
+    Using regression analysis, I find that ORUs appeared to increase the number
+    of coauthors of affiliated faculty, but did not appear to directly affect
+    publication or citation counts. Next, I frame interdisciplinarity in terms
+    of a notion of discursive space, and use a topic model approach to situate
+    researchers within this discursive space. The evidence generally indicates
+    that ORUs promoted multidisciplinarity rather than interdisciplinarity. In
+    the conclusion, drawing on work in philosophy of science on inter- and
+    multidisciplinarity, I argue that multidisciplinarity is not necessarily
+    inferior to interdisciplinarity.
+  accessed:
+    - year: 2021
+      month: 8
+      day: 25
+  author:
+    - family: Hicks
+      given: Daniel J.
+  citation-key: HicksProductivityInterdisciplinaryImpacts2021
+  container-title: Quantitative Science Studies
+  container-title-short: Quantitative Science Studies
+  DOI: 10.1162/qss_a_00150
+  ISSN: 2641-3337
+  issue: '3'
+  issued:
+    - year: 2021
+      month: 11
+      day: 5
+  license: All rights reserved
+  page: 990-1022
+  source: Silverchair
+  title: Productivity and interdisciplinary impacts of Organized Research Units
+  type: article-journal
+  URL: https://doi.org/10.1162/qss_a_00150
+  volume: '2'
+
+- id: MalaterreEarlyDaysContemporary2022
+  abstract: >-
+    Topic model is a well proven tool to investigate the semantic content of
+    textual corpora. Yet corpora sometimes include texts in several languages,
+    making it impossible to apply language-specific computational approaches
+    over their entire content. This is the problem we encountered when setting
+    to analyze a philosophy of science corpus spanning over eight decades and
+    including original articles in Dutch, German and French, on top of a large
+    majority of articles in English. To circumvent this multilingual problem, we
+    use machine-translation tools to bulk translate non-English documents into
+    English. Though largely imperfect, especially syntactically, these
+    translations nevertheless provide correctly translated terms and preserve
+    the semantic proximity of documents with respect to one another. To assess
+    the quality of this translation step, we develop a “semantic topology
+    preservation test” that relies on estimating the extent to which
+    document-to-document distances have been preserved during translation. We
+    then conduct an LDA topic-model analysis over the entire corpus of
+    translated and English original texts, and compare it to a topic-model done
+    over the English original texts only. We thereby identify the specific
+    contribution of the translated texts. These studies reveal a more complete
+    picture of main topics that can found in the philosophy of science
+    literature, especially during the early days of the discipline when numerous
+    articles were published in languages other than English.
+  accessed:
+    - year: 2022
+      month: 6
+      day: 1
+  author:
+    - family: Malaterre
+      given: Christophe
+    - family: Lareau
+      given: Francis
+  citation-key: MalaterreEarlyDaysContemporary2022
+  container-title: Synthese
+  container-title-short: Synthese
+  DOI: 10.1007/s11229-022-03722-x
+  ISSN: 1573-0964
+  issue: '3'
+  issued:
+    - year: 2022
+      month: 5
+      day: 31
+  language: en
+  page: '242'
+  source: Springer Link
+  title: >-
+    The early days of contemporary philosophy of science: novel insights from
+    machine translation and topic-modeling of non-parallel multilingual corpora
+  title-short: The early days of contemporary philosophy of science
+  type: article-journal
+  URL: https://doi.org/10.1007/s11229-022-03722-x
+  volume: '200'
+
+- id: RobertsStmPackageStructural2019
+  abstract: >-
+    This paper demonstrates how to use the R package stm for structural topic
+    modeling. The structural topic model allows researchers to flexibly estimate
+    a topic model that includes document-level metadata. Estimation is
+    accomplished through a fast variational approximation. The stm package
+    provides many useful features, including rich ways to explore topics,
+    estimate uncertainty, and visualize quantities of interest.
+  author:
+    - family: Roberts
+      given: Margaret E
+    - family: Stewart
+      given: Brandon M
+    - family: Tingley
+      given: Dustin
+  citation-key: RobertsStmPackageStructural2019
+  container-title: Journal of Statistical Software
+  DOI: 10.18637/jss.v091.i02
+  ISSN: 1548-7660
+  issued:
+    - year: 2019
+      month: 10
+      day: 31
+  language: en
+  license: Copyright (c) 2019 Margaret E. Roberts, Brandon M. Stewart, Dustin Tingley
+  page: 1-40
+  source: www.jstatsoft.org
+  title: 'stm: An R Package for Structural Topic Models'
+  title-short: stm
+  type: article-journal
+  URL: https://doi.org/10.18637/jss.v091.i02
+  volume: '91'
+
+- id: RoheVintageFactorAnalysis2020
+  abstract: >-
+    Psychologists developed Multiple Factor Analysis to decompose multivariate
+    data into a small number of interpretable factors without any a priori
+    knowledge about those factors. In this form of factor analysis, the Varimax
+    "factor rotation" is a key step to make the factors interpretable. Charles
+    Spearman and many others objected to factor rotations because the factors
+    seem to be rotationally invariant. These objections are still reported in
+    all contemporary multivariate statistics textbooks. This is an engima
+    because this vintage form of factor analysis has survived and is widely
+    popular because, empirically, the factor rotation often makes the factors
+    easier to interpret. We argue that the rotation makes the factors easier to
+    interpret because, in fact, the Varimax factor rotation performs statistical
+    inference. We show that Principal Components Analysis (PCA) with the Varimax
+    rotation provides a unified spectral estimation strategy for a broad class
+    of modern factor models, including the Stochastic Blockmodel and a natural
+    variation of Latent Dirichlet Allocation (i.e., "topic modeling"). In
+    addition, we show that Thurstone's widely employed sparsity diagnostics
+    implicitly assess a key "leptokurtic" condition that makes the rotation
+    statistically identifiable in these models. Taken together, this shows that
+    the know-how of Vintage Factor Analysis performs statistical inference,
+    reversing nearly a century of statistical thinking on the topic. With a
+    sparse eigensolver, PCA with Varimax is both fast and stable. Combined with
+    Thurstone's straightforward diagnostics, this vintage approach is suitable
+    for a wide array of modern applications.
+  accessed:
+    - year: 2022
+      month: 5
+      day: 22
+  author:
+    - family: Rohe
+      given: Karl
+    - family: Zeng
+      given: Muzhe
+  citation-key: RoheVintageFactorAnalysis2020
+  DOI: 10.48550/arXiv.2004.05387
+  issued:
+    - year: 2020
+      month: 4
+      day: 20
+  number: arXiv:2004.05387
+  publisher: arXiv
+  source: arXiv.org
+  title: Vintage Factor Analysis with Varimax Performs Statistical Inference
+  type: article
+  URL: http://arxiv.org/abs/2004.05387
+
+- id: SteegenIncreasingTransparencyMultiverse2016
+  abstract: >-
+    Empirical research inevitably includes constructing a data set by processing
+    raw data into a form ready for statistical analysis. Data processing often
+    involves choices among several reasonable options for excluding,
+    transforming, and coding data. We suggest that instead of performing only
+    one analysis, researchers could perform a multiverse analysis, which
+    involves performing all analyses across the whole set of alternatively
+    processed data sets corresponding to a large set of reasonable scenarios.
+    Using an example focusing on the effect of fertility on religiosity and
+    political attitudes, we show that analyzing a single data set can be
+    misleading and propose a multiverse analysis as an alternative practice. A
+    multiverse analysis offers an idea of how much the conclusions change
+    because of arbitrary choices in data construction and gives pointers as to
+    which choices are most consequential in the fragility of the result.
+  author:
+    - family: Steegen
+      given: Sara
+    - family: Tuerlinckx
+      given: Francis
+    - family: Gelman
+      given: Andrew
+    - family: Vanpaemel
+      given: Wolf
+  citation-key: SteegenIncreasingTransparencyMultiverse2016
+  container-title: Perspectives on Psychological Science
+  container-title-short: Perspectives on Psychological Science
+  DOI: 10.1177/1745691616658637
+  ISSN: 1745-6916
+  issue: '5'
+  issued:
+    - year: 2016
+      month: 9
+      day: 1
+  language: en
+  page: 702-712
+  source: SAGE Journals
+  title: Increasing Transparency Through a Multiverse Analysis
+  type: article-journal
+  URL: https://doi.org/10.1177/1745691616658637
+  volume: '11'
+...

@@ -2,7 +2,15 @@
   "permissions": {
     "allow": [
       "Bash(Rscript -e \"devtools::test\\(\\)\")",
-      "Bash(Rscript -e \"devtools::check\\(\\)\")"
+      "Bash(Rscript -e \"devtools::check\\(\\)\")",
+      "Bash(mv \"vignettes/arxiv.sty\" \"paper/arxiv.sty\")",
+      "Bash(mv \"vignettes/orcidlink.sty\" \"paper/orcidlink.sty\")",
+      "Bash(mv \"vignettes/paper.pdf\" \"paper/paper.pdf\")",
+      "Bash(rm \"vignettes/paper.spl\" \"vignettes/paper.zip\")",
+      "Bash(rm -rf \"vignettes/paper_cache\")",
+      "Bash(quarto render:*)",
+      "Bash(Rscript -e \"install.packages\\(''''stm'''', repos=''''https://cloud.r-project.org''''\\)\")",
+      "Bash(Rscript -e \"install.packages\\(''''gutenbergr'''', repos=''''https://cloud.r-project.org''''\\)\")"
     ]
   }
 }

@@ -6,3 +6,11 @@ vignettes/realbooks/
 
 data
 scratch
+
+paper/paper_cache/
+paper/paper_files/
+paper/realbooks/
+paper/*.html
+paper/*.tex
+paper/*.spl
+paper/*.zip
