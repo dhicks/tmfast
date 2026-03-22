@@ -5,12 +5,14 @@ loadings = function(x, ...) {
     UseMethod("loadings")
 }
 #' @export
-loadings.default = function(x) {
+loadings.default = function(x, ...) {
+    rlang::check_dots_empty()
     # message('loadings.default')
     stats::loadings(x)
 }
 #' @export
-loadings.varimaxes = function(x, k) {
+loadings.varimaxes = function(x, k, ...) {
+    rlang::check_dots_empty()
     # message('loadings.varimaxtm')
     assertthat::assert_that(k %in% x$n,
                             msg = glue::glue('Rank {k} not in fitted model'))
@@ -26,7 +28,8 @@ scores = function(x, ...) {
     UseMethod("scores")
 }
 #' @export
-scores.varimaxes = function(x, k) {
+scores.varimaxes = function(x, k, ...) {
+    rlang::check_dots_empty()
     assertthat::assert_that(k %in% x$n,
                             msg = glue::glue('Rank {k} not in fitted model'))
     x$varimax[[as.character(k)]]$scores
@@ -41,7 +44,8 @@ rotation = function(x, ...) {
     UseMethod('rotation')
 }
 #' @export
-rotation.varimaxes = function(x, k) {
+rotation.varimaxes = function(x, k, ...) {
+    rlang::check_dots_empty()
     assertthat::assert_that(k %in% x$n,
                             msg = glue::glue('Rank {k} not in fitted model'))
     x$varimax[[as.character(k)]]$rotmat
@@ -83,7 +87,9 @@ tidy.tmfast = function(x,
                        df = TRUE,
                        exponent = NULL,
                        keep_original = FALSE,
-                       rotation = NULL) {
+                       rotation = NULL,
+                       ...) {
+    rlang::check_dots_empty()
     assertthat::assert_that(k %in% x$n,
                             msg = glue::glue('Rank {k} not in fitted model'))
     assertthat::assert_that(matrix %in% c('beta', 'gamma'),

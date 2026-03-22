@@ -27,10 +27,12 @@ See \code{df}
 Algorithm checks distances to 3*perplexity nearest neighbors.  Rtsne loses rownames (document IDs); these are either extract from the \code{tmfast} object or passed separately for a \code{STM}object.  The default method (not exported) takes a tidied gamma (document-topic-gamma) matrix.  Use \code{set.seed()} before calling this function for reproducibility.
 }
 \examples{
+\dontrun{
 ## From the real books vignette
 set.seed(42)
 tsne(fitted_tmf, k = 4, df = TRUE) |>
     left_join(meta, by = c('document' = 'book')) |>
     ggplot(aes(x, y, color = author)) +
     geom_point()
+}
 }

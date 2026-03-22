@@ -1,6 +1,6 @@
 Package: tmfast
 Title: Fast Topic Models Using Varimax
-Version: 0.0.0.2023-11-15
+Version: 0.0.0.2026-03-22
 Authors@R: 
     person("Dan", "Hicks", , "hicks.daniel.j@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-7945-4416"))
@@ -8,7 +8,7 @@ Description: Fit topic models fast using varimax-rotated PCA
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.0
+RoxygenNote: 7.3.2
 Imports:
     assertthat,
     purrr,
@@ -24,9 +24,10 @@ Imports:
     Matrix,
     generics,
     psych
-Suggests: 
+Suggests:
     testthat (>= 3.0.0),
     Rtsne,
+    umap,
     lpSolve,
     tidyr,
     tidyverse,

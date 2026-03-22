@@ -15,12 +15,14 @@ tsne = function(x, ...) {
 #' @details Algorithm checks distances to 3*perplexity nearest neighbors.  Rtsne loses rownames (document IDs); these are either extract from the `tmfast` object or passed separately for a `STM`object.  The default method (not exported) takes a tidied gamma (document-topic-gamma) matrix.  Use `set.seed()` before calling this function for reproducibility.
 #' @return See `df`
 #' @examples
+#' \dontrun{
 #' ## From the real books vignette
 #' set.seed(42)
 #' tsne(fitted_tmf, k = 4, df = TRUE) |>
 #'     left_join(meta, by = c('document' = 'book')) |>
 #'     ggplot(aes(x, y, color = author)) +
 #'     geom_point()
+#' }
 tsne.data.frame = function(gamma_df, k, doc_ids,
                         perplexity = NULL, df = TRUE) {
     if (is.null(perplexity)) {
@@ -39,13 +41,15 @@ tsne.data.frame = function(gamma_df, k, doc_ids,
                           .name_repair = \(x)(c('x', 'y')))
 }
 #' @export
-tsne.tmfast = function(tm, k, perplexity = NULL, df = TRUE) {
+tsne.tmfast = function(tm, k, perplexity = NULL, df = TRUE, ...) {
+    rlang::check_dots_empty()
     doc_ids = rownames(scores(tm, k))
     gamma_df = tidy(tm, k, matrix = 'gamma')
     tsne.data.frame(gamma_df, k, doc_ids, perplexity, df)
 }
 #' @export
-tsne.STM = function(tm, doc_ids, perplexity = NULL, df = TRUE) {
+tsne.STM = function(tm, doc_ids, perplexity = NULL, df = TRUE, ...) {
+    rlang::check_dots_empty()
     k = ncol(tm$theta)
     gamma_df = tidy(tm, matrix = 'gamma')
     tsne.data.frame(gamma_df, k, doc_ids, perplexity, df)

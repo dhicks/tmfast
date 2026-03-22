@@ -24,7 +24,8 @@ NULL
 #' mx2 = rdirichlet(3, rep(5, 5))
 #' hellinger(mx1)
 #' hellinger(mx1, mx2)
-hellinger.Matrix = function(mx1, mx2 = NULL) {
+hellinger.Matrix = function(mx1, mx2 = NULL, ...) {
+    rlang::check_dots_empty()
     if (is.null(mx2)) {
         crossed = 1 - tcrossprod(sqrt(mx1))
     } else {
@@ -105,7 +106,9 @@ hellinger.data.frame = function(topicsdf1,
                                 id2 = 'document',
                                 cat2 = 'topic',
                                 prob2 = 'prob',
-                                df = FALSE) {
+                                df = FALSE,
+                                ...) {
+    rlang::check_dots_empty()
     id1 = rlang::enquo(id1)
     matrix1 = build_matrix(topicsdf1, {{id1}}, {{cat1}}, {{prob1}},
                            sparse = FALSE)

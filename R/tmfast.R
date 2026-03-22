@@ -1,7 +1,6 @@
 #' Fitting "topic models" with PCA+varimax
 #'
-#'
-NULL
+"_PACKAGE"
 
 #' Fit a varimax-rotated PCA using irlba
 #'

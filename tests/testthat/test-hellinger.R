@@ -25,6 +25,21 @@ test_that('Hellinger distance for data frames', {
     warning('Not yet tested')
 })
 
+test_that('check_dots_empty: hellinger.Matrix rejects unexpected args', {
+    mat1 = rdirichlet(10, peak_alpha(3, 1), 3)
+    expect_error(hellinger(mat1, typo = TRUE), class = 'rlib_error_dots_nonempty')
+})
+
+test_that('check_dots_empty: hellinger.data.frame rejects unexpected args', {
+    set.seed(20260322)
+    topics = rdirichlet(10, peak_alpha(3, 1), 3) |>
+        tibble::as_tibble(.name_repair = \(x) paste0('T', seq_along(x))) |>
+        tibble::add_column(document = paste0('doc', 1:10), .before = 1) |>
+        tidyr::pivot_longer(-document, names_to = 'topic', values_to = 'gamma')
+    expect_error(hellinger(topics, id1 = document, prob1 = gamma, typo = TRUE),
+                 class = 'rlib_error_dots_nonempty')
+})
+
 test_that('t-SNE wrapper', {
     warning('Not yet tested')
 })
