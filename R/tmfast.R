@@ -177,7 +177,7 @@ insert_topics = function(fitted, k, x = NULL) {
                                   obs_names = fitted$rows,
                                   x = x)
     }
-    fitted_tmf$n = c(fitted_tmf$n, k)
-    fitted_tmf$varimax[[as.character(k)]] = new_varimax
-    return(fitted_tmf)
+    fitted$n = c(fitted$n, k)
+    fitted$varimax[[as.character(k)]] = new_varimax
+    return(fitted)
 }
