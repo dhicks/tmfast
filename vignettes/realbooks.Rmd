@@ -7,6 +7,10 @@ output:
     html_document:
         toc: true
         toc_float: true
+vignette: >
+  %\VignetteIndexEntry{Fast topic modeling with real books}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 In this vignette, we analyze a corpus of works from the long nineteenth century, attempting to recover the author of each one.  

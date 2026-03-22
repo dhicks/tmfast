@@ -3,6 +3,9 @@
 .RData
 .Ruserdata
 vignettes/realbooks/
+vignettes/realbooks.html
+vignettes/realbooks_cache/
+vignettes/simulated_cache/
 
 data
 scratch

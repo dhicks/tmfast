@@ -13,7 +13,8 @@
   id2 = "document",
   cat2 = "topic",
   prob2 = "prob",
-  df = FALSE
+  df = FALSE,
+  ...
 )
 }
 \arguments{

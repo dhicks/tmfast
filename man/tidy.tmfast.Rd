@@ -11,7 +11,8 @@
   df = TRUE,
   exponent = NULL,
   keep_original = FALSE,
-  rotation = NULL
+  rotation = NULL,
+  ...
 )
 }
 \arguments{

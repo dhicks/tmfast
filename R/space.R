@@ -23,8 +23,10 @@ tsne = function(x, ...) {
 #'     ggplot(aes(x, y, color = author)) +
 #'     geom_point()
 #' }
+#' @export
 tsne.data.frame = function(gamma_df, k, doc_ids,
-                        perplexity = NULL, df = TRUE) {
+                        perplexity = NULL, df = TRUE, ...) {
+    rlang::check_dots_empty()
     if (is.null(perplexity)) {
         ndocs = length(doc_ids)
         perplexity = min(30, floor((ndocs - 1)/3) - 1)
@@ -99,7 +101,9 @@ umap.matrix = function(dist_mx, include_data = FALSE, df = TRUE, ...) {
 #' @param ... Other arguments, passed to `umap.matrix()`
 #' @return `umap` object or tidied dataframe; see `umap.matrix()` argument `df`
 #' @examples
+#' \dontrun{
 #' umap(fitted, 10, verbose = TRUE)
+#' }
 #' @export
 umap.tmfast = function(model, k, ...) {
     distances = tidy(model, k, matrix = 'gamma') |>

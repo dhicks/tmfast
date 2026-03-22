@@ -7,6 +7,10 @@ output:
     html_document:
         toc: true
         toc_float: true
+vignette: >
+  %\VignetteIndexEntry{Fitting topic models with tmfast}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 In this vignette, we demonstrate a basic workflow using `tmfast`to fit topic models.  We also show how the generators included in the package can be used to create simulated text data.  The vignette assumes you're already familiar with topic models, and specifically the latent dirichlet allocation (LDA) data generation model, along with PCA and varimax.  The `tmfast` package was inspired by @RoheVintageFactorAnalysis2020, who provide the mathematical justification for treating topic modeling as varimax-rotated PCA, but somewhat finicky and incomplete software for actually fitting models using this approach. 

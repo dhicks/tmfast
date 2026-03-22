@@ -4,7 +4,7 @@
 \alias{tsne.data.frame}
 \title{Discursive space using t-SNE}
 \usage{
-\method{tsne}{data.frame}(gamma_df, k, doc_ids, perplexity = NULL, df = TRUE)
+\method{tsne}{data.frame}(gamma_df, k, doc_ids, perplexity = NULL, df = TRUE, ...)
 }
 \arguments{
 \item{k}{Number of topics (required for \code{tmfast} objects)}

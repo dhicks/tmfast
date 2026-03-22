@@ -11,4 +11,5 @@
 ^LICENSE\.md$
 ^\.claude$
 ^paper$
+^scratch$
 ^vignettes/simulated_cache$

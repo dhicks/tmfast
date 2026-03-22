@@ -20,5 +20,7 @@
 Construct a 2-dimensional "discursive space" embedding given a \code{tmfast} topic model
 }
 \examples{
+\dontrun{
 umap(fitted, 10, verbose = TRUE)
+}
 }

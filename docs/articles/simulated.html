@@ -5,62 +5,48 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="description" content="tmfast">
 <title>Fitting topic models (and simulating text data) with `tmfast` • tmfast</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.2.2/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.2.2/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Fitting topic models (and simulating text data) with `tmfast`">
-<meta property="og:description" content="tmfast">
-<!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
-<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]-->
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Fitting topic models (and simulating text data) with `tmfast`">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
-    
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
-    
+
+    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+
     <a class="navbar-brand me-2" href="../index.html">tmfast</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.2023-11-15</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.2026-03-22</small>
 
-    
+
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item">
-  <a class="nav-link" href="../reference/index.html">Reference</a>
-</li>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="active nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/realbooks.html">Fast topic modeling with real books</a>
-    <a class="dropdown-item" href="../articles/simulated.html">Fitting topic models (and simulating text data) with `tmfast`</a>
-  </div>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li><a class="dropdown-item" href="../articles/realbooks.html">Fast topic modeling with real books</a></li>
+    <li><a class="dropdown-item" href="../articles/simulated.html">Fitting topic models (and simulating text data) with `tmfast`</a></li>
+  </ul>
 </li>
       </ul>
-<form class="form-inline my-2 my-lg-0" role="search">
-        <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
-</form>
-
-      <ul class="navbar-nav">
-<li class="nav-item">
-  <a class="external-link nav-link" href="https://github.com/dhicks/tmfast/" aria-label="github">
-    <span class="fab fa fab fa-github fa-lg"></span>
-     
-  </a>
-</li>
+<ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
+</form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/dhicks/tmfast/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
-    
+
   </div>
 </nav><div class="container template-article">
 
@@ -69,7 +55,8 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="" class="logo" alt=""><h1>Fitting topic models (and simulating text data) with `tmfast`</h1>
+
+      <h1>Fitting topic models (and simulating text data) with `tmfast`</h1>
                         <h4 data-toc-skip class="author"></h4>
 <p>Dan Hicks <a href="mailto:hicks.daniel.j@gmail.com" class="email">hicks.daniel.j@gmail.com</a></p>
             
@@ -92,17 +79,18 @@ varimax-rotated PCA, but somewhat finicky and incomplete software for
 actually fitting models using this approach.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Warning: package 'tibble' was built under R version 4.5.2</span></span></code></pre>
 <pre><code><span><span class="co">## ── <span style="font-weight: bold;">Attaching core tidyverse packages</span> ──────────────────────── tidyverse 2.0.0 ──</span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">dplyr    </span> 1.1.2     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">readr    </span> 2.1.4</span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">forcats  </span> 1.0.0     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">stringr  </span> 1.5.0</span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">ggplot2  </span> 3.4.2     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">tibble   </span> 3.2.1</span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">lubridate</span> 1.9.2     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">tidyr    </span> 1.3.0</span></span>
-<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">purrr    </span> 1.0.2     </span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">dplyr    </span> 1.1.4     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">readr    </span> 2.1.5</span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">forcats  </span> 1.0.0     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">stringr  </span> 1.5.1</span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">ggplot2  </span> 3.5.2     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">tibble   </span> 3.3.1</span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">lubridate</span> 1.9.4     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">tidyr    </span> 1.3.1</span></span>
+<span><span class="co">## <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">purrr    </span> 1.1.0     </span></span>
 <span><span class="co">## ── <span style="font-weight: bold;">Conflicts</span> ────────────────────────────────────────── tidyverse_conflicts() ──</span></span>
 <span><span class="co">## <span style="color: #BB0000;">✖</span> <span style="color: #0000BB;">dplyr</span>::<span style="color: #00BB00;">filter()</span> masks <span style="color: #0000BB;">stats</span>::filter()</span></span>
 <span><span class="co">## <span style="color: #BB0000;">✖</span> <span style="color: #0000BB;">dplyr</span>::<span style="color: #00BB00;">lag()</span>    masks <span style="color: #0000BB;">stats</span>::lag()</span></span>
 <span><span class="co">## <span style="color: #00BBBB;">ℹ</span> Use the conflicted package (<span style="color: #0000BB; font-style: italic;">&lt;http://conflicted.r-lib.org/&gt;</span>) to force all conflicts to become errors</span></span></code></pre>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/gaborcsardi/lpSolve" class="external-link">lpSolve</a></span><span class="op">)</span>    <span class="co"># For matching fitted and trust topics</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/jabiru/tictoc" class="external-link">tictoc</a></span><span class="op">)</span>     <span class="co"># For checking timing</span></span>
 <span></span>
@@ -113,12 +101,12 @@ actually fitting models using this approach.</p>
 <span><span class="co">## The following object is masked from 'package:stats':</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">##     loadings</span></span></code></pre>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.structuraltopicmodel.com/" class="external-link">stm</a></span><span class="op">)</span>        <span class="co"># Used for comparison</span></span></code></pre></div>
-<pre><code><span><span class="co">## stm v1.3.6.1 successfully loaded. See ?stm for help. </span></span>
+<pre><code><span><span class="co">## stm v1.3.8 successfully loaded. See ?stm for help. </span></span>
 <span><span class="co">##  Papers, resources, and other materials at structuraltopicmodel.com</span></span></code></pre>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/juliasilge/tidytext" class="external-link">tidytext</a></span><span class="op">)</span>   <span class="co"># Used for stm tidiers</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://juliasilge.github.io/tidytext/" class="external-link">tidytext</a></span><span class="op">)</span>   <span class="co"># Used for stm tidiers</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="simulated-text-data">Simulated text data<a class="anchor" aria-label="anchor" href="#simulated-text-data"></a>
 </h2>
@@ -128,9 +116,11 @@ actually fitting models using this approach.</p>
 <p>We create simulated text data following the data-generating process
 assumed by LDA. Specifically, each document will be generated from one
 of several “journals.” Each journal corresponds to a topic, and vice
-versa, in that documents from journal <span class="math inline">\(j\)</span> will tend to have a much greater
-mixture (probably) of topic <span class="math inline">\(j\)</span> than
-the other topics.</p>
+versa, in that documents from journal
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
+will tend to have a much greater mixture (probably) of topic
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>
+than the other topics.</p>
 <p>We first specify the number of topics/journals <code>k</code>, and
 the number of documents to draw from each journal <code>Mj</code>, for a
 total of <code>M = Mj * k</code> documents in the corpus. We also
@@ -138,9 +128,9 @@ specify the length of the vocabulary (total unique words) as a multiple
 of the total number of documents <code>M</code>. Document lengths are
 generated using a negative binomial distribution, using the size-mean
 parameterization. Per <code><a href="https://rdrr.io/r/stats/NegBinomial.html" class="external-link">?NegBinomial</a></code>, the standard deviation
-of document lengths in this parameterization is <span class="math inline">\(\sqrt{\mu +
-\frac{\mu^2}{\mathrm{size}}}\)</span></p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+of document lengths in this parameterization is
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msqrt><mrow><mi>μ</mi><mo>+</mo><mfrac><msup><mi>μ</mi><mn>2</mn></msup><mstyle mathvariant="normal"><mi>s</mi><mi>i</mi><mi>z</mi><mi>e</mi></mstyle></mfrac></mrow></msqrt><annotation encoding="application/x-tex">\sqrt{\mu + \frac{\mu^2}{\mathrm{size}}}</annotation></semantics></math></p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">k</span> <span class="op">=</span> <span class="fl">10</span>                <span class="co"># Num. topics / journals</span></span>
 <span><span class="va">Mj</span> <span class="op">=</span> <span class="fl">100</span>              <span class="co"># Num. documents per journal</span></span>
 <span><span class="va">M</span> <span class="op">=</span> <span class="va">Mj</span><span class="op">*</span><span class="va">k</span>              <span class="co"># Total corpus size</span></span>
@@ -151,7 +141,7 @@ of document lengths in this parameterization is <span class="math inline">\(\sqr
 <span><span class="va">mu</span> <span class="op">=</span> <span class="fl">300</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">mu</span> <span class="op">+</span> <span class="va">mu</span><span class="op">^</span><span class="fl">2</span><span class="op">/</span><span class="va">size</span><span class="op">)</span>  <span class="co"># Resulting SD of document sizes</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 96.43651</span></span></code></pre>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Dirichlet distributions for topic-docs and word-topics</span></span>
 <span><span class="va">topic_peak</span> <span class="op">=</span> <span class="fl">.8</span></span>
 <span><span class="va">topic_scale</span> <span class="op">=</span> <span class="fl">10</span></span>
@@ -159,24 +149,35 @@ of document lengths in this parameterization is <span class="math inline">\(\sqr
 <span><span class="va">word_beta</span> <span class="op">=</span> <span class="fl">0.1</span></span></code></pre></div>
 <p>Because the simulations involve drawing samples using a RNG, we first
 set a seed.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">2022</span><span class="op">-</span><span class="fl">06</span><span class="op">-</span><span class="fl">19</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="draw-true-topic-distributions">Draw true topic distributions<a class="anchor" aria-label="anchor" href="#draw-true-topic-distributions"></a>
 </h3>
-<p>We first generate the true topic-document distributions <span class="math inline">\(p(\theta = t | \mathrm{doc}_m)\)</span>, often
-simply called <span class="math inline">\(\theta\)</span> or <span class="math inline">\(\gamma\)</span>. In this vignette we use <span class="math inline">\(\theta\)</span> for the true distribution and
-<span class="math inline">\(\gamma\)</span> for the fitted distribution
-in the topic model. Each document’s <span class="math inline">\(\theta\)</span> is sampled from a Dirichlet
-distribution (<code><a href="../reference/rdirichlet.html">rdirichlet()</a></code>), with the parameter <span class="math inline">\(\mathbf{\alpha}\)</span> corresponding to the
-document’s journal <span class="math inline">\(j\)</span>. The variable
-<code>theta</code> is a <code>M</code> by <code>k</code> matrix;
-<code>theta_df</code> is a tidy representation with columns
+<p>We first generate the true topic-document distributions
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo>=</mo><mi>t</mi><mo stretchy="false" form="prefix">|</mo><msub><mstyle mathvariant="normal"><mi>d</mi><mi>o</mi><mi>c</mi></mstyle><mi>m</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(\theta = t | \mathrm{doc}_m)</annotation></semantics></math>,
+often simply called
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math>
+or
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>γ</mi><annotation encoding="application/x-tex">\gamma</annotation></semantics></math>.
+In this vignette we use
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math>
+for the true distribution and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>γ</mi><annotation encoding="application/x-tex">\gamma</annotation></semantics></math>
+for the fitted distribution in the topic model. Each document’s
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>θ</mi><annotation encoding="application/x-tex">\theta</annotation></semantics></math>
+is sampled from a Dirichlet distribution (<code><a href="../reference/rdirichlet.html">rdirichlet()</a></code>),
+with the parameter
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mstyle mathvariant="bold"><mi>𝛂</mi></mstyle><annotation encoding="application/x-tex">\mathbf{\alpha}</annotation></semantics></math>
+corresponding to the document’s journal
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>j</mi><annotation encoding="application/x-tex">j</annotation></semantics></math>.
+The variable <code>theta</code> is a <code>M</code> by <code>k</code>
+matrix; <code>theta_df</code> is a tidy representation with columns
 <code>doc</code>, <code>topic</code>, and <code>prob</code>. The
 visualization confirms that documents are generally most strongly
 associated with the corresponding topics, though with some noise.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Journal-specific alpha, with a peak value (.8 by default) and uniform otherwise</span></span>
 <span><span class="va">theta</span> <span class="op">=</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">k</span>, </span>
 <span>            <span class="op">~</span><span class="fu"><a href="../reference/rdirichlet.html">rdirichlet</a></span><span class="op">(</span><span class="va">Mj</span>, <span class="fu"><a href="../reference/peak_alpha.html">peak_alpha</a></span><span class="op">(</span><span class="va">k</span>, <span class="va">.x</span>, </span>
@@ -194,18 +195,27 @@ associated with the corresponding topics, though with some noise.</p>
 <span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">theta_df</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">doc</span>, <span class="va">topic</span>, fill <span class="op">=</span> <span class="va">prob</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_tile.html" class="external-link">geom_tile</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="simulated_files/figure-html/unnamed-chunk-4-1.png" width="700"></p>
+<p><img src="simulated_files/figure-html/unnamed-chunk-4-1.png" alt="" width="700"></p>
 </div>
 <div class="section level3">
 <h3 id="draw-true-word-distributions">Draw true word distributions<a class="anchor" aria-label="anchor" href="#draw-true-word-distributions"></a>
 </h3>
-<p>Next we generate the true word-topic distributions <span class="math inline">\(p(\phi = w | \theta = t)\)</span>, often designed
-as either <span class="math inline">\(\phi\)</span> or <span class="math inline">\(\beta\)</span>. We use <span class="math inline">\(\phi\)</span> for the true distribution and <span class="math inline">\(\beta\)</span> for the fitted distribution. We
-sample these distributions from a symmetric Dirichlet distribution over
-the length of the vocabulary with <span class="math inline">\(\alpha =
-.01\)</span>. Tile and Zipfian (probability vs. rank on a log-log scale)
-plots confirm these distributions are working correctly.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<p>Next we generate the true word-topic distributions
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>ϕ</mi><mo>=</mo><mi>w</mi><mo stretchy="false" form="prefix">|</mo><mi>θ</mi><mo>=</mo><mi>t</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p(\phi = w | \theta = t)</annotation></semantics></math>,
+often designed as either
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ϕ</mi><annotation encoding="application/x-tex">\phi</annotation></semantics></math>
+or
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>.
+We use
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>ϕ</mi><annotation encoding="application/x-tex">\phi</annotation></semantics></math>
+for the true distribution and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>
+for the fitted distribution. We sample these distributions from a
+symmetric Dirichlet distribution over the length of the vocabulary with
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>=</mo><mn>.01</mn></mrow><annotation encoding="application/x-tex">\alpha = .01</annotation></semantics></math>.
+Tile and Zipfian (probability vs. rank on a log-log scale) plots confirm
+these distributions are working correctly.</p>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## phi_j:  Word distribution for topic j</span></span>
 <span><span class="va">phi</span> <span class="op">=</span> <span class="fu"><a href="../reference/rdirichlet.html">rdirichlet</a></span><span class="op">(</span><span class="va">k</span>, <span class="va">word_beta</span>, k <span class="op">=</span> <span class="va">vocab</span><span class="op">)</span></span>
 <span></span>
@@ -219,8 +229,8 @@ plots confirm these distributions are working correctly.</p>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">topic</span>, <span class="va">word</span>, fill <span class="op">=</span> <span class="op">(</span><span class="va">prob</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_tile.html" class="external-link">geom_tile</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_discrete.html" class="external-link">scale_y_discrete</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
-<p><img src="simulated_files/figure-html/unnamed-chunk-5-1.png" width="700"></p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<p><img src="simulated_files/figure-html/unnamed-chunk-5-1.png" alt="" width="700"></p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Zipf's law</span></span>
 <span><span class="va">phi</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span>rownames <span class="op">=</span> <span class="st">'topic'</span>, </span>
@@ -236,25 +246,25 @@ plots confirm these distributions are working correctly.</p>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_log10</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_y_log10</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="simulated_files/figure-html/unnamed-chunk-5-2.png" width="700"></p>
+<p><img src="simulated_files/figure-html/unnamed-chunk-5-2.png" alt="" width="700"></p>
 </div>
 <div class="section level3">
 <h3 id="document-lengths">Document lengths<a class="anchor" aria-label="anchor" href="#document-lengths"></a>
 </h3>
 <p>Again, document lengths are drawn from a negative binomial
 distribution.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## N_i:  Length of document i</span></span>
 <span><span class="va">N</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/NegBinomial.html" class="external-link">rnbinom</a></span><span class="op">(</span><span class="va">M</span>, size <span class="op">=</span> <span class="va">size</span>, mu <span class="op">=</span> <span class="va">mu</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">N</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
 <span><span class="co">##    93.0   240.8   300.5   308.6   364.5   774.0</span></span></code></pre>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/sd.html" class="external-link">sd</a></span><span class="op">(</span><span class="va">N</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 95.1555</span></span></code></pre>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">hist</a></span><span class="op">(</span><span class="va">N</span><span class="op">)</span></span></code></pre></div>
-<p><img src="simulated_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
+<p><img src="simulated_files/figure-html/unnamed-chunk-6-1.png" alt="" width="700"></p>
 </div>
 <div class="section level3">
 <h3 id="draw-corpus">Draw corpus<a class="anchor" aria-label="anchor" href="#draw-corpus"></a>
@@ -267,12 +277,12 @@ counts produced better results than other scaling techniques (eg,
 dividing by the total length of each document, scaling words by their
 standard deviation) for accounting for radical differences in document
 length.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">tic</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">corpus</span> <span class="op">=</span> <span class="fu"><a href="../reference/draw_corpus.html">draw_corpus</a></span><span class="op">(</span><span class="va">N</span>, <span class="va">theta</span>, <span class="va">phi</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## 27.636 sec elapsed</span></span></code></pre>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">dtm</span> <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">corpus</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log1p</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
@@ -301,11 +311,11 @@ basis vectors are no longer orthogonal&lt;/a&gt;. Unlike PCA, in topic
 modeling we don’t care about orthogonality. And unlike factor analysis,
 we’re not interested in dropping features (words) that don’t load
 substantially on exactly one factor (topic).&lt;/p&gt;'><sup>1</sup></a></p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">tic</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">fitted</span> <span class="op">=</span> <span class="fu"><a href="../reference/tmfast.html">tmfast</a></span><span class="op">(</span><span class="va">dtm</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span>, <span class="va">k</span>, <span class="fl">2</span><span class="op">*</span><span class="va">k</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## 0.878 sec elapsed</span></span></code></pre>
+<pre><code><span><span class="co">## 0.228 sec elapsed</span></span></code></pre>
 <p>The object returned by <code><a href="../reference/tmfast.html">tmfast()</a></code> has a simple structure.
 <code>totalvar</code> and <code>sdev</code> come from the PCA step,
 giving the total variance across all feature variables and the standard
@@ -317,7 +327,7 @@ value of <code>n</code>. The varimax objects each contain three
 matrices, the rotated <code>loadings</code> (word-topics), the rotation
 matrix <code>rotmat</code>, and the rotated <code>scores</code>
 (document-topics).</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">fitted</span>, max.level <span class="op">=</span> <span class="fl">2L</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## List of 9</span></span>
 <span><span class="co">##  $ totalvar: num 138</span></span>
@@ -336,40 +346,45 @@ matrix <code>rotmat</code>, and the rotated <code>scores</code>
 <span><span class="co">##   ..$ 10:List of 3</span></span>
 <span><span class="co">##   ..$ 20:List of 3</span></span>
 <span><span class="co">##  - attr(*, "class")= chr [1:3] "tmfast" "varimaxes" "list"</span></span></code></pre>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">fitted</span><span class="op">$</span><span class="va">varimax</span><span class="op">$</span><span class="va">`5`</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##  NULL</span></span></code></pre>
 <p>Because the model contains a <code>sdev</code> component,
-<code><a href="https://rdrr.io/r/stats/screeplot.html" class="external-link">screeplot()</a></code> works out of the box. Note that the first <span class="math inline">\(k\)</span> PCs have much higher variance than the
-others, and often the <span class="math inline">\(k\)</span>th PC is
-somewhat lower than the first <span class="math inline">\(k-1\)</span>.
+<code><a href="https://rdrr.io/r/stats/screeplot.html" class="external-link">screeplot()</a></code> works out of the box. Note that the first
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
+PCs have much higher variance than the others, and often the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>th
+PC is somewhat lower than the first
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi><mo>−</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">k-1</annotation></semantics></math>.
 This reflects the highly simplified structure of the simulated data.
 Real datasets often have a much more gradual decline in the screeplot,
 likely reflecting the complex hierarchy of topics in actual
 documents.</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/screeplot.html" class="external-link">screeplot</a></span><span class="op">(</span><span class="va">fitted</span><span class="op">)</span></span></code></pre></div>
-<p><img src="simulated_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
+<p><img src="simulated_files/figure-html/unnamed-chunk-10-1.png" alt="" width="700"></p>
 <p>It’s also straightforward to calculate the share of total variance
 covered by successive principal components. Experimenting with this
-simulation, when some documents are much larger than others, <span class="math inline">\(k\)</span> PCs might cover less than half of the
-total variance. In this case it covers about 65%. Again, note that the
-rotated varimax factors don’t correspond to the principal components;
-but the total covered variance remains the same.</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+simulation, when some documents are much larger than others,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
+PCs might cover less than half of the total variance. In this case it
+covers about 65%. Again, note that the rotated varimax factors don’t
+correspond to the principal components; but the total covered variance
+remains the same.</p>
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Variance coverage?</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/cumsum.html" class="external-link">cumsum</a></span><span class="op">(</span><span class="va">fitted</span><span class="op">$</span><span class="va">sdev</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">/</span> <span class="va">fitted</span><span class="op">$</span><span class="va">totalvar</span></span></code></pre></div>
 <pre><code><span><span class="co">##  [1] 0.07689789 0.14466433 0.21018176 0.27420309 0.33636478 0.39492291</span></span>
 <span><span class="co">##  [7] 0.45196354 0.50563725 0.55705654 0.57380104 0.57606900 0.57828256</span></span>
 <span><span class="co">## [13] 0.58048004 0.58264465 0.58479395 0.58691426 0.58902127 0.59107016</span></span>
 <span><span class="co">## [19] 0.59311409 0.59514063</span></span></code></pre>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>PC <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">fitted</span><span class="op">$</span><span class="va">sdev</span><span class="op">)</span>,</span>
 <span>           cum_var <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cumsum.html" class="external-link">cumsum</a></span><span class="op">(</span><span class="va">fitted</span><span class="op">$</span><span class="va">sdev</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span> <span class="op">/</span> <span class="va">fitted</span><span class="op">$</span><span class="va">totalvar</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">PC</span>, <span class="va">cum_var</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="simulated_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
+<p><img src="simulated_files/figure-html/unnamed-chunk-11-1.png" alt="" width="700"></p>
 </div>
 <div class="section level2">
 <h2 id="fitting-a-conventional-topic-model-stm">Fitting a conventional topic model (stm)<a class="anchor" aria-label="anchor" href="#fitting-a-conventional-topic-model-stm"></a>
@@ -381,22 +396,22 @@ of topics, it will conduct a topic estimation process when passed
 used here, this process takes almost 12 seconds and produces a model
 with 33 topics. We therefore do not automatically run the next
 chunk.</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">tic</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">corpus</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu"><a href="https://rdrr.io/pkg/tidytext/man/cast_sparse.html" class="external-link">cast_sparse</a></span><span class="op">(</span><span class="va">doc</span>, <span class="va">word</span>, <span class="va">n</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>    <span class="fu"><a href="https://juliasilge.github.io/tidytext/reference/cast_sparse.html" class="external-link">cast_sparse</a></span><span class="op">(</span><span class="va">doc</span>, <span class="va">word</span>, <span class="va">n</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/stm/man/stm.html" class="external-link">stm</a></span><span class="op">(</span>K <span class="op">=</span> <span class="fl">0</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>Setting <code>K = k</code> gives us a fitted topic model in a few
 seconds, about an order of magnitude slower than
 <code><a href="../reference/tmfast.html">tmfast()</a></code>.</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">tic</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">fitted_stm</span> <span class="op">=</span> <span class="va">corpus</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu"><a href="https://rdrr.io/pkg/tidytext/man/cast_sparse.html" class="external-link">cast_sparse</a></span><span class="op">(</span><span class="va">doc</span>, <span class="va">word</span>, <span class="va">n</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>    <span class="fu"><a href="https://juliasilge.github.io/tidytext/reference/cast_sparse.html" class="external-link">cast_sparse</a></span><span class="op">(</span><span class="va">doc</span>, <span class="va">word</span>, <span class="va">n</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/stm/man/stm.html" class="external-link">stm</a></span><span class="op">(</span>K <span class="op">=</span> <span class="va">k</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## 4.61 sec elapsed</span></span></code></pre>
+<pre><code><span><span class="co">## 1.917 sec elapsed</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 id="assessing-accuracy">Assessing accuracy<a class="anchor" aria-label="anchor" href="#assessing-accuracy"></a>
@@ -405,51 +420,77 @@ seconds, about an order of magnitude slower than
 distributions lets us check the accuracy of varimax-based topic models.
 Here we’ll develop a method proposed by Malaterre and Lareau (2022),
 comparing distributions using Hellinger distance. For discrete
-probability distributions <span class="math inline">\(p, q\)</span> over
-the same space <span class="math inline">\(X\)</span>, the Hellinger
-distance is given by <span class="math display">\[ d(p,q) =
-\frac{1}{\sqrt{2}} \sqrt{\sum_{x \in X} (\sqrt{p(x)} - \sqrt{q(x)})^2} =
-\frac{1}{\sqrt{2}} \lVert \sqrt p - \sqrt q \rVert_2.\]</span> The last
-equation means that the Hellinger distance is the Euclidean (<span class="math inline">\(L^2\)</span>-norm) distance between the <em>square
-roots</em> of the distributions. Some authors working with topic models
-sometimes compare distributions using the <span class="math inline">\(L^2\)</span>-norm of the distributions themselves,
-without the square root. But this approach is flawed, since probability
-distributions can have different lengths in the <span class="math inline">\(L^2\)</span> norm. (For example, the distribution
-<span class="math inline">\(\left&lt; 1, 0\right&gt;\)</span> has <span class="math inline">\(L^2\)</span> length 1, while <span class="math inline">\(\left&lt; \frac{1}{2}, \frac{1}{2}
-\right&gt;\)</span> has <span class="math inline">\(L^2\)</span> length
-approximately 1.19.)<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Cosine similarity is directly related to the &lt;span class="math inline"&gt;\(L^2\)&lt;/span&gt;-norm, and has the same problem.&lt;/p&gt;'><sup>2</sup></a></p>
-<p>Hellinger distance satisfies the equation <span class="math display">\[ 1 - d^2(p, q) = \sum_{x \in X} \sqrt{p(x)q(x)}.
-\]</span> When working with topic models, we’re interested in pairwise
-sets of Hellinger distances, either between all pairs of distributions
-from a single set (for example, the topic distributions for each
-document, as used in “discursive space” analysis <em>[cite and
-xref]</em>) or two sets (for example, comparing fitted vs. true
-word-topic distributions, as in this section). Working with two sets of
-distributions <span class="math inline">\(P = \{p_i | i \in I\}\)</span>
-and <span class="math inline">\(Q = \{q_j | j \in J\}\)</span>, the
-right-hand side of the last equation is equivalent to a matrix
-multiplication.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;For &lt;span class="math inline"&gt;\(P\)&lt;/span&gt;, each row
-corresponds to the elementwise square root of one distribution &lt;span class="math inline"&gt;\(\sqrt p_i\)&lt;/span&gt; and each column to one
-component &lt;span class="math inline"&gt;\(x \in X\)&lt;/span&gt;, i.e., a cell
-contains the value &lt;span class="math inline"&gt;\(\sqrt{p_i(x)}\)&lt;/span&gt;.
-&lt;span class="math inline"&gt;\(Q\)&lt;/span&gt; is the transpose, with each row
-corresponding to one component &lt;span class="math inline"&gt;\(x \in
-X\)&lt;/span&gt; and each column corresponding to the square root of a
-distribution &lt;span class="math inline"&gt;\(\sqrt q_j\)&lt;/span&gt;. The product
-of these matrices is a &lt;span class="math inline"&gt;\(i \times j\)&lt;/span&gt;
-matrix with each cell the desired sum for &lt;span class="math inline"&gt;\(p\)&lt;/span&gt; and &lt;span class="math inline"&gt;\(q\)&lt;/span&gt;.&lt;/p&gt;'><sup>3</sup></a> The <code><a href="../reference/hellinger.html">hellinger()</a></code> function
+probability distributions
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><mo>,</mo><mi>q</mi></mrow><annotation encoding="application/x-tex">p, q</annotation></semantics></math>
+over the same space
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>X</mi><annotation encoding="application/x-tex">X</annotation></semantics></math>,
+the Hellinger distance is given by
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>p</mi><mo>,</mo><mi>q</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mfrac><mn>1</mn><msqrt><mn>2</mn></msqrt></mfrac><msqrt><mrow><munder><mo>∑</mo><mrow><mi>x</mi><mo>∈</mo><mi>X</mi></mrow></munder><msup><mrow><mo stretchy="true" form="prefix">(</mo><msqrt><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msqrt><mo>−</mo><msqrt><mrow><mi>q</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msqrt><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt><mo>=</mo><mfrac><mn>1</mn><msqrt><mn>2</mn></msqrt></mfrac><mo stretchy="false" form="prefix">∥</mo><msqrt><mi>p</mi></msqrt><mo>−</mo><msqrt><mi>q</mi></msqrt><msub><mo stretchy="false" form="postfix">∥</mo><mn>2</mn></msub><mi>.</mi></mrow><annotation encoding="application/x-tex"> d(p,q) = \frac{1}{\sqrt{2}} \sqrt{\sum_{x \in X} (\sqrt{p(x)} - \sqrt{q(x)})^2} = \frac{1}{\sqrt{2}} \lVert \sqrt p - \sqrt q \rVert_2.</annotation></semantics></math>
+The last equation means that the Hellinger distance is the Euclidean
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>L</mi><mn>2</mn></msup><annotation encoding="application/x-tex">L^2</annotation></semantics></math>-norm)
+distance between the <em>square roots</em> of the distributions. Some
+authors working with topic models sometimes compare distributions using
+the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>L</mi><mn>2</mn></msup><annotation encoding="application/x-tex">L^2</annotation></semantics></math>-norm
+of the distributions themselves, without the square root. But this
+approach is flawed, since probability distributions can have different
+lengths in the
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>L</mi><mn>2</mn></msup><annotation encoding="application/x-tex">L^2</annotation></semantics></math>
+norm. (For example, the distribution
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">⟨</mo><mn>1</mn><mo>,</mo><mn>0</mn><mo stretchy="true" form="postfix">⟩</mo></mrow><annotation encoding="application/x-tex">\left&lt; 1, 0\right&gt;</annotation></semantics></math>
+has
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>L</mi><mn>2</mn></msup><annotation encoding="application/x-tex">L^2</annotation></semantics></math>
+length 1, while
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="true" form="prefix">⟨</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>,</mo><mfrac><mn>1</mn><mn>2</mn></mfrac><mo stretchy="true" form="postfix">⟩</mo></mrow><annotation encoding="application/x-tex">\left&lt; \frac{1}{2}, \frac{1}{2} \right&gt;</annotation></semantics></math>
+has
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>L</mi><mn>2</mn></msup><annotation encoding="application/x-tex">L^2</annotation></semantics></math>
+length approximately 1.19.)<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;Cosine similarity is directly related to the
+&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;msup&gt;&lt;mi&gt;L&lt;/mi&gt;&lt;mn&gt;2&lt;/mn&gt;&lt;/msup&gt;&lt;annotation encoding="application/x-tex"&gt;L^2&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;-norm,
+and has the same problem.&lt;/p&gt;'><sup>2</sup></a></p>
+<p>Hellinger distance satisfies the equation
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>−</mo><msup><mi>d</mi><mn>2</mn></msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>p</mi><mo>,</mo><mi>q</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><munder><mo>∑</mo><mrow><mi>x</mi><mo>∈</mo><mi>X</mi></mrow></munder><msqrt><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow><mi>q</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>x</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msqrt><mi>.</mi></mrow><annotation encoding="application/x-tex"> 1 - d^2(p, q) = \sum_{x \in X} \sqrt{p(x)q(x)}. </annotation></semantics></math>
+When working with topic models, we’re interested in pairwise sets of
+Hellinger distances, either between all pairs of distributions from a
+single set (for example, the topic distributions for each document, as
+used in “discursive space” analysis <em>[cite and xref]</em>) or two
+sets (for example, comparing fitted vs. true word-topic distributions,
+as in this section). Working with two sets of distributions
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mo>=</mo><mo stretchy="false" form="prefix">{</mo><msub><mi>p</mi><mi>i</mi></msub><mo stretchy="false" form="prefix">|</mo><mi>i</mi><mo>∈</mo><mi>I</mi><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">P = \{p_i | i \in I\}</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Q</mi><mo>=</mo><mo stretchy="false" form="prefix">{</mo><msub><mi>q</mi><mi>j</mi></msub><mo stretchy="false" form="prefix">|</mo><mi>j</mi><mo>∈</mo><mi>J</mi><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">Q = \{q_j | j \in J\}</annotation></semantics></math>,
+the right-hand side of the last equation is equivalent to a matrix
+multiplication.<a class="footnote-ref" tabindex="0" data-bs-toggle="popover" data-bs-content='&lt;p&gt;For
+&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mi&gt;P&lt;/mi&gt;&lt;annotation encoding="application/x-tex"&gt;P&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;,
+each row corresponds to the elementwise square root of one distribution
+&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;msub&gt;&lt;msqrt&gt;&lt;mi&gt;p&lt;/mi&gt;&lt;/msqrt&gt;&lt;mi&gt;i&lt;/mi&gt;&lt;/msub&gt;&lt;annotation encoding="application/x-tex"&gt;\sqrt p_i&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;
+and each column to one component
+&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;mo&gt;∈&lt;/mo&gt;&lt;mi&gt;X&lt;/mi&gt;&lt;/mrow&gt;&lt;annotation encoding="application/x-tex"&gt;x \in X&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;,
+i.e., a cell contains the value
+&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;msqrt&gt;&lt;mrow&gt;&lt;msub&gt;&lt;mi&gt;p&lt;/mi&gt;&lt;mi&gt;i&lt;/mi&gt;&lt;/msub&gt;&lt;mrow&gt;&lt;mo stretchy="true" form="prefix"&gt;(&lt;/mo&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;mo stretchy="true" form="postfix"&gt;)&lt;/mo&gt;&lt;/mrow&gt;&lt;/mrow&gt;&lt;/msqrt&gt;&lt;annotation encoding="application/x-tex"&gt;\sqrt{p_i(x)}&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;.
+&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mi&gt;Q&lt;/mi&gt;&lt;annotation encoding="application/x-tex"&gt;Q&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;
+is the transpose, with each row corresponding to one component
+&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;mo&gt;∈&lt;/mo&gt;&lt;mi&gt;X&lt;/mi&gt;&lt;/mrow&gt;&lt;annotation encoding="application/x-tex"&gt;x \in X&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;
+and each column corresponding to the square root of a distribution
+&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;msub&gt;&lt;msqrt&gt;&lt;mi&gt;q&lt;/mi&gt;&lt;/msqrt&gt;&lt;mi&gt;j&lt;/mi&gt;&lt;/msub&gt;&lt;annotation encoding="application/x-tex"&gt;\sqrt q_j&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;.
+The product of these matrices is a
+&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mi&gt;i&lt;/mi&gt;&lt;mo&gt;×&lt;/mo&gt;&lt;mi&gt;j&lt;/mi&gt;&lt;/mrow&gt;&lt;annotation encoding="application/x-tex"&gt;i \times j&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;
+matrix with each cell the desired sum for
+&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mi&gt;p&lt;/mi&gt;&lt;annotation encoding="application/x-tex"&gt;p&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;
+and
+&lt;math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"&gt;&lt;semantics&gt;&lt;mi&gt;q&lt;/mi&gt;&lt;annotation encoding="application/x-tex"&gt;q&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;.&lt;/p&gt;'><sup>3</sup></a> The <code><a href="../reference/hellinger.html">hellinger()</a></code> function
 provides S3 methods for calculating Hellinger pairwise distances given a
 single dataframe, single matrix, or two dataframes or matrices.</p>
 <p>First, however, we need to extract the word-topic distributions.
 <code>tmfast</code> provides a <code><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy()</a></code> method, following the
 pattern of the topicmodel tidiers in <code>tidytext</code>. Unlike other
 topic models, <code>tmfast</code> objects can contain models for
-multiple different values of <span class="math inline">\(k\)</span>
+multiple different values of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
 (numbers of topics). So, in the second argument to <code><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy()</a></code>,
 we need to specify which number of topics we want. The third argument
 specifies the desired set of distributions, either word-topics
 (<code>'beta'</code>) or topic-documents (<code>'gamma'</code>).</p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## beta: fitted varimax loadings, transformed to probability distributions</span></span>
 <span><span class="va">beta</span> <span class="op">=</span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fitted</span>, <span class="va">k</span>, <span class="st">'beta'</span><span class="op">)</span></span></code></pre></div>
 <p>Word-topic distributions correspond to the varimax factor loadings.
@@ -463,7 +504,7 @@ about 100 words. In other words, the varimax topic model highlights a
 relatively long list of characteristic words for each topic — the actual
 distributions have fewer characteristic words — and then ignores the
 other words.</p>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Compare Zipfian distributions</span></span>
 <span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="op">{</span><span class="va">beta</span> <span class="op">|&gt;</span></span>
 <span>        <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>type <span class="op">=</span> <span class="st">'fitted'</span><span class="op">)</span><span class="op">}</span>,</span>
@@ -486,7 +527,7 @@ other words.</p>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_y_log10</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_log10</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="simulated_files/figure-html/unnamed-chunk-15-1.png" width="700">
+<p><img src="simulated_files/figure-html/unnamed-chunk-15-1.png" alt="" width="700">
 The Zipfian distribution doesn’t tell us which fitted topics might
 correspond to which true topics. For that, following Malaterre and
 Lareau, we’ll use pairwise Hellinger distances. There’s one
@@ -500,7 +541,7 @@ words to be 0 across all topics). In the pipe below, we first fix these
 issues with the words, widen the long dataframe, convert it to a matrix,
 and then calculate pairwise Hellinger distances with the true word-topic
 matrix <code>phi</code>.</p>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Hellinger distance of word-topic distributions</span></span>
 <span><span class="va">beta_mx</span> <span class="op">=</span> <span class="va">beta</span> <span class="op">|&gt;</span></span>
 <span>    <span class="co">## Fix order of words</span></span>
@@ -550,7 +591,7 @@ the loadings and scores (topic-document distributions). After rotating,
 the true-fitted pairs are on the diagonal of the Hellinger distance
 matrix, making it easy to extract and summarize the quality of the
 fit.</p>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Use lpSolve to match fitted topics to true topics</span></span>
 <span><span class="va">dist</span> <span class="op">=</span> <span class="fu"><a href="../reference/hellinger.html">hellinger</a></span><span class="op">(</span><span class="va">phi</span>, <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">beta_mx</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">soln</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/lpSolve/man/lp.assign.html" class="external-link">lp.assign</a></span><span class="op">(</span><span class="va">dist</span><span class="op">)</span></span>
@@ -566,7 +607,7 @@ fit.</p>
 <span><span class="co">##  [8,]    0    0    0    0    0    0    0    0    0     1</span></span>
 <span><span class="co">##  [9,]    0    0    0    1    0    0    0    0    0     0</span></span>
 <span><span class="co">## [10,]    0    0    0    0    0    0    0    1    0     0</span></span></code></pre>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/hellinger.html">hellinger</a></span><span class="op">(</span><span class="va">phi</span>, <span class="va">soln</span><span class="op">$</span><span class="va">solution</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">beta_mx</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##            [,1]      [,2]      [,3]      [,4]      [,5]      [,6]      [,7]</span></span>
 <span><span class="co">##  [1,] 0.1637336 0.8751537 0.8852931 0.9165058 0.9036184 0.8995845 0.9031738</span></span>
@@ -590,7 +631,7 @@ fit.</p>
 <span><span class="co">##  [8,] 0.1708753 0.8977089 0.8796820</span></span>
 <span><span class="co">##  [9,] 0.9004598 0.1682888 0.8968698</span></span>
 <span><span class="co">## [10,] 0.8824513 0.8935218 0.1616073</span></span></code></pre>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/hellinger.html">hellinger</a></span><span class="op">(</span><span class="va">phi</span>, <span class="va">soln</span><span class="op">$</span><span class="va">solution</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">beta_mx</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
@@ -599,7 +640,7 @@ fit.</p>
 <p>And we do the same thing with the conventional topic model. It
 performs somewhat better, with a median Hellinger distance of about
 0.08. But again, it’s significantly slower.</p>
-<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">beta_stm_mx</span> <span class="op">=</span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fitted_stm</span>, matrix <span class="op">=</span> <span class="st">'beta'</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="co">## Fix order of words</span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>term <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="va">term</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -616,28 +657,28 @@ performs somewhat better, with a median Hellinger distance of about
 <span></span>
 <span><span class="fu"><a href="../reference/hellinger.html">hellinger</a></span><span class="op">(</span><span class="va">phi</span>, <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">beta_stm_mx</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##                1          2          3          4          5          6</span></span>
-<span><span class="co">##  [1,] 0.08551476 0.84250732 0.84248134 0.88213508 0.87444870 0.87157834</span></span>
-<span><span class="co">##  [2,] 0.84329922 0.85367721 0.08226114 0.87003933 0.85853111 0.86964720</span></span>
-<span><span class="co">##  [3,] 0.84814338 0.08498287 0.84966302 0.85873155 0.83485457 0.87730942</span></span>
-<span><span class="co">##  [4,] 0.88728074 0.86458774 0.87596766 0.08716275 0.86137846 0.90341396</span></span>
-<span><span class="co">##  [5,] 0.86509433 0.84154766 0.84198078 0.86693020 0.85183981 0.85492194</span></span>
-<span><span class="co">##  [6,] 0.89275208 0.85457918 0.87148785 0.83690625 0.84770470 0.89097927</span></span>
-<span><span class="co">##  [7,] 0.87604529 0.87475670 0.86935797 0.89497509 0.86136575 0.08427024</span></span>
-<span><span class="co">##  [8,] 0.86179446 0.88513627 0.87104990 0.87765133 0.85763362 0.88206046</span></span>
-<span><span class="co">##  [9,] 0.88272319 0.84014092 0.86831204 0.85799803 0.09038475 0.86010142</span></span>
-<span><span class="co">## [10,] 0.88217135 0.87848592 0.86296463 0.86880249 0.85155013 0.87344130</span></span>
-<span><span class="co">##                7          8          9         10</span></span>
-<span><span class="co">##  [1,] 0.85051526 0.86539658 0.87856817 0.86805865</span></span>
-<span><span class="co">##  [2,] 0.86158904 0.87025988 0.85982995 0.85353582</span></span>
-<span><span class="co">##  [3,] 0.88224633 0.85827133 0.87289308 0.84502101</span></span>
-<span><span class="co">##  [4,] 0.87295764 0.83661054 0.86684110 0.87271693</span></span>
-<span><span class="co">##  [5,] 0.84603547 0.86047913 0.83835750 0.07902295</span></span>
-<span><span class="co">##  [6,] 0.86282228 0.08880347 0.85411829 0.86252234</span></span>
-<span><span class="co">##  [7,] 0.87474253 0.89536072 0.86677860 0.85727623</span></span>
-<span><span class="co">##  [8,] 0.09267689 0.87054310 0.84452997 0.85300612</span></span>
-<span><span class="co">##  [9,] 0.85178500 0.85313348 0.85250779 0.85785724</span></span>
-<span><span class="co">## [10,] 0.84600884 0.85587004 0.09097089 0.84596278</span></span></code></pre>
-<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<span><span class="co">##  [1,] 0.08551309 0.84250822 0.84248081 0.88213456 0.87444893 0.87158481</span></span>
+<span><span class="co">##  [2,] 0.84329982 0.85367764 0.08226138 0.87003915 0.85853149 0.86965052</span></span>
+<span><span class="co">##  [3,] 0.84814586 0.08498166 0.84966319 0.85873081 0.83485510 0.87731318</span></span>
+<span><span class="co">##  [4,] 0.88728389 0.86458833 0.87596785 0.08716286 0.86137815 0.90341308</span></span>
+<span><span class="co">##  [5,] 0.86509991 0.84154855 0.84198045 0.86693014 0.85183939 0.85492694</span></span>
+<span><span class="co">##  [6,] 0.89275256 0.85458013 0.87148757 0.83690612 0.84770566 0.89098313</span></span>
+<span><span class="co">##  [7,] 0.87604584 0.87475679 0.86935792 0.89497551 0.86136570 0.08426198</span></span>
+<span><span class="co">##  [8,] 0.86179696 0.88513645 0.87104983 0.87765103 0.85763363 0.88206881</span></span>
+<span><span class="co">##  [9,] 0.88272457 0.84014143 0.86831191 0.85799772 0.09038414 0.86010657</span></span>
+<span><span class="co">## [10,] 0.88217497 0.87848728 0.86296462 0.86880294 0.85154928 0.87344610</span></span>
+<span><span class="co">##               7          8          9         10</span></span>
+<span><span class="co">##  [1,] 0.8505157 0.86539554 0.87856776 0.86805817</span></span>
+<span><span class="co">##  [2,] 0.8615900 0.87026329 0.85983013 0.85353576</span></span>
+<span><span class="co">##  [3,] 0.8822492 0.85827128 0.87289289 0.84502057</span></span>
+<span><span class="co">##  [4,] 0.8729586 0.83661049 0.86684066 0.87271754</span></span>
+<span><span class="co">##  [5,] 0.8460363 0.86047844 0.83835726 0.07902305</span></span>
+<span><span class="co">##  [6,] 0.8628231 0.08880366 0.85411796 0.86252219</span></span>
+<span><span class="co">##  [7,] 0.8747440 0.89536041 0.86677815 0.85727482</span></span>
+<span><span class="co">##  [8,] 0.0926754 0.87054303 0.84452963 0.85300520</span></span>
+<span><span class="co">##  [9,] 0.8517883 0.85313257 0.85250714 0.85785593</span></span>
+<span><span class="co">## [10,] 0.8460104 0.85587071 0.09097124 0.84596307</span></span></code></pre>
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">rotation_stm</span> <span class="op">=</span> <span class="fu"><a href="../reference/hellinger.html">hellinger</a></span><span class="op">(</span><span class="va">phi</span>, <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">beta_stm_mx</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="https://rdrr.io/pkg/lpSolve/man/lp.assign.html" class="external-link">lp.assign</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu">magrittr</span><span class="fu">::</span><span class="fu"><a href="https://magrittr.tidyverse.org/reference/aliases.html" class="external-link">extract2</a></span><span class="op">(</span><span class="st">'solution'</span><span class="op">)</span></span>
@@ -646,7 +687,7 @@ performs somewhat better, with a median Hellinger distance of about
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
-<span><span class="co">## 0.07902 0.08445 0.08634 0.08661 0.08999 0.09268</span></span></code></pre>
+<span><span class="co">## 0.07902 0.08444 0.08634 0.08660 0.08999 0.09268</span></span></code></pre>
 <p>The tidied word-topic distributions can be used in standard ways for
 further analysis, such as a <a href="https://juliasilge.com/blog/2018/2018-01-25-sherlock-holmes-stm_files/figure-html/unnamed-chunk-6-1.png" class="external-link">Silge
 plot</a> of the highest probability words for each topic. But because
@@ -668,19 +709,19 @@ parallel coordinates plots can be used to visualize all of the
 topic-document distributions. These show that the varimax topic models
 successfully recover the overall association of each document’s journal
 with a distinctive topic.</p>
-<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gamma_df</span> <span class="op">=</span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fitted</span>, <span class="va">k</span>, <span class="st">'gamma'</span>, </span>
 <span>                rotation <span class="op">=</span> <span class="va">soln</span><span class="op">$</span><span class="va">solution</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Warning in tidy.tmfast(fitted, k, "gamma", rotation = soln$solution): Rotating</span></span>
 <span><span class="co">## scores</span></span></code></pre>
-<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gamma_df</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>document <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="va">document</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">document</span>, <span class="va">topic</span>, fill <span class="op">=</span> <span class="va">gamma</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_tile.html" class="external-link">geom_raster</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_continuous</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
-<p><img src="simulated_files/figure-html/unnamed-chunk-19-1.png" width="700"></p>
-<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
+<p><img src="simulated_files/figure-html/unnamed-chunk-19-1.png" alt="" width="700"></p>
+<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gamma_df</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>document <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="va">document</span><span class="op">)</span>,</span>
 <span>           journal <span class="op">=</span> <span class="op">(</span><span class="va">document</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html" class="external-link">%/%</a></span> <span class="va">Mj</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -689,31 +730,32 @@ with a distinctive topic.</p>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>alpha <span class="op">=</span> <span class="fl">.25</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/vars.html" class="external-link">vars</a></span><span class="op">(</span><span class="va">journal</span><span class="op">)</span>, scales <span class="op">=</span> <span class="st">'free_x'</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_colour_discrete.html" class="external-link">scale_color_discrete</a></span><span class="op">(</span>guide <span class="op">=</span> <span class="st">'none'</span><span class="op">)</span></span></code></pre></div>
-<p><img src="simulated_files/figure-html/unnamed-chunk-19-2.png" width="700"></p>
+<p><img src="simulated_files/figure-html/unnamed-chunk-19-2.png" alt="" width="700"></p>
 <p>However, the fitted topic-document distributions are flatter than the
 true ones. Consider the true and fitted distributions for document 1.
 Compared to the true distribution, the fitted distribution has a
 somewhat lower probability for topic <code>V01</code> and a somewhat
 higher probability for the other topics.</p>
-<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">topic</span>, group <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">theta</span>, color <span class="op">=</span> <span class="st">'true'</span><span class="op">)</span>, </span>
 <span>              data <span class="op">=</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>theta <span class="op">=</span> <span class="va">theta</span><span class="op">[</span><span class="fl">1</span>,<span class="op">]</span>, </span>
 <span>                            topic <span class="op">=</span> <span class="fu">tmfast</span><span class="fu">:::</span><span class="fu"><a href="../reference/make_colnames.html">make_colnames</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">k</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>y <span class="op">=</span> <span class="va">gamma</span>, color <span class="op">=</span> <span class="st">'fitted'</span><span class="op">)</span>, </span>
 <span>              data <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">gamma_df</span>, <span class="va">document</span> <span class="op">==</span> <span class="st">'1'</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="simulated_files/figure-html/unnamed-chunk-20-1.png" width="700"></p>
+<p><img src="simulated_files/figure-html/unnamed-chunk-20-1.png" alt="" width="700"></p>
 <p>This flatter distribution corresponds to greater entropy. In this
 simulation, the entropy of the fitted distributions are about 1 bit
 greater than those of the true distributions. This discrepancy tends to
-become worse with greater values of <span class="math inline">\(k\)</span>.</p>
-<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
+become worse with greater values of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>.</p>
+<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">theta</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="fl">1</span>, <span class="va">entropy</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
 <span><span class="co">##  0.1006  0.6614  0.9715  1.0100  1.3311  2.5821</span></span></code></pre>
-<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fitted</span>, <span class="va">k</span>, <span class="st">'gamma'</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">document</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span>H <span class="op">=</span> <span class="fu"><a href="../reference/entropy.html">entropy</a></span><span class="op">(</span><span class="va">gamma</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
@@ -723,39 +765,55 @@ become worse with greater values of <span class="math inline">\(k\)</span>.</p>
 <span><span class="co">##  0.8486  1.7040  1.9319  1.9129  2.1592  2.7673</span></span></code></pre>
 <p>To mitigate this problem, we add an optional renormalization step
 when converting document scores to topic-document distributions. Given a
-discrete probability distribution <span class="math inline">\(P\)</span>
-with components <span class="math inline">\(p_i\)</span> and entropy
-<span class="math inline">\(H\)</span>, and a parameter <span class="math inline">\(\beta\)</span>, we can define a new distribution
-<span class="math inline">\(P'\)</span> with components</p>
-<p><span class="math display">\[ p'_i = \frac{p_i^\beta}{\sum_i
-p_i^\beta} = \frac{p_i^\beta}{Z}\]</span></p>
+discrete probability distribution
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>P</mi><annotation encoding="application/x-tex">P</annotation></semantics></math>
+with components
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>p</mi><mi>i</mi></msub><annotation encoding="application/x-tex">p_i</annotation></semantics></math>
+and entropy
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>H</mi><annotation encoding="application/x-tex">H</annotation></semantics></math>,
+and a parameter
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>,
+we can define a new distribution
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mi>′</mi></mrow><annotation encoding="application/x-tex">P'</annotation></semantics></math>
+with components</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>p</mi><msub><mi>′</mi><mi>i</mi></msub><mo>=</mo><mfrac><msubsup><mi>p</mi><mi>i</mi><mi>β</mi></msubsup><mrow><munder><mo>∑</mo><mi>i</mi></munder><msubsup><mi>p</mi><mi>i</mi><mi>β</mi></msubsup></mrow></mfrac><mo>=</mo><mfrac><msubsup><mi>p</mi><mi>i</mi><mi>β</mi></msubsup><mi>Z</mi></mfrac></mrow><annotation encoding="application/x-tex"> p'_i = \frac{p_i^\beta}{\sum_i p_i^\beta} = \frac{p_i^\beta}{Z}</annotation></semantics></math></p>
 <p>which has entropy</p>
-<p><span class="math display">\[ H' = \frac{1}{Z} \sum_i [p_i^\beta
-\beta \log p_i] - \log Z.\]</span></p>
-<p>That is, we can choose a parameter <span class="math inline">\(\beta\)</span> that renormalizes <span class="math inline">\(P\)</span> to achieve a target entropy <span class="math inline">\(H'\)</span>. In LDA, the target entropy is the
-expected entropy for topic-document distributions drawn from the
-Dirichlet prior. <code>tmfast</code> provides convenience functions for
-calculating this expected entropy; compare this to the mean entropy of
-the distributions in <code>theta</code> above. <strong>In actual
-applications, where the Dirichlet prior is an idealization, choosing
-<span class="math inline">\(\alpha\)</span> to set the target entropy is
-an important researcher degree of freedom.</strong> It is equivalent to
-choosing prior parameters in other topic modeling packages.</p>
-<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>H</mi><mi>′</mi><mo>=</mo><mfrac><mn>1</mn><mi>Z</mi></mfrac><munder><mo>∑</mo><mi>i</mi></munder><mrow><mo stretchy="true" form="prefix">[</mo><msubsup><mi>p</mi><mi>i</mi><mi>β</mi></msubsup><mi>β</mi><mo>log</mo><msub><mi>p</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">]</mo></mrow><mo>−</mo><mo>log</mo><mi>Z</mi><mi>.</mi></mrow><annotation encoding="application/x-tex"> H' = \frac{1}{Z} \sum_i [p_i^\beta \beta \log p_i] - \log Z.</annotation></semantics></math></p>
+<p>That is, we can choose a parameter
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>
+that renormalizes
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>P</mi><annotation encoding="application/x-tex">P</annotation></semantics></math>
+to achieve a target entropy
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>H</mi><mi>′</mi></mrow><annotation encoding="application/x-tex">H'</annotation></semantics></math>.
+In LDA, the target entropy is the expected entropy for topic-document
+distributions drawn from the Dirichlet prior. <code>tmfast</code>
+provides convenience functions for calculating this expected entropy;
+compare this to the mean entropy of the distributions in
+<code>theta</code> above. <strong>In actual applications, where the
+Dirichlet prior is an idealization, choosing
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>
+to set the target entropy is an important researcher degree of
+freedom.</strong> It is equivalent to choosing prior parameters in other
+topic modeling packages.</p>
+<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/peak_alpha.html">peak_alpha</a></span><span class="op">(</span><span class="va">k</span>, <span class="fl">1</span>, <span class="va">topic_peak</span>, <span class="va">topic_scale</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##  [1] 8.0000000 0.2222222 0.2222222 0.2222222 0.2222222 0.2222222 0.2222222</span></span>
 <span><span class="co">##  [8] 0.2222222 0.2222222 0.2222222</span></span></code></pre>
-<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/expected_entropy.html">expected_entropy</a></span><span class="op">(</span><span class="fu"><a href="../reference/peak_alpha.html">peak_alpha</a></span><span class="op">(</span><span class="va">k</span>, <span class="fl">1</span>, <span class="va">topic_peak</span>, <span class="va">topic_scale</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 0.997604</span></span></code></pre>
-<p>Since solving the equation for <span class="math inline">\(H'\)</span> for <span class="math inline">\(\beta\)</span> requires numerical optimization,
-it’s inefficient to do this every time we call <code><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy()</a></code>,
-especially with large corpora. Instead,
+<p>Since solving the equation for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>H</mi><mi>′</mi></mrow><annotation encoding="application/x-tex">H'</annotation></semantics></math>
+for
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>
+requires numerical optimization, it’s inefficient to do this every time
+we call <code><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy()</a></code>, especially with large corpora. Instead,
 <code><a href="../reference/target_power.html">tmfast::target_power()</a></code> is used to run this optimization
 once, and then return the mean value across all documents. We then use
-this single value of <span class="math inline">\(\beta\)</span> in all
-future calls to <code><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy()</a></code>.</p>
-<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
+this single value of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>
+in all future calls to <code><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy()</a></code>.</p>
+<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gamma_power</span> <span class="op">=</span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fitted</span>, <span class="va">k</span>, <span class="st">'gamma'</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="../reference/target_power.html">target_power</a></span><span class="op">(</span><span class="va">document</span>, <span class="va">gamma</span>, </span>
 <span>                 <span class="fu"><a href="../reference/expected_entropy.html">expected_entropy</a></span><span class="op">(</span><span class="fu"><a href="../reference/peak_alpha.html">peak_alpha</a></span><span class="op">(</span><span class="va">k</span>, </span>
@@ -767,14 +825,14 @@ future calls to <code><a href="https://generics.r-lib.org/reference/tidy.html" c
 <p>The renormalized topic-document distributions have closer entropy to
 theta. The <code>keep_original</code> argument lets us compare the
 original and renormalized distributions.</p>
-<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gamma_df</span> <span class="op">=</span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fitted</span>, <span class="va">k</span>, <span class="st">'gamma'</span>, </span>
 <span>                rotation <span class="op">=</span> <span class="va">soln</span><span class="op">$</span><span class="va">solution</span>, </span>
 <span>                exponent <span class="op">=</span> <span class="va">gamma_power</span>, </span>
 <span>                keep_original <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Warning in tidy.tmfast(fitted, k, "gamma", rotation = soln$solution, exponent =</span></span>
 <span><span class="co">## gamma_power, : Rotating scores</span></span></code></pre>
-<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gamma_df</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">document</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarize</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">across</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">gamma</span>, <span class="va">gamma_rn</span><span class="op">)</span>, <span class="va">entropy</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
@@ -791,11 +849,12 @@ columns. The tile plot shows that the true and fitted topics are aligned
 above), and so again we can get an overall summary from the diagonal.
 Without renormalization, in the current simulation the mean Hellinger
 distance is 0.24 — not too bad, but perhaps larger than one would like.
-With larger values of <span class="math inline">\(k\)</span>, this
-accuracy increases significantly. Renormalization keeps the mean
+With larger values of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>,
+this accuracy increases significantly. Renormalization keeps the mean
 distance around 0.13, slightly better the the word-topic
 distributions.</p>
-<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## w/o renormalization, mean distance is .24</span></span>
 <span><span class="fu"><a href="../reference/hellinger.html">hellinger</a></span><span class="op">(</span><span class="va">theta_df</span>, <span class="va">doc</span>,</span>
 <span>                        topicsdf2 <span class="op">=</span> <span class="va">gamma_df</span>, id2 <span class="op">=</span> <span class="va">document</span>, </span>
@@ -804,7 +863,7 @@ distributions.</p>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
 <span><span class="co">## 0.08499 0.20131 0.23733 0.23770 0.27244 0.37585</span></span></code></pre>
-<div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## w/ renormalization, mean distance drops to .13</span></span>
 <span><span class="va">doc_compare</span> <span class="op">=</span> <span class="fu"><a href="../reference/hellinger.html">hellinger</a></span><span class="op">(</span><span class="va">theta_df</span>, <span class="va">doc</span>,</span>
 <span>          topicsdf2 <span class="op">=</span> <span class="va">gamma_df</span>, id2 <span class="op">=</span> <span class="va">document</span>, </span>
@@ -816,17 +875,17 @@ distributions.</p>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
 <span><span class="co">## 0.04808 0.10195 0.12378 0.12518 0.14564 0.24868</span></span></code></pre>
-<div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb74"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">doc_compare</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="va">doc</span><span class="op">)</span>, </span>
 <span>                        <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="va">document</span><span class="op">)</span>, </span>
 <span>                        fill <span class="op">=</span> <span class="fl">1</span> <span class="op">-</span> <span class="va">dist</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_tile.html" class="external-link">geom_raster</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_discrete.html" class="external-link">scale_x_discrete</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="cn">NULL</span>, name <span class="op">=</span> <span class="st">'true'</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_discrete.html" class="external-link">scale_y_discrete</a></span><span class="op">(</span>breaks <span class="op">=</span> <span class="cn">NULL</span>, name <span class="op">=</span> <span class="st">'fitted'</span><span class="op">)</span></span></code></pre></div>
-<p><img src="simulated_files/figure-html/unnamed-chunk-25-1.png" width="700"></p>
+<p><img src="simulated_files/figure-html/unnamed-chunk-25-1.png" alt="" width="700"></p>
 <p>STM has a slightly closer fit, with a mean Hellinger distance of
 0.08.</p>
-<div class="sourceCode" id="cb74"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fitted_stm_gamma</span> <span class="op">=</span> <span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">fitted_stm</span>, matrix <span class="op">=</span> <span class="st">'gamma'</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_wider.html" class="external-link">pivot_wider</a></span><span class="op">(</span>names_from <span class="op">=</span> <span class="st">'topic'</span>, </span>
 <span>                values_from <span class="op">=</span> <span class="st">'gamma'</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
@@ -837,7 +896,7 @@ distributions.</p>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/diag.html" class="external-link">diag</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span></span>
-<span><span class="co">## 0.03216 0.07148 0.08638 0.08823 0.10260 0.19884</span></span></code></pre>
+<span><span class="co">## 0.03216 0.07148 0.08638 0.08822 0.10260 0.19884</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 id="discursive-space-visualization-using-t-sne-and-umap">Discursive space visualization using t-SNE and UMAP<a class="anchor" aria-label="anchor" href="#discursive-space-visualization-using-t-sne-and-umap"></a>
@@ -853,44 +912,42 @@ efficiently produce such visualizations. Note that the t-SNE algorithm
 involves further random number draws (I believe to set the initial
 positions of the points), so repeatedly running this next chunk will
 produce superficially different visualizations.</p>
-<div class="sourceCode" id="cb76"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tsne.html">tsne</a></span><span class="op">(</span><span class="va">fitted</span>, <span class="va">k</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>journal <span class="op">=</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="va">document</span><span class="op">)</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html" class="external-link">%/%</a></span> <span class="va">Mj</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">journal</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">'t-SNE visualization'</span><span class="op">)</span></span></code></pre></div>
-<p><img src="simulated_files/figure-html/unnamed-chunk-27-1.png" width="700"></p>
-<div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
+<p><img src="simulated_files/figure-html/unnamed-chunk-27-1.png" alt="" width="700"></p>
+<div class="sourceCode" id="cb78"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/umap.html">umap</a></span><span class="op">(</span><span class="va">fitted</span>, <span class="va">k</span>, df <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>journal <span class="op">=</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="va">document</span><span class="op">)</span><span class="op">-</span><span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html" class="external-link">%/%</a></span> <span class="va">Mj</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="va">journal</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">'UMAP visualization'</span><span class="op">)</span></span></code></pre></div>
-<p><img src="simulated_files/figure-html/unnamed-chunk-27-2.png" width="700"></p>
+<p><img src="simulated_files/figure-html/unnamed-chunk-27-2.png" alt="" width="700"></p>
 </div>
 
-  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
 </div>
 
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p>
-<p>Developed by <a href="https://dhicks.github.io" class="external-link">Dan Hicks</a>.</p>
+  <p>Developed by <a href="https://dhicks.github.io" class="external-link">Dan Hicks</a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>
 </div>
 
-  
 
-  
+
+
 
   </body>
 </html>

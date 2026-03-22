@@ -12,10 +12,10 @@ expected_entropy(alpha, k = NULL)
 \item{k}{If length(alpha) is 1, number of components in symmetric Dirichlet distribution}
 }
 \value{
-Expected entropy E\link{H(P)} in bits (log2 scale)
+Expected entropy \eqn{E[H(P)]} in bits (log2 scale)
 }
 \description{
-Samples P = <p1, p2, ..., pk> from Dirichlet distribution with parameter alpha = <alpha1, alpha2, ..., alphak> can be treated as categorical probability distributions with entropy H(P) = sum(-p log(p)).  This function calculates the expected entropy E\link{H(P)} given alpha.
+Samples P = <p1, p2, ..., pk> from Dirichlet distribution with parameter alpha = <alpha1, alpha2, ..., alphak> can be treated as categorical probability distributions with entropy \eqn{H(P) = \sum(-p \log p)}.  This function calculates the expected entropy \eqn{E[H(P)]} given alpha.
 }
 \details{
 After \url{https://math.stackexchange.com/questions/2266285/expected-entropy-based-on-dirichlet-distribution/3195376#3195376}

@@ -4,7 +4,7 @@
 \alias{hellinger.Matrix}
 \title{Hellinger distance for matrices}
 \usage{
-\method{hellinger}{Matrix}(mx1, mx2 = NULL)
+\method{hellinger}{Matrix}(mx1, mx2 = NULL, ...)
 }
 \arguments{
 \item{mx1}{First matrix, \eqn{n_1 \times k}}

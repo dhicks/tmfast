@@ -5,7 +5,7 @@
 \alias{tmfast-package}
 \title{Fitting "topic models" with PCA+varimax}
 \description{
-Fit topic models fast using varimax-rotated PCA
+Fit topic models fast using varimax-rotated PCA.
 }
 \seealso{
 Useful links:
