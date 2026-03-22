@@ -88,7 +88,7 @@ ndR = function(dataf, doc_col, term_col, count_col) {
     ## len: Length of doc_j
     ## r: Probability of drawing doc_j, len / sum(len) across all docs
     alpha = dataf |>
-        pull({{ count_col }}) |>
+        dplyr::pull({{ count_col }}) |>
         sum()
     r_df = dataf |>
         dplyr::group_by({{ doc_col }}) |>
@@ -103,8 +103,8 @@ ndR = function(dataf, doc_col, term_col, count_col) {
 
     ## Conditional entropy for each term, and KL divergence wrt r/R
     result = dataf |>
-        dplyr::left_join(r_df, by = rlang::as_name(enquo(doc_col))) |>
-        dplyr::left_join(totals, by = rlang::as_name(enquo(term_col))) |>
+        dplyr::left_join(r_df, by = rlang::as_name(rlang::enquo(doc_col))) |>
+        dplyr::left_join(totals, by = rlang::as_name(rlang::enquo(term_col))) |>
         dplyr::mutate(p = n / n_tot,
                       dR_term = p * log2(p / r)) |>
         dplyr::group_by({{ term_col }}) |>

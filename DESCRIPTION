@@ -23,7 +23,8 @@ Imports:
     glue,
     Matrix,
     generics,
-    psych
+    psych,
+    cli
 Suggests:
     testthat (>= 3.0.0),
     knitr,

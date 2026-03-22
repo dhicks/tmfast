@@ -2,21 +2,23 @@
 #'
 #' @export
 loadings = function(x, ...) {
-    UseMethod("loadings")
+      UseMethod("loadings")
 }
 #' @export
 loadings.default = function(x, ...) {
-    rlang::check_dots_empty()
-    # message('loadings.default')
-    stats::loadings(x)
+      rlang::check_dots_empty()
+      # message('loadings.default')
+      stats::loadings(x)
 }
 #' @export
 loadings.varimaxes = function(x, k, ...) {
-    rlang::check_dots_empty()
-    # message('loadings.varimaxtm')
-    assertthat::assert_that(k %in% x$n,
-                            msg = glue::glue('Rank {k} not in fitted model'))
-    loadings(x$varimax[[as.character(k)]])
+      rlang::check_dots_empty()
+      # message('loadings.varimaxtm')
+      assertthat::assert_that(
+            k %in% x$n,
+            msg = glue::glue('Rank {k} not in fitted model')
+      )
+      loadings(x$varimax[[as.character(k)]])
 }
 # loadings(fitted, 5)
 # loadings(fitted, 6)
@@ -25,14 +27,16 @@ loadings.varimaxes = function(x, k, ...) {
 #'
 #' @export
 scores = function(x, ...) {
-    UseMethod("scores")
+      UseMethod("scores")
 }
 #' @export
 scores.varimaxes = function(x, k, ...) {
-    rlang::check_dots_empty()
-    assertthat::assert_that(k %in% x$n,
-                            msg = glue::glue('Rank {k} not in fitted model'))
-    x$varimax[[as.character(k)]]$scores
+      rlang::check_dots_empty()
+      assertthat::assert_that(
+            k %in% x$n,
+            msg = glue::glue('Rank {k} not in fitted model')
+      )
+      x$varimax[[as.character(k)]]$scores
 }
 # scores(fitted, 5)
 # scores(fitted, 6)
@@ -41,14 +45,16 @@ scores.varimaxes = function(x, k, ...) {
 #'
 #' @export
 rotation = function(x, ...) {
-    UseMethod('rotation')
+      UseMethod('rotation')
 }
 #' @export
 rotation.varimaxes = function(x, k, ...) {
-    rlang::check_dots_empty()
-    assertthat::assert_that(k %in% x$n,
-                            msg = glue::glue('Rank {k} not in fitted model'))
-    x$varimax[[as.character(k)]]$rotmat
+      rlang::check_dots_empty()
+      assertthat::assert_that(
+            k %in% x$n,
+            msg = glue::glue('Rank {k} not in fitted model')
+      )
+      x$varimax[[as.character(k)]]$rotmat
 }
 # rotation(fitted, 5)
 
@@ -56,12 +62,11 @@ rotation.varimaxes = function(x, k, ...) {
 #'
 #' Helper function to make matrix column names of the form 'V09'
 make_colnames = function(names, prefix = 'V') {
-    n = length(names)
-    1:n |>
-        as.character() |>
-        stringr::str_pad(stringr::str_length(n),
-                         pad = '0') %>%
-        stringr::str_c(prefix, .)
+      n = length(names)
+      1:n |>
+            as.character() |>
+            stringr::str_pad(stringr::str_length(n), pad = '0') %>%
+            stringr::str_c(prefix, .)
 }
 
 
@@ -81,72 +86,95 @@ generics::tidy
 #' @return A long dataframe, with one row per word-topic or topic-doc combination. Column names depend on the value of `matrix`.
 #' @details If `rotation` is not `NULL`, loadings/scores will be rotated.  This might be used to align the fitted topics with known true topics, as in the `journal_specific` simulation.  Loadings are left-multiplied by the given rotation, while scores are right-multiplied by the transpose of the given rotation.
 #' @export
-tidy.tmfast = function(x,
-                       k,
-                       matrix = 'beta',
-                       df = TRUE,
-                       exponent = NULL,
-                       keep_original = FALSE,
-                       rotation = NULL,
-                       ...) {
-    rlang::check_dots_empty()
-    assertthat::assert_that(k %in% x$n,
-                            msg = glue::glue('Rank {k} not in fitted model'))
-    assertthat::assert_that(matrix %in% c('beta', 'gamma'),
-                            msg = glue::glue('Matrix argument {matrix} invalid'))
-    if (identical(matrix, 'beta')) {
-        if (!df) {
-            warning('Varimax token loadings, not rotated, trimmed, or normalized')
-            return(loadings(x, k))
-        }
-        loadings_mx = loadings(x, k)
-        if (!is.null(rotation)) {
-            warning('Rotating loadings')
-            loadings_mx = rotation %*% loadings_mx
-        }
-        dataf = loadings_mx |>
-            tibble::as_tibble(rownames = 'token',
-                              .name_repair = make_colnames) |>
-            tidyr::pivot_longer(starts_with('V'),
-                                names_to = 'topic',
-                                values_to = 'beta') |>
-            ## Trim at 0, then normalize to sum to 1
-            dplyr::group_by(topic) |>
-            dplyr::filter(beta > 0) |>
-            dplyr::mutate(beta = beta / sum(beta)) |>
-            dplyr::ungroup()
-        if (!is.null(exponent)) {
-            dataf = renorm(dataf, topic, beta, exponent, keep_original)
-        }
-        return(dataf)
-    }
-    if (identical(matrix, 'gamma')) {
-        if (!df) {
-            warning('Varimax document scores, not rotated, nudged, or normalized')
-            return(scores(x, k))
-        }
-        scores_mx = scores(x, k)
-        if (!is.null(rotation)) {
-            warning('Rotating scores')
-            scores_mx = scores_mx %*% t(rotation)
-        }
-        dataf = scores_mx |>
-            tibble::as_tibble(rownames = 'document',
-                              .name_repair = make_colnames) |>
-            tidyr::pivot_longer(starts_with('V'),
-                                names_to = 'topic',
-                                values_to = 'gamma') |>
-            ## Nudge everything so the minimum value is 0, then normalize
-            dplyr::group_by(document) |>
-            dplyr::mutate(gamma = gamma - min(gamma)) |>
-            dplyr::mutate(gamma = gamma / sum(gamma)) |>
-            dplyr::ungroup()
-        if (!is.null(exponent)) {
-            dataf = renorm(dataf, document, gamma,
-                           exponent, keep_original)
-        }
-        return(dataf)
-    }
+tidy.tmfast = function(
+      x,
+      k,
+      matrix = 'beta',
+      df = TRUE,
+      exponent = NULL,
+      keep_original = FALSE,
+      rotation = NULL,
+      ...
+) {
+      rlang::check_dots_empty()
+      assertthat::assert_that(
+            k %in% x$n,
+            msg = glue::glue('Rank {k} not in fitted model')
+      )
+      assertthat::assert_that(
+            matrix %in% c('beta', 'gamma'),
+            msg = glue::glue('Matrix argument {matrix} invalid')
+      )
+      if (identical(matrix, 'beta')) {
+            if (!df) {
+                  cli::cli_alert_warning(
+                        'Varimax token loadings, not rotated, trimmed, or normalized'
+                  )
+                  return(loadings(x, k))
+            }
+            loadings_mx = loadings(x, k)
+            if (!is.null(rotation)) {
+                  cli::cli_alert_info('Rotating loadings')
+                  loadings_mx = rotation %*% loadings_mx
+            }
+            dataf = loadings_mx |>
+                  tibble::as_tibble(
+                        rownames = 'token',
+                        .name_repair = make_colnames
+                  ) |>
+                  tidyr::pivot_longer(
+                        starts_with('V'),
+                        names_to = 'topic',
+                        values_to = 'beta'
+                  ) |>
+                  ## Trim at 0, then normalize to sum to 1
+                  dplyr::group_by(topic) |>
+                  dplyr::filter(beta > 0) |>
+                  dplyr::mutate(beta = beta / sum(beta)) |>
+                  dplyr::ungroup()
+            if (!is.null(exponent)) {
+                  dataf = renorm(dataf, topic, beta, exponent, keep_original)
+            }
+            return(dataf)
+      }
+      if (identical(matrix, 'gamma')) {
+            if (!df) {
+                  cli::cli_alert_warning(
+                        'Varimax document scores, not rotated, nudged, or normalized'
+                  )
+                  return(scores(x, k))
+            }
+            scores_mx = scores(x, k)
+            if (!is.null(rotation)) {
+                  cli::cli_alert_info('Rotating scores')
+                  scores_mx = scores_mx %*% t(rotation)
+            }
+            dataf = scores_mx |>
+                  tibble::as_tibble(
+                        rownames = 'document',
+                        .name_repair = make_colnames
+                  ) |>
+                  tidyr::pivot_longer(
+                        starts_with('V'),
+                        names_to = 'topic',
+                        values_to = 'gamma'
+                  ) |>
+                  ## Nudge everything so the minimum value is 0, then normalize
+                  dplyr::group_by(document) |>
+                  dplyr::mutate(gamma = gamma - min(gamma)) |>
+                  dplyr::mutate(gamma = gamma / sum(gamma)) |>
+                  dplyr::ungroup()
+            if (!is.null(exponent)) {
+                  dataf = renorm(
+                        dataf,
+                        document,
+                        gamma,
+                        exponent,
+                        keep_original
+                  )
+            }
+            return(dataf)
+      }
 }
 # tidy(fitted, 5, 'gamma', df = TRUE)
 
@@ -158,9 +186,9 @@ tidy.tmfast = function(x,
 #' @return A long dataframe, with one row per word-topic or topic-doc combination. Column names depend on the value of `matrix`.
 #' @export
 tidy_all = function(x, matrix = 'beta', ...) {
-    k = x$n |>
-        rlang::set_names()
-    purrr::map_dfr(k, ~ tidy(x, .x, matrix = matrix, ...), .id = 'k') |>
-        dplyr::mutate(k = as.integer(k)) |>
-        dplyr::select(k, tidyselect::everything())
+      k = x$n |>
+            rlang::set_names()
+      purrr::map_dfr(k, ~ tidy(x, .x, matrix = matrix, ...), .id = 'k') |>
+            dplyr::mutate(k = as.integer(k)) |>
+            dplyr::select(k, tidyselect::everything())
 }
