@@ -12,7 +12,18 @@
       "Bash(Rscript -e \"install.packages\\(''''stm'''', repos=''''https://cloud.r-project.org''''\\)\")",
       "Bash(Rscript -e \"install.packages\\(''''gutenbergr'''', repos=''''https://cloud.r-project.org''''\\)\")",
       "Bash(Rscript -e \"devtools::document\\(\\)\")",
-      "Bash(Rscript -e \"pkgdown::build_site\\(\\)\")"
+      "Bash(Rscript -e \"pkgdown::build_site\\(\\)\")",
+      "Bash(Rscript -e \"devtools::test\\(filter = ''fitting''\\)\")",
+      "Bash(Rscript -e \"devtools::test\\(filter = ''hellinger''\\)\")",
+      "Bash(Rscript -e \"devtools::test\\(filter = ''space''\\)\")",
+      "Bash(Rscript -e \"devtools::test\\(filter = ''information''\\)\")",
+      "Bash(grep -n \"@export\\\\|^[a-zA-Z_][a-zA-Z0-9_.]*.*=.*function\\\\|^[a-zA-Z_][a-zA-Z0-9_.]*\\\\.[a-zA-Z].*=.*function\" \"/Users/danhicks/Google Drive/Coding/tmfast/R\"/*.R)",
+      "Bash(Rscript -e \"devtools::document\\(quiet = TRUE\\)\")",
+      "Bash(Rscript -e \"devtools::test\\(filter = ''compare'', reporter = ''progress''\\)\")",
+      "Bash(Rscript -e \"devtools::test\\(reporter = ''progress''\\)\")",
+      "Bash(Rscript -e \"devtools::document\\(\\); devtools::test\\(\\)\")",
+      "Bash(Rscript -e \"devtools::test\\(filter = ''predict''\\)\")",
+      "Bash(Rscript -e \"devtools::document\\(\\); devtools::check\\(\\)\")"
     ]
   }
 }
