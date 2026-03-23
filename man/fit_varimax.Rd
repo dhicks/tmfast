@@ -30,7 +30,7 @@ fit_varimax(
 
 \item{positive_skew}{Should negative-skewed factors be flipped to have positive skew?}
 
-\item{x}{Original data matrix; passed here if not included in \code{pca} (eg, via \code{retx = TRUE})}
+\item{x}{PCA scores matrix (n_obs x max_k), as returned by \code{predict(fitted, newdata)}. Used when the fitted \code{pca} object does not contain scores.}
 }
 \value{
 List with components

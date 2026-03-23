@@ -2,16 +2,6 @@
 
 ## Bugs
 
-### `insert_topics()` scores are computed incorrectly
-When `insert_topics()` calls `fit_varimax()`, it passes the `tmfast`/`varimaxes`
-object as the `pca` argument. `fit_varimax()` then uses `pca$x[, 1:k]` to compute
-scores — but `$x` on a `varimaxes` object is the **original DTM** (stored when
-`retx = TRUE`), not the PCA scores. The original `varimax_irlba()` call works
-correctly because it passes the raw `prcomp_irlba` output (where `$x` *are* the
-PCA scores). The fix likely requires either storing PCA scores separately in the
-`varimaxes` object, or reprojecting the DTM through `fitted$rotation` inside
-`insert_topics()` before passing to `fit_varimax()`.
-
 ### `umap.STM()` — missing `return()` statement
 In [R/space.R:128](R/space.R#L128), `umap.STM()` assigns the result to `embedding` but
 never returns it. The function silently returns `NULL`. Compare `umap.tmfast()` at line
@@ -37,6 +27,13 @@ so if `return_full` is `FALSE` and `soln` is `NA_real_`, `is.na(soln$root)` is s
 reached and will error (`$` on an atomic). Fix: reorder as
 `if (return_full || identical(soln, NA_real_) || is.na(soln$root))`.
 
+### `fit_varimax()` — duck-typed `pca` argument
+`fit_varimax()` accesses `pca$rotation`, `pca$sdev`, and `pca$x` by name, accepting either
+a `prcomp_irlba` result or a `varimaxes` object by coincidence of shared field names. The
+original `insert_topics()` bug was a duck-typing failure of exactly this kind. The `@param
+pca` roxygen entry should document exactly which fields are accessed, to prevent future
+callers from accidentally passing an incompatible object.
+
 ### `hellinger.R` — deprecated `one_of()` in `pivot_longer()`
 In [R/hellinger.R:137](R/hellinger.R#L137), `tidyr::pivot_longer(-one_of(id1), ...)`.
 `one_of()` is deprecated in tidyselect; should be `all_of()` or `any_of()`.
@@ -51,5 +48,6 @@ Some exported functions have incomplete or no documentation. Internal functions 
 | Area | File | Notes |
 |------|------|-------|
 | `varimax_irlba()` | `test-tmfast.R` | Stub only ("Rely on tests in irlba") |
+| `insert_topics()` | — | No tests; key invariant: scores from `insert_topics(fitted, k, dtm)` should match scores from a model fitted directly at rank `k`. Also needs coverage of the `retx = TRUE` path (where `fitted$x` supplies the DTM). |
 | `draw_corpus()` | `test-generators.R` | No tests |
 | `journal_specific()` | `test-generators.R` | No tests; complex simulation |

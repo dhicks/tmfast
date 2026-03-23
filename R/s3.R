@@ -58,6 +58,38 @@ rotation.varimaxes = function(x, k, ...) {
 }
 # rotation(fitted, 5)
 
+#' Project new data into PCA score space
+#'
+#' @param object Fitted `varimaxes` or `tmfast` object
+#' @param newdata Document-term matrix (observations x terms) to project
+#' @details Projects `newdata` through the PCA rotation stored in `object`, returning
+#'   raw PCA scores (not varimax scores). Intended for use in pipelines that combine
+#'   new data with an existing fitted model (e.g., `insert_topics()`). Fragile: `newdata`
+#'   must share the vocabulary of the training DTM, and the centering/scaling stored in
+#'   `object` must match how the training data was prepared.
+#'
+#'   **Memory warning**: `scale()` coerces sparse matrices to dense. For large DTMs,
+#'   this can be a substantial memory hazard. This mirrors the behavior of `prcomp_irlba`
+#'   itself, which is why PCA scores are computed once at fit time and not re-projected
+#'   on demand.
+#' @param ... Not used; included for S3 method compatibility.
+#' @return Matrix of PCA scores (n_obs x max_k)
+#' @importFrom stats predict
+#' @export
+predict.varimaxes = function(object, newdata, ...) {
+    rlang::check_dots_empty()
+    nm = object$cols
+    if (!is.null(nm)) {
+        if (!all(nm %in% colnames(newdata)))
+            stop("'newdata' does not have named columns matching the original vocabulary")
+        newdata = newdata[, nm, drop = FALSE]
+    } else {
+        if (ncol(newdata) != nrow(object$rotation))
+            stop("'newdata' does not have the correct number of columns")
+    }
+    scale(newdata, center = object$center, scale = object$scale) %*% object$rotation
+}
+
 #' Make colnames
 #'
 #' Helper function to make matrix column names of the form 'V09'
