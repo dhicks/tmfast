@@ -26,12 +26,15 @@ varimax_irlba(
 \item{varimax_fn}{Function to use for varimax rotation}
 
 \item{varimax_opts}{List of options to pass to \code{varimax_fn}}
+
+\item{retx}{Whether to return the input matrix \code{mx}}
 }
 \value{
 A list of class \code{varimaxes}, with elements
 \itemize{
 \item \code{totalvar}: Total variance, from PCA
 \item \code{sdev}:  Standard deviations of the extracted principal components
+\item \code{x}: If \code{retx} is \code{TRUE}, the input matrix \code{mx}
 \item \code{rotation}:  Rotation matrix (variable loadings) from PCA
 \item \code{varimaxes}: A list of class \code{varimaxes}, containing one fitted varimax model for each value of \code{n}, with further elements
 \itemize{

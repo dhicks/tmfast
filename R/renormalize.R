@@ -30,7 +30,6 @@ expected_entropy = function(alpha, k = NULL) {
 #' After <https://stats.stackexchange.com/questions/521582/controlling-the-entropy-of-a-distribution>
 #' @param p Initial distribution
 #' @param target_H Desired entropy for the transformed distribution
-#' @param interval Range of exponents within which to search
 #' @param return_full Return the full uniroot() output?
 #' @return Numeric value of the desired exponent
 #' @export
@@ -65,7 +64,7 @@ solve_power = function(p,
 #'
 #' Given a tidied dataframe of topic-doc or word-topic distributions and a target entropy, find the mean exponent needed to adjust the temperature of each distribution to approximately match the target entropy.
 #' @param tidy_df The tidied distribution dataframe
-#' @param Grouping column, RHS of the conditional probability distribution, eg, topics for word-topic distributions
+#' @param group_col Grouping column, RHS of the conditional probability distribution, eg, topics for word-topic distributions
 #' @param p_col Column containing the probability for each category (eg, word) conditional on the group (eg, topic)
 #' @param target_entropy Target entropy
 #' @returns Mean exponent to renormalize to the target entropy

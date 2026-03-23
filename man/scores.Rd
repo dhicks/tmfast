@@ -6,6 +6,11 @@
 \usage{
 scores(x, ...)
 }
+\arguments{
+\item{x}{Object to dispatch on}
+
+\item{...}{Passed to methods}
+}
 \description{
 Extract item scores from a fitted PCA/varimax model
 }

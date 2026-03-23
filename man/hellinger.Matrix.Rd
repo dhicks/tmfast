@@ -10,6 +10,8 @@
 \item{mx1}{First matrix, \eqn{n_1 \times k}}
 
 \item{mx2}{Optional second matrix, \eqn{n_2 \times k}}
+
+\item{...}{Not used; required for S3 method compatibility}
 }
 \value{
 Matrix of size \eqn{n_1 \times n_1} or \eqn{n_1 \times n_2}

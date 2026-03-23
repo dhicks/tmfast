@@ -29,6 +29,8 @@
 \item{keep_original}{If renormalizing, return original (pre-renormalized) probabilities?}
 
 \item{rotation}{Optional rotation matrix; see details}
+
+\item{...}{Not used; required for S3 method compatibility}
 }
 \value{
 A long dataframe, with one row per word-topic or topic-doc combination. Column names depend on the value of \code{matrix}.

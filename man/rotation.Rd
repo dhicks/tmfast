@@ -6,6 +6,11 @@
 \usage{
 rotation(x, ...)
 }
+\arguments{
+\item{x}{Object to dispatch on}
+
+\item{...}{Passed to methods}
+}
 \description{
 Extract varimax rotation
 }

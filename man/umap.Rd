@@ -6,6 +6,11 @@
 \usage{
 umap(x, ...)
 }
+\arguments{
+\item{x}{Object to dispatch on}
+
+\item{...}{Passed to methods}
+}
 \description{
 2-dimensional "discursive space" representation of relationships between documents using Hellinger distances and UMAP
 }

@@ -6,6 +6,11 @@
 \usage{
 loadings(x, ...)
 }
+\arguments{
+\item{x}{Object to dispatch on}
+
+\item{...}{Passed to methods}
+}
 \description{
 Extract a PCA/varimax loadings matrix
 }

@@ -6,6 +6,11 @@
 \usage{
 hellinger(x, ...)
 }
+\arguments{
+\item{x}{Object to dispatch on}
+
+\item{...}{Passed to methods}
+}
 \description{
 Hellinger distances
 }

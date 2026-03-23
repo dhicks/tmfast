@@ -12,8 +12,6 @@ solve_power(p, target_H, return_full = FALSE)
 \item{target_H}{Desired entropy for the transformed distribution}
 
 \item{return_full}{Return the full uniroot() output?}
-
-\item{interval}{Range of exponents within which to search}
 }
 \value{
 Numeric value of the desired exponent

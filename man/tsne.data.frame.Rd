@@ -7,6 +7,8 @@
 \method{tsne}{data.frame}(gamma_df, k, doc_ids, perplexity = NULL, df = TRUE, ...)
 }
 \arguments{
+\item{gamma_df}{Tidied document-topic-gamma dataframe (used by the default method)}
+
 \item{k}{Number of topics (required for \code{tmfast} objects)}
 
 \item{doc_ids}{Vector of document IDs (required for \code{STM} objects)}
@@ -15,7 +17,7 @@
 
 \item{df}{Return a dataframe with columns \code{document}, \code{x}, and \code{y} (default) or the output of \code{Rtsne}.}
 
-\item{tm}{A fitted topic model}
+\item{...}{Not used; required for S3 method compatibility}
 }
 \value{
 See \code{df}

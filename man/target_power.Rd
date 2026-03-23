@@ -9,11 +9,11 @@ target_power(tidy_df, group_col, p_col, target_entropy)
 \arguments{
 \item{tidy_df}{The tidied distribution dataframe}
 
+\item{group_col}{Grouping column, RHS of the conditional probability distribution, eg, topics for word-topic distributions}
+
 \item{p_col}{Column containing the probability for each category (eg, word) conditional on the group (eg, topic)}
 
 \item{target_entropy}{Target entropy}
-
-\item{Grouping}{column, RHS of the conditional probability distribution, eg, topics for word-topic distributions}
 }
 \value{
 Mean exponent to renormalize to the target entropy

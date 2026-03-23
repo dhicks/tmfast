@@ -5,6 +5,7 @@
 #' @param k Number of components
 #' @param i Index for the component that takes value `peak`
 #' @param peak Value for the single peak component
+#' @param scale Scaling factor applied to all concentration parameters
 #' @export
 #' @return Vector of length `k`
 #' @family generators
@@ -86,10 +87,12 @@ NULL
 #' Generates a corpus with `Mj` documents from `k` journals, each of which has a characteristic topic.  Fits a varimax topic model of rank `k`, rotates the word-topic distribution to align with the true values, and reports Hellinger distance comparisons for each topic (word-topic) and document (topic-doc).
 #' @param k Number of topics/journals
 #' @param Mj Number of documents from each journal
-#' @param {topic_peak,topic_scale} Parameters for the asymmetric Dirichlet prior for true topic-doc distributions
+#' @param topic_peak Peak value for the asymmetric Dirichlet prior for true topic-doc distributions
+#' @param topic_scale Scale for the asymmetric Dirichlet prior for true topic-doc distributions
 #' @param word_beta Parameter for the symmetric Dirichlet prior for true word-doc distributions
 #' @param vocab Size of the vocabulary
-#' @param {size,mu} Parameters for the negative binomial distribution of document lengths
+#' @param size Size parameter for the negative binomial distribution of document lengths
+#' @param mu Mean parameter for the negative binomial distribution of document lengths
 #' @param bigjournal Should the first journal have documents 10x as long (on average) as the others?
 #' @param verbose When TRUE, sends messages about the progress of the simulation
 #' @export

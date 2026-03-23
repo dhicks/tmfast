@@ -18,15 +18,25 @@
 )
 }
 \arguments{
+\item{topicsdf1}{First tidied topic model dataframe}
+
+\item{id1}{Unit identifier column in \code{topicsdf1} (DOIs, auids, ORU name, etc.)}
+
+\item{cat1}{Category identifier column in \code{topicsdf1} (topics)}
+
+\item{prob1}{Probability value column in \code{topicsdf1} (gamma)}
+
+\item{topicsdf2}{Optional second tidied topic model dataframe}
+
+\item{id2}{Unit identifier column in \code{topicsdf2}}
+
+\item{cat2}{Category identifier column in \code{topicsdf2}}
+
+\item{prob2}{Probability value column in \code{topicsdf2}}
+
 \item{df}{Should the function return the matrix of Hellinger distances (default) or a tidy dataframe?}
 
-\item{{topicsdf1, topicsdf2}}{Tidied topic model dataframes}
-
-\item{{id1, id2}}{Unit identifiers (DOIs, auids, ORU name, etc.)}
-
-\item{{cat1, cat2}}{Category identifiers (topics)}
-
-\item{{prob1, prob2}}{Probability values (gamma)}
+\item{...}{Not used; required for S3 method compatibility}
 }
 \value{
 matrix or tidy dataframe (default) of Hellinger distances

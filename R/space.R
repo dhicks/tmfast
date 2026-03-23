@@ -1,17 +1,21 @@
 #' Discursive space using t-SNE
+#' @param x Object to dispatch on
+#' @param ... Passed to methods
 #' @export
 tsne = function(x, ...) {
-    UseMethod('tsne')
+      UseMethod('tsne')
 }
 
 #' Discursive space using t-SNE
 #'
 #' 2-dimensional "discursive space" representation of relationships between documents using Hellinger distances and t-SNE
-#' @param tm A fitted topic model
+#' @param tm Fitted topic model object (either `tmfast` or `STM`)
+#' @param gamma_df Tidied document-topic gamma dataframe
 #' @param k  Number of topics (required for `tmfast` objects)
 #' @param doc_ids Vector of document IDs (required for `STM` objects)
-#' @param perplexity Perplexity parameter for t-SNE. By default, minimum of 30 and `floor((ndocs - 1)/3) - 1`.
+#' @param perplexity Perplexity parameter for t-SNE. By default, minimum of 30 and `floor((length(docs_ids) - 1)/3) - 1`.
 #' @param df Return a dataframe with columns `document`, `x`, and `y` (default) or the output of `Rtsne`.
+#' @param ... Not used; required for S3 method compatibility
 #' @details Algorithm checks distances to 3*perplexity nearest neighbors.  Rtsne loses rownames (document IDs); these are either extract from the `tmfast` object or passed separately for a `STM`object.  The default method (not exported) takes a tidied gamma (document-topic-gamma) matrix.  Use `set.seed()` before calling this function for reproducibility.
 #' @return See `df`
 #' @examples
@@ -24,46 +28,53 @@ tsne = function(x, ...) {
 #'     geom_point()
 #' }
 #' @export
-tsne.data.frame = function(gamma_df, k, doc_ids,
-                        perplexity = NULL, df = TRUE, ...) {
-    rlang::check_dots_empty()
-    if (is.null(perplexity)) {
-        ndocs = length(doc_ids)
-        perplexity = min(30, floor((ndocs - 1)/3) - 1)
-    }
-    fitted_tsne = gamma_df |>
-        hellinger(id1 = document, prob1 = gamma) |>
-        Rtsne::Rtsne(perplexity = perplexity, is_distance = TRUE)
-    if (!df) {
-        return(fitted_tsne)
-    }
-    fitted_tsne$Y |>
-        magrittr::set_rownames(doc_ids) |>
-        tibble::as_tibble(rownames = 'document',
-                          .name_repair = \(x)(c('x', 'y')))
+tsne.data.frame = function(
+      gamma_df,
+      doc_ids,
+      perplexity = NULL,
+      df = TRUE,
+      ...
+) {
+      rlang::check_dots_empty()
+      if (is.null(perplexity)) {
+            ndocs = length(doc_ids)
+            perplexity = min(30, floor((ndocs - 1) / 3) - 1)
+      }
+      fitted_tsne = gamma_df |>
+            hellinger(id1 = document, prob1 = gamma) |>
+            Rtsne::Rtsne(perplexity = perplexity, is_distance = TRUE)
+      if (!df) {
+            return(fitted_tsne)
+      }
+      fitted_tsne$Y |>
+            magrittr::set_rownames(doc_ids) |>
+            tibble::as_tibble(rownames = 'document', .name_repair = \(x) {
+                  (c('x', 'y'))
+            })
 }
 #' @export
 tsne.tmfast = function(tm, k, perplexity = NULL, df = TRUE, ...) {
-    rlang::check_dots_empty()
-    doc_ids = rownames(scores(tm, k))
-    gamma_df = tidy(tm, k, matrix = 'gamma')
-    tsne.data.frame(gamma_df, k, doc_ids, perplexity, df)
+      rlang::check_dots_empty()
+      doc_ids = rownames(scores(tm, k))
+      gamma_df = tidy(tm, k, matrix = 'gamma')
+      tsne.data.frame(gamma_df, doc_ids, perplexity, df)
 }
 #' @export
 tsne.STM = function(tm, doc_ids, perplexity = NULL, df = TRUE, ...) {
-    rlang::check_dots_empty()
-    k = ncol(tm$theta)
-    gamma_df = tidy(tm, matrix = 'gamma')
-    tsne.data.frame(gamma_df, k, doc_ids, perplexity, df)
+      rlang::check_dots_empty()
+      gamma_df = tidy(tm, matrix = 'gamma')
+      tsne.data.frame(gamma_df, doc_ids, perplexity, df)
 }
 
 
 #' Discursive space using UMAP
 #'
 #' 2-dimensional "discursive space" representation of relationships between documents using Hellinger distances and UMAP
+#' @param x Object to dispatch on
+#' @param ... Passed to methods
 #' @export
 umap = function(x, ...) {
-    UseMethod('umap')
+      UseMethod('umap')
 }
 #' Discursive space with UMAP given a distance matrix
 #'
@@ -80,17 +91,18 @@ umap = function(x, ...) {
 #' embedded = umap(h_gamma, df = TRUE, verbose = TRUE)
 #' @export
 umap.matrix = function(dist_mx, include_data = FALSE, df = TRUE, ...) {
-    embedding = umap::umap(dist_mx, input = 'dist', ...)
-    if (!include_data) {
-        embedding$data = NULL
-    }
-    rownames(embedding$layout) = rownames(dist_mx)
-    if (df) {
-        embedding = embedding$layout |>
-            tibble::as_tibble(rownames = 'document',
-                              .name_repair = \(x)(c('x', 'y')))
-    }
-    return(embedding)
+      embedding = umap::umap(dist_mx, input = 'dist', ...)
+      if (!include_data) {
+            embedding$data = NULL
+      }
+      rownames(embedding$layout) = rownames(dist_mx)
+      if (df) {
+            embedding = embedding$layout |>
+                  tibble::as_tibble(rownames = 'document', .name_repair = \(x) {
+                        (c('x', 'y'))
+                  })
+      }
+      return(embedding)
 }
 
 #' Discursive space with UMAP for tmfast topic models
@@ -106,10 +118,10 @@ umap.matrix = function(dist_mx, include_data = FALSE, df = TRUE, ...) {
 #' }
 #' @export
 umap.tmfast = function(model, k, ...) {
-    distances = tidy(model, k, matrix = 'gamma') |>
-        hellinger(prob1 = 'gamma', df = FALSE)
-    embedding = umap.matrix(distances, ...)
-    return(embedding)
+      distances = tidy(model, k, matrix = 'gamma') |>
+            hellinger(prob1 = 'gamma', df = FALSE)
+      embedding = umap.matrix(distances, ...)
+      return(embedding)
 }
 
 #' Discursive space with UMAP for structural topic models
@@ -120,9 +132,9 @@ umap.tmfast = function(model, k, ...) {
 #' @return `umap` object or tidied dataframe; see `umap.matrix()` argument `df`
 #' @export
 umap.STM = function(tm, doc_ids, ...) {
-    k = ncol(tm$theta)
-    distances = tidy(tm, matrix = 'gamma') |>
-        hellinger(prob1 = 'gamma', df = FALSE)
-    rownames(distances) = doc_ids
-    embedding = umap.matrix(distances, ...)
+      k = ncol(tm$theta)
+      distances = tidy(tm, matrix = 'gamma') |>
+            hellinger(prob1 = 'gamma', df = FALSE)
+      rownames(distances) = doc_ids
+      embedding = umap.matrix(distances, ...)
 }

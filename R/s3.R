@@ -1,5 +1,7 @@
 #' Extract a PCA/varimax loadings matrix
 #'
+#' @param x Object to dispatch on
+#' @param ... Passed to methods
 #' @export
 loadings = function(x, ...) {
       UseMethod("loadings")
@@ -25,6 +27,8 @@ loadings.varimaxes = function(x, k, ...) {
 
 #' Extract item scores from a fitted PCA/varimax model
 #'
+#' @param x Object to dispatch on
+#' @param ... Passed to methods
 #' @export
 scores = function(x, ...) {
       UseMethod("scores")
@@ -43,6 +47,8 @@ scores.varimaxes = function(x, k, ...) {
 
 #' Extract varimax rotation
 #'
+#' @param x Object to dispatch on
+#' @param ... Passed to methods
 #' @export
 rotation = function(x, ...) {
       UseMethod('rotation')
@@ -93,6 +99,7 @@ predict.varimaxes = function(object, newdata, ...) {
 #' Make colnames
 #'
 #' Helper function to make matrix column names of the form 'V09'
+#' @noRd
 make_colnames = function(names, prefix = 'V') {
       n = length(names)
       1:n |>
@@ -115,6 +122,7 @@ generics::tidy
 #' @param exponent Renormalize the probabilities using a given exponent  Applies only for `df == TRUE`
 #' @param keep_original If renormalizing, return original (pre-renormalized) probabilities?
 #' @param rotation Optional rotation matrix; see details
+#' @param ... Not used; required for S3 method compatibility
 #' @return A long dataframe, with one row per word-topic or topic-doc combination. Column names depend on the value of `matrix`.
 #' @details If `rotation` is not `NULL`, loadings/scores will be rotated.  This might be used to align the fitted topics with known true topics, as in the `journal_specific` simulation.  Loadings are left-multiplied by the given rotation, while scores are right-multiplied by the transpose of the given rotation.
 #' @export

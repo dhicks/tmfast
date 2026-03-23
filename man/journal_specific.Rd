@@ -22,17 +22,21 @@ journal_specific(
 
 \item{Mj}{Number of documents from each journal}
 
+\item{topic_peak}{Peak value for the asymmetric Dirichlet prior for true topic-doc distributions}
+
+\item{topic_scale}{Scale for the asymmetric Dirichlet prior for true topic-doc distributions}
+
 \item{word_beta}{Parameter for the symmetric Dirichlet prior for true word-doc distributions}
 
 \item{vocab}{Size of the vocabulary}
 
+\item{size}{Size parameter for the negative binomial distribution of document lengths}
+
+\item{mu}{Mean parameter for the negative binomial distribution of document lengths}
+
 \item{bigjournal}{Should the first journal have documents 10x as long (on average) as the others?}
 
 \item{verbose}{When TRUE, sends messages about the progress of the simulation}
-
-\item{{topic_peak, topic_scale}}{Parameters for the asymmetric Dirichlet prior for true topic-doc distributions}
-
-\item{{size, mu}}{Parameters for the negative binomial distribution of document lengths}
 }
 \description{
 Generates a corpus with \code{Mj} documents from \code{k} journals, each of which has a characteristic topic.  Fits a varimax topic model of rank \code{k}, rotates the word-topic distribution to align with the true values, and reports Hellinger distance comparisons for each topic (word-topic) and document (topic-doc).

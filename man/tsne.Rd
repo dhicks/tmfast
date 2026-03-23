@@ -6,6 +6,11 @@
 \usage{
 tsne(x, ...)
 }
+\arguments{
+\item{x}{Object to dispatch on}
+
+\item{...}{Passed to methods}
+}
 \description{
 Discursive space using t-SNE
 }

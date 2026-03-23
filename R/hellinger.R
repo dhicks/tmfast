@@ -1,5 +1,7 @@
 #' Hellinger distances
 #'
+#' @param x Object to dispatch on
+#' @param ... Passed to methods
 #' @export
 hellinger = function(x, ...) {
     UseMethod("hellinger")
@@ -16,6 +18,7 @@ NULL
 #' Calculates Hellinger distance for each pair of rows in the given matrix, or each combination of rows from the two matrices
 #' @param mx1 First matrix, \eqn{n_1 \times k}
 #' @param mx2 Optional second matrix, \eqn{n_2 \times k}
+#' @param ... Not used; required for S3 method compatibility
 #' @returns Matrix of size \eqn{n_1 \times n_1} or \eqn{n_1 \times n_2}
 #' @export
 #' @examples
@@ -72,11 +75,16 @@ build_matrix = function(data, row, column, value, ..., sparse = TRUE) {
 #' Hellinger distance for dataframes
 #'
 #' Hellinger distances, either pairwise within a single tidied topic model dataframe or between two tidied topic model dataframes
-#' @param {topicsdf1,topicsdf2} Tidied topic model dataframes
-#' @param {id1,id2} Unit identifiers (DOIs, auids, ORU name, etc.)
-#' @param {cat1,cat2} Category identifiers (topics)
-#' @param {prob1,prob2} Probability values (gamma)
+#' @param topicsdf1 First tidied topic model dataframe
+#' @param id1 Unit identifier column in `topicsdf1` (DOIs, auids, ORU name, etc.)
+#' @param cat1 Category identifier column in `topicsdf1` (topics)
+#' @param prob1 Probability value column in `topicsdf1` (gamma)
+#' @param topicsdf2 Optional second tidied topic model dataframe
+#' @param id2 Unit identifier column in `topicsdf2`
+#' @param cat2 Category identifier column in `topicsdf2`
+#' @param prob2 Probability value column in `topicsdf2`
 #' @param df Should the function return the matrix of Hellinger distances (default) or a tidy dataframe?
+#' @param ... Not used; required for S3 method compatibility
 #' @return matrix or tidy dataframe (default) of Hellinger distances
 #' @export
 #' @examples

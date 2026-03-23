@@ -12,6 +12,8 @@ peak_alpha(k, i, peak = 0.8, scale = 1)
 \item{i}{Index for the component that takes value \code{peak}}
 
 \item{peak}{Value for the single peak component}
+
+\item{scale}{Scaling factor applied to all concentration parameters}
 }
 \value{
 Vector of length \code{k}
