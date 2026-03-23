@@ -144,8 +144,6 @@ test_that('ndH: focused term matches expected value', {
 
 ## Equal-length documents (30 words each): r_i = 1/3 for all docs
 ## 'uniform' spread equally → p_i = r_i → dR = 0 → ndR = 0
-## Note: ndR() has a hardcoded 'n' bug in totals calculation;
-##       count column must be named 'n' for ndR() to work correctly
 equal_corpus = tibble::tribble(
     ~doc, ~term,     ~n,
     'A',  'uniform', 10,
@@ -164,6 +162,13 @@ test_that('ndR: output has correct column names', {
 test_that('ndR: output is sorted descending by ndR', {
     result = ndR(equal_corpus, doc, term, n)
     expect_equal(result$ndR, sort(result$ndR, decreasing = TRUE))
+})
+
+test_that('ndR: works when count column is not named n', {
+    renamed = dplyr::rename(equal_corpus, count = n)
+    result = ndR(renamed, doc, term, count)
+    expect_named(result, c('term', 'n', 'dR', 'ndR'))
+    expect_true(all(result$ndR >= 0))
 })
 
 test_that('ndR: focused term has higher ndR than uniformly spread term', {

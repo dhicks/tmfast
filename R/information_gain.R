@@ -99,16 +99,16 @@ ndR = function(dataf, doc_col, term_col, count_col) {
     ## Termwise total occurrences
     totals = dataf |>
         dplyr::group_by({{ term_col }}) |>
-        dplyr::summarize(n_tot = sum(n))
+        dplyr::summarize(n_tot = sum({{ count_col }}))
 
     ## Conditional entropy for each term, and KL divergence wrt r/R
     result = dataf |>
         dplyr::left_join(r_df, by = rlang::as_name(rlang::enquo(doc_col))) |>
         dplyr::left_join(totals, by = rlang::as_name(rlang::enquo(term_col))) |>
-        dplyr::mutate(p = n / n_tot,
+        dplyr::mutate(p = {{ count_col }} / n_tot,
                       dR_term = p * log2(p / r)) |>
         dplyr::group_by({{ term_col }}) |>
-        dplyr::summarize(n = sum(n),
+        dplyr::summarize(n = sum({{ count_col }}),
                          dR = sum(dR_term)) |>
         dplyr::ungroup() |>
         dplyr::mutate(ndR = log2(n)*dR) |>

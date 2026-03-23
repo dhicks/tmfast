@@ -12,17 +12,6 @@ PCA scores). The fix likely requires either storing PCA scores separately in the
 `varimaxes` object, or reprojecting the DTM through `fitted$rotation` inside
 `insert_topics()` before passing to `fit_varimax()`.
 
-### `ndR()` — missing `dplyr::` and `rlang::` namespace prefixes (fixed)
-Two bare function calls in `R/information_gain.R` caused `ndR()` to fail when
-called from a package context (functions not in scope without `dplyr` attached):
-- Line 91: `pull(...)` → fixed to `dplyr::pull(...)`
-- Lines 106–107: `enquo(doc_col)` / `enquo(term_col)` → fixed to `rlang::enquo(...)`
-
-### `ndR()` — hardcoded column name `n` in totals calculation
-In `R/information_gain.R` line 102, the totals summarize uses `sum(n)` instead
-of `sum({{ count_col }})`. This means `ndR()` only works when the count column
-is literally named `n`. Should be `dplyr::summarize(n_tot = sum({{ count_col }}))`.
-
 ### `umap.STM()` — missing `return()` statement
 In [R/space.R:128](R/space.R#L128), `umap.STM()` assigns the result to `embedding` but
 never returns it. The function silently returns `NULL`. Compare `umap.tmfast()` at line
