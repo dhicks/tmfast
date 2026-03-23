@@ -23,25 +23,44 @@ In `R/information_gain.R` line 102, the totals summarize uses `sum(n)` instead
 of `sum({{ count_col }})`. This means `ndR()` only works when the count column
 is literally named `n`. Should be `dplyr::summarize(n_tot = sum({{ count_col }}))`.
 
+### `umap.STM()` — missing `return()` statement
+In [R/space.R:128](R/space.R#L128), `umap.STM()` assigns the result to `embedding` but
+never returns it. The function silently returns `NULL`. Compare `umap.tmfast()` at line
+112, which has `return(embedding)`. Fix: add `return(embedding)` as the last line.
+
+### `ndH.ArrowObject()` — bare `enquo()` and hardcoded `n` in `ndH` column
+In [R/information_gain.R:51](R/information_gain.R#L51), `enquo(term_col)` is called
+without the `rlang::` prefix. The function may work if `rlang` is attached but will
+fail in a clean package context. Fix: `rlang::enquo(term_col)`.
+
+Additionally, line 47 uses `sum(n)` (hardcoded column name `n`) for `totals`, identical
+to the known bug in `ndR()`. And line 58 references bare `n` instead of `{{ count_col
+}}` — this only works when the count column is literally named `n`.
+
+### `renormalize.R` — `solve_power()` risky condition accessing `$root` on `NA_real_`
+In [R/renormalize.R:55](R/renormalize.R#L55), the condition is:
+```r
+if ((return_full || identical(soln, NA_real_)) || is.na(soln$root)) {
+```
+When `soln` is `NA_real_` (scalar), the short-circuit `||` *should* prevent evaluating
+`is.na(soln$root)`, but operator precedence groups `(return_full || identical(...))` first,
+so if `return_full` is `FALSE` and `soln` is `NA_real_`, `is.na(soln$root)` is still
+reached and will error (`$` on an atomic). Fix: reorder as
+`if (return_full || identical(soln, NA_real_) || is.na(soln$root))`.
+
+### `hellinger.R` — deprecated `one_of()` in `pivot_longer()`
+In [R/hellinger.R:137](R/hellinger.R#L137), `tidyr::pivot_longer(-one_of(id1), ...)`.
+`one_of()` is deprecated in tidyselect; should be `all_of()` or `any_of()`.
+
+### Documentation
+Some exported functions have incomplete or no documentation. Internal functions don't need full documentation, but might need some comments explaining what they do, for future developers. 
+
 ---
 
 ## Test coverage gaps
 
-### Remaining untested / placeholder
-
 | Area | File | Notes |
 |------|------|-------|
-| `hellinger.data.frame()` | `test-hellinger.R` | Explicit "Not yet tested" placeholder |
-| `tsne.*()` | `test-hellinger.R` | Explicit "Not yet tested" placeholder |
-| `umap.*()` | — | No tests at all |
-| `information_gain.R` | — | Zero tests: `entropy`, `ndH`, `ndR`, `expected_entropy`, `solve_power`, `target_power`, `renorm` |
-| `journal_specific()` | — | Complex simulation; no tests |
-| `varimax_irlba()` | `test-tmfast.R` | Stub warning only ("Rely on tests in irlba") |
-
-### Done this session
-- `tmfast()` — 4 tests
-- `insert_topics()` — 5 tests (guards + structure; scores unverified due to bug above)
-- `tidy.tmfast()` beta + gamma — 5 tests each
-- `tidy_all()` — 3 tests
-- `loadings()`, `scores()`, `rotation()` return values — 3 tests
-- Bug fix: `insert_topics()` variable name typo (`fitted_tmf` → `fitted`)
+| `varimax_irlba()` | `test-tmfast.R` | Stub only ("Rely on tests in irlba") |
+| `draw_corpus()` | `test-generators.R` | No tests |
+| `journal_specific()` | `test-generators.R` | No tests; complex simulation |

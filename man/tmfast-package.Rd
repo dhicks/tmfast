@@ -16,6 +16,6 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Dan Hicks \email{hicks.daniel.j@gmail.com} (\href{https://orcid.org/0000-0001-7945-4416}{ORCID})
+\strong{Maintainer}: D. Hicks \email{hicks.daniel.j@gmail.com} (\href{https://orcid.org/0000-0001-7945-4416}{ORCID})
 
 }
