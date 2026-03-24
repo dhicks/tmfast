@@ -23,7 +23,9 @@
       "Bash(Rscript -e \"devtools::test\\(reporter = ''progress''\\)\")",
       "Bash(Rscript -e \"devtools::document\\(\\); devtools::test\\(\\)\")",
       "Bash(Rscript -e \"devtools::test\\(filter = ''predict''\\)\")",
-      "Bash(Rscript -e \"devtools::document\\(\\); devtools::check\\(\\)\")"
+      "Bash(Rscript -e \"devtools::document\\(\\); devtools::check\\(\\)\")",
+      "Bash(Rscript -e \"devtools::test\\(filter = ''generators''\\)\")",
+      "Bash(Rscript -e \"devtools::test\\(filter = ''tmfast|fitting|generators''\\)\")"
     ]
   }
 }

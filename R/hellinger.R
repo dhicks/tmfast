@@ -142,7 +142,7 @@ hellinger.data.frame = function(topicsdf1,
     hellinger_matrix |>
         as.matrix() |>
         tibble::as_tibble(rownames = id1) |>
-        tidyr::pivot_longer(-one_of(id1),
+        tidyr::pivot_longer(-tidyselect::all_of(id1),
                             names_to = id2,
                             values_to = 'dist')
 }

@@ -15,13 +15,16 @@
 #' expected_entropy(alpha)
 #' @export
 expected_entropy = function(alpha, k = NULL) {
-    if (identical(length(alpha), 1L)) {
-        assertthat::assert_that(!is.null(k),
-                                msg = 'When alpha is length 1, k must not be null')
-        alpha = rep(alpha, k)
-    }
-    alpha0 = sum(alpha)
-    sum(alpha / alpha0 * (digamma(alpha0 + 1) - digamma(alpha + 1))) * log2(exp(1))
+      if (identical(length(alpha), 1L)) {
+            assertthat::assert_that(
+                  !is.null(k),
+                  msg = 'When alpha is length 1, k must not be null'
+            )
+            alpha = rep(alpha, k)
+      }
+      alpha0 = sum(alpha)
+      sum(alpha / alpha0 * (digamma(alpha0 + 1) - digamma(alpha + 1))) *
+            log2(exp(1))
 }
 
 
@@ -33,29 +36,28 @@ expected_entropy = function(alpha, k = NULL) {
 #' @param return_full Return the full uniroot() output?
 #' @return Numeric value of the desired exponent
 #' @export
-solve_power = function(p,
-                       target_H,
-                       return_full = FALSE) {
-    ## Entropy of the distribution after transformation
-    transformed_entropy = function(p) {
-        function(beta) {
-            Z = sum(p^beta, na.rm = TRUE)
-            - 1/Z *
-                sum(p^beta * beta * log2(p), na.rm = TRUE) +
-                log2(Z)
-        }
-    }
+solve_power = function(p, target_H, return_full = FALSE) {
+      ## Entropy of the distribution after transformation
+      transformed_entropy = function(p) {
+            function(beta) {
+                  Z = sum(p^beta, na.rm = TRUE)
+                  -1 / Z * sum(p^beta * beta * log2(p), na.rm = TRUE) + log2(Z)
+            }
+      }
 
-    soln = purrr::possibly(uniroot, otherwise = NA_real_)(
-        \(beta) {transformed_entropy(p)(beta) - target_H},
-        interval = c(.1, 10),
-        extendInt = 'yes',
-        maxiter = 3000)
-    if ((return_full || identical(soln, NA_real_)) || is.na(soln$root)) {
-        return(soln)
-    } else {
-        return(soln$root)
-    }
+      soln = purrr::possibly(uniroot, otherwise = NA_real_)(
+            \(beta) {
+                  transformed_entropy(p)(beta) - target_H
+            },
+            interval = c(.1, 10),
+            extendInt = 'yes',
+            maxiter = 3000
+      )
+      if (return_full || identical(soln, NA_real_) || is.na(soln$root)) {
+            return(soln)
+      } else {
+            return(soln$root)
+      }
 }
 # doc1 = beta$beta[1:500]
 # solve_power(doc1, target_entropy)
@@ -69,19 +71,18 @@ solve_power = function(p,
 #' @param target_entropy Target entropy
 #' @returns Mean exponent to renormalize to the target entropy
 #' @export
-target_power = function(tidy_df,
-                        group_col,
-                        p_col,
-                        target_entropy) {
-    powers = tidy_df |>
-        dplyr::group_by({{ group_col }}) |>
-        dplyr::summarize(H = entropy({{ p_col }}),
-                  power = solve_power({{ p_col }}, target_entropy)) |>
-        dplyr::pull(power)
-    if (sum(is.na(powers)) > 0.1 * length(powers)) {
-        warning('More than 10% of powers could not be calculated')
-    }
-    median(powers, na.rm = TRUE)
+target_power = function(tidy_df, group_col, p_col, target_entropy) {
+      powers = tidy_df |>
+            dplyr::group_by({{ group_col }}) |>
+            dplyr::summarize(
+                  H = entropy({{ p_col }}),
+                  power = solve_power({{ p_col }}, target_entropy)
+            ) |>
+            dplyr::pull(power)
+      if (sum(is.na(powers)) > 0.1 * length(powers)) {
+            warning('More than 10% of powers could not be calculated')
+      }
+      median(powers, na.rm = TRUE)
 }
 
 #' Renormalize tidied distributions
@@ -94,20 +95,18 @@ target_power = function(tidy_df,
 #' @param keep_original Keep original probabilities?
 #' @returns A dataframe with (if `keep_original` is `TRUE`) an added column of the form `p_col_rn` containing the renormalized probabilities or (if `keep_original` is `FALSE`) renormalized values in `p_col`.
 #' @export
-renorm = function(tidy_df,
-                  group_col,
-                  p_col,
-                  exponent,
-                  keep_original = FALSE) {
-    if (keep_original) {
-        newcol = rlang::englue('{{ p_col }}_rn')
-    } else {
-        newcol = rlang::englue('{{ p_col }}')
-    }
-    tidy_df |>
-        dplyr::group_by({{ group_col }}) |>
-        dplyr::mutate({{ newcol }} := {{ p_col }}^exponent / sum({{ p_col }}^exponent)) |>
-        dplyr::ungroup()
+renorm = function(tidy_df, group_col, p_col, exponent, keep_original = FALSE) {
+      if (keep_original) {
+            newcol = rlang::englue('{{ p_col }}_rn')
+      } else {
+            newcol = rlang::englue('{{ p_col }}')
+      }
+      tidy_df |>
+            dplyr::group_by({{ group_col }}) |>
+            dplyr::mutate(
+                  {{ newcol }} := {{ p_col }}^exponent /
+                        sum({{ p_col }}^exponent)
+            ) |>
+            dplyr::ungroup()
 }
 # renorm(beta, topic, beta, target_entropy)
-

@@ -113,8 +113,7 @@ journal_specific = function(k = 5,
                                                   scale = topic_scale))) %>%
         do.call(rbind, .)
     theta_df = theta |>
-        tibble::as_tibble(rownames = 'doc', .name_repair = make_colnames) |>
-        dplyr::mutate(doc = as.integer(doc)) |>
+        tibble::as_tibble(rownames = 'document', .name_repair = make_colnames) |>
         tidyr::pivot_longer(tidyselect::starts_with('V'),
                             names_to = 'topic',
                             values_to = 'prob')
@@ -158,10 +157,10 @@ journal_specific = function(k = 5,
     ## Topic-doc distributions
     gamma_df = tidy(fitted, k, 'gamma', rotation = soln$solution)
 
-    theta_accuracy = hellinger(theta_df, id1 = doc, prob1 = prob,
-                               topicsdf2 = gamma_df, id2 = doc, prob2 = gamma,
+    theta_accuracy = hellinger(theta_df, id1 = document, prob1 = prob,
+                               topicsdf2 = gamma_df, id2 = document, prob2 = gamma,
                                df = TRUE) |>
-        dplyr::filter(doc_x == doc_y) |>
+        dplyr::filter(document_x == document_y) |>
         dplyr::pull(dist)
 
     tibble::tibble(phi = mean(phi_accuracy),

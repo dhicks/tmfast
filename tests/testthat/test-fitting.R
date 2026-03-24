@@ -72,6 +72,30 @@ test_that('insert_topics: inserts new k with explicit x', {
     expect_named(result$varimax[['2']], c('loadings', 'rotmat', 'scores'))
 })
 
+test_that('insert_topics: retx path uses fitted$x without explicit x', {
+    fitted_with_x = tmfast(dtm_mx, n = c(3, 4), retx = TRUE)
+    result = insert_topics(fitted_with_x, 2)
+    expect_true(2 %in% result$n)
+    expect_true('2' %in% names(result$varimax))
+    expect_named(result$varimax[['2']], c('loadings', 'rotmat', 'scores'))
+})
+
+test_that('insert_topics: inserted scores match direct fit at same k', {
+    ## Both fits use the same PCA (n = max = 4) by starting from the same seed,
+    ## so varimax at k=2 is fully determined and the two solutions must agree.
+    set.seed(20260324)
+    direct_both  = tmfast(dtm_mx, n = c(2, 4))
+    set.seed(20260324)
+    fitted_high  = tmfast(dtm_mx, n = 4)
+    inserted = insert_topics(fitted_high, 2, x = dtm_mx)
+    expect_equal(
+        scores(inserted,    k = 2),
+        scores(direct_both, k = 2),
+        tolerance = 1e-8,
+        ignore_attr = TRUE
+    )
+})
+
 ## ---- tidy.tmfast() beta branch ----------------------------------------------
 
 test_that('tidy beta: returns expected columns', {

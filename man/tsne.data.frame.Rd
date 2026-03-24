@@ -4,20 +4,22 @@
 \alias{tsne.data.frame}
 \title{Discursive space using t-SNE}
 \usage{
-\method{tsne}{data.frame}(gamma_df, k, doc_ids, perplexity = NULL, df = TRUE, ...)
+\method{tsne}{data.frame}(gamma_df, doc_ids, perplexity = NULL, df = TRUE, ...)
 }
 \arguments{
-\item{gamma_df}{Tidied document-topic-gamma dataframe (used by the default method)}
-
-\item{k}{Number of topics (required for \code{tmfast} objects)}
+\item{gamma_df}{Tidied document-topic gamma dataframe}
 
 \item{doc_ids}{Vector of document IDs (required for \code{STM} objects)}
 
-\item{perplexity}{Perplexity parameter for t-SNE. By default, minimum of 30 and \code{floor((ndocs - 1)/3) - 1}.}
+\item{perplexity}{Perplexity parameter for t-SNE. By default, minimum of 30 and \code{floor((length(docs_ids) - 1)/3) - 1}.}
 
 \item{df}{Return a dataframe with columns \code{document}, \code{x}, and \code{y} (default) or the output of \code{Rtsne}.}
 
 \item{...}{Not used; required for S3 method compatibility}
+
+\item{tm}{Fitted topic model object (either \code{tmfast} or \code{STM})}
+
+\item{k}{Number of topics (required for \code{tmfast} objects)}
 }
 \value{
 See \code{df}

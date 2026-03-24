@@ -137,4 +137,5 @@ umap.STM = function(tm, doc_ids, ...) {
             hellinger(prob1 = 'gamma', df = FALSE)
       rownames(distances) = doc_ids
       embedding = umap.matrix(distances, ...)
+      return(embedding)
 }

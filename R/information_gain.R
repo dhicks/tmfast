@@ -44,15 +44,15 @@ ndH.ArrowObject = function(dataset, doc_col, term_col, count_col) {
 
     totals = dataset |>
         dplyr::group_by({{ term_col }}) |>
-        dplyr::summarize(n_tot = sum(n))
+        dplyr::summarize(n_tot = sum({{ count_col }}))
 
     result = dataset |>
         dplyr::left_join(totals,
-                         by = rlang::as_label(enquo(term_col))) |>
+                         by = rlang::as_label(rlang::enquo(term_col))) |>
         dplyr::group_by({{ term_col }}) |>
         dplyr::mutate(p = {{ count_col }} / n_tot) |>
         dplyr::summarize(H = entropy(p),
-                  {{ count_col }} := sum({{ count_col }})) |>
+                  n = sum({{ count_col }})) |>
         dplyr::ungroup() |>
         dplyr::mutate(dH = log2(n_docs) - H,
                ndH = log2(n) * dH) |>
