@@ -25,7 +25,12 @@
       "Bash(Rscript -e \"devtools::test\\(filter = ''predict''\\)\")",
       "Bash(Rscript -e \"devtools::document\\(\\); devtools::check\\(\\)\")",
       "Bash(Rscript -e \"devtools::test\\(filter = ''generators''\\)\")",
-      "Bash(Rscript -e \"devtools::test\\(filter = ''tmfast|fitting|generators''\\)\")"
+      "Bash(Rscript -e \"devtools::test\\(filter = ''tmfast|fitting|generators''\\)\")",
+      "Bash(Rscript -e \"rmarkdown::render\\(''realbooks.Rmd''\\)\")",
+      "Bash(Rscript -e \"rmarkdown::render\\(''simulated.Rmd''\\)\")",
+      "Bash(mkdir -p \"/Users/danhicks/Google Drive/Coding/tmfast/inst/doc\")",
+      "Bash(cp \"/Users/danhicks/Google Drive/Coding/tmfast/vignettes/realbooks.html\" \"/Users/danhicks/Google Drive/Coding/tmfast/inst/doc/realbooks.html\")",
+      "Bash(cp \"/Users/danhicks/Google Drive/Coding/tmfast/vignettes/simulated.html\" \"/Users/danhicks/Google Drive/Coding/tmfast/inst/doc/simulated.html\")"
     ]
   }
 }
