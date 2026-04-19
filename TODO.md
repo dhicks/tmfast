@@ -26,6 +26,8 @@ The vignette builds fine locally with the cache present. Options:
 - **`eval=FALSE` stub**: replace live chunks with pre-computed inline output. Significant
   rewrite.
 
+[NB: rather than also submitting the data package to CRAN, we will make it available on GitHub via drat: https://blog.thecoatlessprofessor.com/programming/r/r-data-packages-in-external-data-repositories-using-the-additional-repositories-field/index.html]
+
 ---
 
 ## Documentation issues
