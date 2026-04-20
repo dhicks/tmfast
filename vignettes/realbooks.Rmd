@@ -15,14 +15,28 @@ vignette: >
 
 In this vignette, we analyze a corpus of works from the long nineteenth century, attempting to recover the author of each one.  
 
-The corpus is provided in the [`tmfast.realbooks` data package](https://github.com/dhicks/tmfast.realbooks), which is served by the package repository <https://dhicks.github.io/drat/>. In turn, this repository is made available when `tmfast` is loaded: 
-```
+The corpus is provided in the [`tmfast.realbooks` data package](https://github.com/dhicks/tmfast.realbooks). To install this data package use `remotes`: 
+```{r}
 #| eval: false
-library(tmfast)
-install.packages('tmfast.realbooks')
+remotes::install_github('dhicks/tmfast.realbooks')
+```
+or specify the drat repository:
+```{r}
+#| eval: false
+install.packages('tmfast.realbooks', repos = 'https://dhicks.github.io/drat/')
 ```
 
+## Setup
 
+```{r}
+#| echo: false
+knitr::opts_chunk$set(
+      eval = requireNamespace('tmfast.realbooks', quietly = TRUE)
+)
+if (!requireNamespace('tmfast.realbooks', quietly = TRUE)) {
+      warning('Data package not available; skipping execution')
+}
+```
 ```{r}
 library(tidyverse)
 theme_set(theme_minimal())
