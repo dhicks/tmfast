@@ -18,7 +18,7 @@ fit_varimax(
 \arguments{
 \item{k}{Desired rank of the fitted varimax model}
 
-\item{pca}{Fitted PCA model}
+\item{pca}{Fitted PCA model or \code{varimaxes} object}
 
 \item{feature_names}{Names of the features (eg, data columns)}
 
@@ -43,4 +43,6 @@ Given a (rank \code{n}) PCA fit, return a rank \code{k < n} varimax fit
 }
 \details{
 After the initial rotation, factors with negative skew (left tails) are flipped
+\code{pca} must contain \verb{$rotation} (feature loadings matrix) and \verb{$sdev} (standard deviations
+per PC); \verb{$x} (PC scores matrix) is also required unless \code{x} is supplied directly.
 }
