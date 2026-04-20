@@ -2,6 +2,10 @@
 
 ## Bugs
 
+- `tidy.tmfast()` accounts for negative values in the scores and loadings by trimming everything to 0 and then normalizing to probability distributions. 
+    - replace this with a softmax implementation, maybe `mclust::softmax`
+    - create `NEWS.md` and note this major change
+
 ## CRAN blockers
 ---
 
