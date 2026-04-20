@@ -15,6 +15,13 @@ vignette: >
 
 In this vignette, we analyze a corpus of works from the long nineteenth century, attempting to recover the author of each one.  
 
+The corpus is provided in the [`tmfast.realbooks` data package](https://github.com/dhicks/tmfast.realbooks), which is served by the package repository <https://dhicks.github.io/drat/>. In turn, this repository is made available when `tmfast` is loaded: 
+```
+#| eval: false
+library(tmfast)
+install.packages('tmfast.realbooks')
+```
+
 
 ```{r}
 library(tidyverse)
@@ -30,7 +37,7 @@ library(tmfast.realbooks)
 
 ## Corpus assembly
 
-We analyze works by 10 authors of the long nineteenth century: Jane Austen, Anne, Charlotte, and Emily Brontë, Louisa May Alcott, George Eliot, Mary Shelley, Charles Dickens, HG Wells, and HP Lovecraft.  The corpus is distributed as a pre-downloaded snapshot via the [`tmfast.realbooks`](https://github.com/dhicks/tmfast.realbooks) package (install with `install.packages("tmfast.realbooks")`).  We load it and use `tidytext::unnest_tokens()` to convert it into a long-format document-term matrix.
+We analyze works by 10 authors of the long nineteenth century: Jane Austen, Anne, Charlotte, and Emily Brontë, Louisa May Alcott, George Eliot, Mary Shelley, Charles Dickens, HG Wells, and HP Lovecraft. We load the corpus and use `tidytext::unnest_tokens()` to convert it into a long-format document-term matrix.
 
 ```{r}
 data(corpus_raw)
@@ -46,7 +53,7 @@ meta_df = distinct(dataf, author, title)
 dataf
 ```
 
-To reproduce the corpus download from scratch (requires network access and several minutes), see `data-raw/download.R` in the `tmfast.realbooks` package.
+To reproduce the corpus download from scratch (requires network access and several minutes), see `data-raw/download.R` in the [`tmfast.realbooks` package](https://github.com/dhicks/tmfast.realbooks).
 
 The number of works by each author varies widely, as does the total token count. 
 
