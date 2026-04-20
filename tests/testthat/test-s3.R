@@ -30,3 +30,41 @@ test_that('make_colnames', {
                    'V06', 'V07', 'V08', 'V09', 'V10',
                    'V11', 'V12', 'V13', 'V14', 'V15'))
 })
+
+test_that('softmax: sums to 1, all positive, handles negatives', {
+    x = c(-2, -1, 0, 1, 2)
+    result = softmax(x)
+    expect_equal(sum(result), 1)
+    expect_true(all(result > 0))
+})
+
+test_that('softmax: numerically stable on large values', {
+    x = c(1000, 1001, 1002)
+    result = softmax(x)
+    expect_equal(sum(result), 1)
+    expect_false(any(is.nan(result)))
+})
+
+test_that('tidy beta: all tokens present, sums to 1 per topic, all positive', {
+    beta = tidy(fitted, k = 5, matrix = 'beta')
+    ## all 20 terms appear in each topic
+    expect_equal(nrow(beta), 20 * 5)
+    ## sums to 1 within each topic
+    topic_sums = beta |>
+        dplyr::group_by(topic) |>
+        dplyr::summarize(s = sum(beta))
+    expect_equal(topic_sums$s, rep(1, 5), tolerance = 1e-10)
+    expect_true(all(beta$beta > 0))
+})
+
+test_that('tidy gamma: all topics present, sums to 1 per document, all positive', {
+    gamma = tidy(fitted, k = 5, matrix = 'gamma')
+    ## all 5 topics appear for each of 100 documents
+    expect_equal(nrow(gamma), 100 * 5)
+    ## sums to 1 within each document
+    doc_sums = gamma |>
+        dplyr::group_by(document) |>
+        dplyr::summarize(s = sum(gamma))
+    expect_equal(doc_sums$s, rep(1, 100), tolerance = 1e-10)
+    expect_true(all(gamma$gamma > 0))
+})

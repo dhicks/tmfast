@@ -109,6 +109,13 @@ make_colnames = function(names, prefix = 'V') {
 }
 
 
+#' @noRd
+softmax = function(x) {
+      e = exp(x - max(x))
+      e / sum(e)
+}
+
+
 #' @importFrom generics tidy
 #' @export
 generics::tidy
@@ -148,7 +155,7 @@ tidy.tmfast = function(
       if (identical(matrix, 'beta')) {
             if (!df) {
                   cli::cli_alert_warning(
-                        'Varimax token loadings, not rotated, trimmed, or normalized'
+                        'Varimax token loadings, not rotated or softmax-normalized'
                   )
                   return(loadings(x, k))
             }
@@ -167,10 +174,8 @@ tidy.tmfast = function(
                         names_to = 'topic',
                         values_to = 'beta'
                   ) |>
-                  ## Trim at 0, then normalize to sum to 1
                   dplyr::group_by(topic) |>
-                  dplyr::filter(beta > 0) |>
-                  dplyr::mutate(beta = beta / sum(beta)) |>
+                  dplyr::mutate(beta = softmax(beta)) |>
                   dplyr::ungroup()
             if (!is.null(exponent)) {
                   dataf = renorm(dataf, topic, beta, exponent, keep_original)
@@ -180,7 +185,7 @@ tidy.tmfast = function(
       if (identical(matrix, 'gamma')) {
             if (!df) {
                   cli::cli_alert_warning(
-                        'Varimax document scores, not rotated, nudged, or normalized'
+                        'Varimax document scores, not rotated or softmax-normalized'
                   )
                   return(scores(x, k))
             }
@@ -199,10 +204,8 @@ tidy.tmfast = function(
                         names_to = 'topic',
                         values_to = 'gamma'
                   ) |>
-                  ## Nudge everything so the minimum value is 0, then normalize
                   dplyr::group_by(document) |>
-                  dplyr::mutate(gamma = gamma - min(gamma)) |>
-                  dplyr::mutate(gamma = gamma / sum(gamma)) |>
+                  dplyr::mutate(gamma = softmax(gamma)) |>
                   dplyr::ungroup()
             if (!is.null(exponent)) {
                   dataf = renorm(
