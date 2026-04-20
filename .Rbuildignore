@@ -13,3 +13,5 @@
 ^paper$
 ^scratch$
 ^vignettes/simulated_cache$
+^tmfast_realbooks$
+^TODO.md$

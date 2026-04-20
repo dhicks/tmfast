@@ -3,9 +3,11 @@
 .RData
 .Ruserdata
 vignettes/realbooks/
-vignettes/realbooks.html
+vignettes/*.html
 vignettes/realbooks_cache/
 vignettes/simulated_cache/
+vignettes/realbooks_files/
+vignettes/simulated_files/
 
 data
 scratch
@@ -17,3 +19,6 @@ paper/*.html
 paper/*.tex
 paper/*.spl
 paper/*.zip
+
+tmfast_realbooks
+tmfast.Rcheck

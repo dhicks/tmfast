@@ -3,20 +3,6 @@
 ## Bugs
 
 ## CRAN blockers
-
-### Vignette network dependency — `vignettes/realbooks.Rmd`
-`R CMD build` re-knits all vignettes in a clean temp directory. `realbooks.Rmd` requires
-network access (Project Gutenberg) and a memoise cache, so it always fails in that context.
-The vignette builds fine locally with the cache present. Options:
-
-- **R.rsp asis engine**: add `R.rsp` to Suggests, provide the pre-built HTML as a `.html`
-  vignette with an asis header — R CMD build copies it without re-knitting. Most compatible
-  with CRAN.
-- **Cache data in `inst/extdata/`**: store the downloaded Gutenberg data as `.rda` and load
-  from there, removing the network dependency entirely.
-- **`eval=FALSE` stub**: replace live chunks with pre-computed inline output. Significant
-  rewrite.
-
 ---
 
 ## Documentation issues
