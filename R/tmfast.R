@@ -71,7 +71,7 @@ varimax_irlba = function(
 #' Given a (rank `n`) PCA fit, return a rank `k < n` varimax fit
 #'
 #' @param k Desired rank of the fitted varimax model
-#' @param pca Fitted PCA model
+#' @param pca Fitted PCA model or `varimaxes` object
 #' @param feature_names Names of the features (eg, data columns)
 #' @param obs_names Names of the observations (eg, data rows)
 #' @param varimax_fn Function to use for varimax rotation
@@ -83,6 +83,8 @@ varimax_irlba = function(
 #'     - `rotmat`:  Rotation matrix
 #'     - `scores`:  Rotated observation scores
 #' @details After the initial rotation, factors with negative skew (left tails) are flipped
+#'   `pca` must contain `$rotation` (feature loadings matrix) and `$sdev` (standard deviations
+#'   per PC); `$x` (PC scores matrix) is also required unless `x` is supplied directly.
 #' @export
 fit_varimax = function(
       k,
@@ -94,9 +96,18 @@ fit_varimax = function(
       positive_skew = TRUE,
       x = NULL
 ) {
-      if (is.null(pca$x) && is.null(x)) {
-            stop('Data matrix must be passed through either `pca` or `x`')
-      }
+      assertthat::assert_that(
+            !is.null(pca$rotation),
+            msg = '`pca` must have a `$rotation` field (feature loadings matrix)'
+      )
+      assertthat::assert_that(
+            !is.null(pca$sdev),
+            msg = '`pca` must have a `$sdev` field (standard deviations per PC)'
+      )
+      assertthat::assert_that(
+            !is.null(pca$x) || !is.null(x),
+            msg = 'Data matrix must be passed through either `pca` or `x`'
+      )
       raw_loadings = pca$rotation[, 1:k] %*%
             diag(pca$sdev, k, k) |>
             magrittr::set_rownames(feature_names)

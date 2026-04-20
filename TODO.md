@@ -2,15 +2,6 @@
 
 ## Bugs
 
-### `fit_varimax()` — duck-typed `pca` argument
-`fit_varimax()` accesses `pca$rotation`, `pca$sdev`, and `pca$x` by name, accepting either
-a `prcomp_irlba` result or a `varimaxes` object by coincidence of shared field names. The
-original `insert_topics()` bug was a duck-typing failure of exactly this kind. The `@param
-pca` roxygen entry should document exactly which fields are accessed, to prevent future
-callers from accidentally passing an incompatible object.
-
----
-
 ## CRAN blockers
 
 ### Vignette network dependency — `vignettes/realbooks.Rmd`
