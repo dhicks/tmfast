@@ -152,7 +152,7 @@ The object returned by `tmfast()` has a simple structure.  `totalvar` and `sdev`
 
 ```{r}
 str(fitted, max.level = 2L)
-str(fitted$varimax$`5`)
+str(fitted$varimax$`10`)
 ```
 
 Because the model contains a `sdev` component, `screeplot()` works out of the box.  Note that the first $k$ PCs have much higher variance than the others, and often the $k$th PC is somewhat lower than the first $k-1$.  This reflects the highly simplified structure of the simulated data.  Real datasets often have a much more gradual decline in the screeplot, likely reflecting the complex hierarchy of topics in actual documents.  
@@ -177,7 +177,7 @@ data.frame(
 
 # Fitting a conventional topic model (stm)
 
-For comparison, we'll also fit a conventional topic model using the `stm` package.  To address the challenge of picking a number of topics, it will conduct a topic estimation process when passed `K = 0`.  With the simulation parameters and the random seed used here, this process takes almost 12 seconds and produces a model with 33 topics.  We therefore do not automatically run the next chunk. 
+For comparison, we'll also fit a conventional topic model using the `stm` package.  To address the challenge of picking a number of topics, it will conduct a topic estimation process when passed `K = 0`.  With the simulation parameters and the random seed used here, this process takes almost 12 seconds and produces a model with 36 topics.  We therefore do not automatically run the next chunk. 
 
 ```{r, eval = FALSE}
 tic()
@@ -214,30 +214,28 @@ First, however, we need to extract the word-topic distributions.  `tmfast` provi
 beta = tidy(fitted, k, 'beta')
 ```
 
-Word-topic distributions correspond to the varimax factor loadings.  These loadings can take any real value.  To convert them to probability distributions, within each factor (topic), we trim negative values to 0 and divide each loading by the sum of all loadings.  The Zipfian plot below compares the fitted and true word-topic distributions.  Consistently across experiments with this simulation, fitted distributions started off a little flatter, then dropped sharply after about 100 words.  In other words, the varimax topic model highlights a relatively long list of characteristic words for each topic — the actual distributions have fewer characteristic words — and then ignores the other words.  
+Word-topic distributions correspond to the varimax factor loadings.  These loadings can take any real value, so we use softmax ($e^x / \sum e^x$) within each factor (topic) to transform them to a probability distribution. The Zipfian plot below compares the fitted and true word-topic distributions.  Consistently across experiments with this simulation, the softmax-transformed fitted distributions are radically flatter than the true ones. 
 
 ```{r}
+## For convenience, arrange phi in a tidy-like format
+phi_tidy = phi |>
+      t() |>
+      as_tibble(
+            rownames = 'token',
+            .name_repair = tmfast:::make_colnames
+      ) |>
+      pivot_longer(
+            starts_with('V'),
+            names_to = 'topic',
+            values_to = 'beta'
+      ) |>
+      mutate(beta_rn = beta) |>
+      mutate(type = 'true')
+
 ## Compare Zipfian distributions
 bind_rows(
-      {
-            beta |>
-                  mutate(type = 'fitted')
-      },
-      {
-            phi |>
-                  t() |>
-                  as_tibble(
-                        rownames = 'token',
-                        .name_repair = tmfast:::make_colnames
-                  ) |>
-                  pivot_longer(
-                        starts_with('V'),
-                        names_to = 'topic',
-                        values_to = 'beta'
-                  ) |>
-                  mutate(beta_rn = beta) |>
-                  mutate(type = 'true')
-      }
+      mutate(beta, type = 'fitted'),
+      phi_tidy
 ) |>
       group_by(type, topic) |>
       mutate(rank = rank(desc(beta))) |>
@@ -248,11 +246,86 @@ bind_rows(
       scale_y_log10() +
       scale_x_log10()
 ```
-The Zipfian distribution doesn't tell us which fitted topics might correspond to which true topics.  For that, following Malaterre and Lareau, we'll use pairwise Hellinger distances.  There's one complication, however.  The parameters chosen for this simulation typically end up not drawing some of the words from the vocabulary, and they don't end up in the same order as the true word-topic matrix `phi`.  Fortunately words are represented as the integers `1:vocab`, so it's relatively painless to put them back in order and fill in the gaps (setting the probability for the missing words to be 0 across all topics).  In the pipe below, we first fix these issues with the words, widen the long dataframe, convert it to a matrix, and then calculate pairwise Hellinger distances with the true word-topic matrix `phi`. 
+
+This flatter distribution corresponds to greater entropy. In this simulation, the entropy of the true distributions slightly over 7 bits, while the fitted distributions are nearly 10 bits. 
+
+```{r}
+phi_tidy |>
+      group_by(topic) |>
+      summarize(entropy = entropy(beta))
+
+beta |>
+      group_by(topic) |>
+      summarize(entropy = entropy(beta))
+```
+
+## Renormalizing fitted distributions
+
+To mitigate the tendency of `tmfast` to produce distributions that are too flat, when extracting probability distributions with `tidy()` we add an optional renormalization step. 
+
+Given a discrete probability distribution $P$ with components $p_i$ and entropy $H$, and a parameter $\beta$, we can define a new distribution $P'$ with components
+
+$$ p'_i = \frac{p_i^\beta}{\sum_i p_i^\beta} = \frac{p_i^\beta}{Z}$$
+
+which has entropy
+
+$$ H' = \frac{1}{Z} \sum_i [p_i^\beta \beta \log p_i] - \log Z.$$
+
+That is, we can choose an exponent $\beta$ that renormalizes $P$ to achieve a target entropy $H'$.  In LDA, the target entropy is the expected entropy for the underlying Dirichlet prior, for either word-topic or topic-document distributions (depending on which set of probability distributions are being extracted). `tmfast` provides convenience functions for calculating this expected entropy. 
+
+Note how the expected entropy of the Dirichlet distribution used to draw $\phi$ corresponds to the mean entropy of the word-topic distributions in $\phi$ calculated above. 
+
+```{r}
+expected_entropy(word_beta, k = vocab)
+```
+
+**In actual applications, where the Dirichlet prior is an idealization, setting the target entropy is an important researcher degree of freedom.**  It plays roughly the same role as choosing prior parameters in other topic modeling packages.  
+
+Since solving for the exponent in the equation for $H'$ requires numerical optimization, it's inefficient to do this every time we call `tidy()`, especially with the topic-document distributions for large corpora.  Instead, `tmfast::target_power()` is used to run this optimization once, returning the mean target exponent, and we can use this value in all future calls to `tidy()`. 
+
+```{r}
+beta_power = target_power(
+      tidy_df = beta,
+      group_col = topic,
+      p_col = beta,
+      target_entropy = expected_entropy(word_beta, k = vocab)
+)
+beta_power
+```
+
+The result is a better approximation to the true word-topic distributions. 
+
+```{r}
+## Renormalized beta
+beta_rn = tidy(fitted, k, 'beta', exponent = beta_power)
+
+## Entropies after renormalization
+beta_rn |>
+      group_by(topic) |>
+      summarize(entropy = entropy(beta))
+
+## Compare Zipfian distributions
+bind_rows(
+      mutate(beta_rn, type = 'fitted'),
+      phi_tidy
+) |>
+      group_by(type, topic) |>
+      mutate(rank = rank(desc(beta))) |>
+      arrange(type, topic, rank) |>
+      filter(rank < vocab / 2) |>
+      ggplot(aes(rank, beta, color = type, group = interaction(topic, type))) +
+      geom_line() +
+      scale_y_log10() +
+      scale_x_log10()
+```
+
+## Topic alignment
+
+The Zipfian distribution plot doesn't tell us which fitted topics might correspond to which true topics.  For that, following Malaterre and Lareau, we'll use pairwise Hellinger distances.  There's one complication, however.  The parameters chosen for this simulation typically end up not drawing some of the words from the vocabulary, and they don't end up in the same order as the true word-topic matrix `phi`.  Fortunately words are represented as the integers `1:vocab`, so it's relatively painless to put them back in order and fill in the gaps (setting the probability for the missing words to be 0 across all topics).  In the pipe below, we first fix these issues with the words, widen the long dataframe, convert it to a matrix, and then calculate pairwise Hellinger distances with the true word-topic matrix `phi`. 
 
 ```{r}
 ## Hellinger distance of word-topic distributions
-beta_mx = beta |>
+beta_mx = beta_rn |>
       ## Fix order of words
       mutate(token = as.integer(token)) |>
       arrange(token) |>
@@ -272,7 +345,7 @@ beta_mx = beta |>
 hellinger(phi, t(beta_mx))
 ```
 
-In this distance matrix, the rows are the true topics and the columns are the fitted topics.  Low values include that the topics are closer to each other.  It's clear that the topics don't match up perfectly — typically the minimum in each row is about 0.17 — but there is a clear minimum.  We treat this as a linear assignment problem, which is solved rapidly using the `lpSolve` package.  The solution — which matches true to fitted topics — can then be used as a rotation with both the loadings and scores (topic-document distributions).  After rotating, the true-fitted pairs are on the diagonal of the Hellinger distance matrix, making it easy to extract and summarize the quality of the fit.  
+In this distance matrix, the rows are the true topics and the columns are the fitted topics.  Low values include that the topics are closer to each other.  It's clear that the topics don't match up perfectly — typically the minimum in each row is about 0.38 — but there is a clear minimum.  We treat this as a linear assignment problem, which is solved rapidly using the `lpSolve` package.  The solution — which matches true to fitted topics — can then be used as a rotation with both the loadings and scores (topic-document distributions).  After rotating, the true-fitted pairs are on the diagonal of the Hellinger distance matrix, making it easy to extract and summarize the quality of the fit.  
 
 ```{r}
 ## Use lpSolve to match fitted topics to true topics
@@ -286,7 +359,7 @@ hellinger(phi, soln$solution %*% t(beta_mx)) |>
       summary()
 ```
 
-And we do the same thing with the conventional topic model.  It performs somewhat better, with a median Hellinger distance of about 0.08.  But again, it's significantly slower.  
+And we do the same thing with the conventional topic model.  It performs somewhat better, with a median Hellinger distance of about 0.08.  But again, fitting this model is significantly slower.  
 
 ```{r}
 beta_stm_mx = tidy(fitted_stm, matrix = 'beta') |>
@@ -321,11 +394,36 @@ The tidied word-topic distributions can be used in standard ways for further ana
 
 # Topic-document distributions 
 
-We extract topic-document distributions using the same `tidy()` function, specifying the matrix `gamma` and including the rotation above to align the fitted and true topics.^[As with the word-topic distributions/loadings above, the scores must be transformed to treat them as topic-document distributions.  Experiments with this simulation found that nudging the scores — setting the smallest score in each document to zero — and then dividing by the total was the most effective approach.  Note that this means that each document has probability exactly zero for one topic.]  Tile and parallel coordinates plots can be used to visualize all of the topic-document distributions.  These show that the varimax topic models successfully recover the overall association of each document's journal with a distinctive topic.  
+We extract topic-document distributions using the same `tidy()` function, specifying the matrix `gamma` and including the rotation above to align the fitted and true topics. As with the loadings, the topic-document scores are transformed to probability distributions using softmax and need to be renormalized. 
 
 ```{r}
-gamma_df = tidy(fitted, k, 'gamma', rotation = soln$solution)
+## Example Dirichlet distribution used in drawing the true topic-document distributions
+peak_alpha(k, 1, topic_peak, topic_scale)
+expected_entropy(peak_alpha(k, 1, topic_peak, topic_scale))
 
+## Renormalization exponent
+gamma_power = tidy(fitted, k, 'gamma') |>
+      target_power(
+            document,
+            gamma,
+            expected_entropy(peak_alpha(k, 1, topic_peak, topic_scale))
+      )
+gamma_power
+
+gamma_df = tidy(
+      fitted,
+      k,
+      'gamma',
+      rotation = soln$solution,
+      exponent = gamma_power
+)
+
+gamma_df
+```
+
+Tile and parallel coordinates plots can be used to visualize all of the topic-document distributions.  These show that the varimax topic models successfully recover the overall association of each document's journal with a distinctive topic.  
+
+```{r}
 gamma_df |>
       mutate(document = as.integer(document)) |>
       ggplot(aes(document, topic, fill = gamma)) +
@@ -343,90 +441,13 @@ gamma_df |>
       scale_color_discrete(guide = 'none')
 ```
 
-However, the fitted topic-document distributions are flatter than the true ones.  Consider the true and fitted distributions for document 1.  Compared to the true distribution, the fitted distribution has a somewhat lower probability for topic `V01` and a somewhat higher probability for the other topics.  
+
+We can now assess accuracy of the topic-document distributions.  Above we used the `hellinger()` method for two matrices.  The method for two dataframes requires specifying the id, topic, and probability columns; see `?hellinger.data.frame`.  The tile plot shows that the true and fitted topics are aligned (because we used the rotation when extracting `gamma_df` above), and so again we can get an overall summary from the diagonal.  In the current simulation, the mean Hellinger distance is 0.20. 
 
 ```{r}
-ggplot(mapping = aes(topic, group = 1L)) +
-      geom_line(
-            mapping = aes(y = theta, color = 'true'),
-            data = tibble(
-                  theta = theta[1, ],
-                  topic = tmfast:::make_colnames(1:k)
-            )
-      ) +
-      geom_line(
-            mapping = aes(y = gamma, color = 'fitted'),
-            data = filter(gamma_df, document == '1')
-      )
-```
-
-This flatter distribution corresponds to greater entropy.  In this simulation, the entropy of the fitted distributions are about 1 bit greater than those of the true distributions.  This discrepancy tends to become worse with greater values of $k$.  
-
-```{r}
-theta |>
-      apply(1, entropy) |>
-      summary()
-
-tidy(fitted, k, 'gamma') |>
-      group_by(document) |>
-      summarize(H = entropy(gamma)) |>
-      pull(H) |>
-      summary()
-```
-
-To mitigate this problem, we add an optional renormalization step when converting document scores to topic-document distributions.  Given a discrete probability distribution $P$ with components $p_i$ and entropy $H$, and a parameter $\beta$, we can define a new distribution $P'$ with components
-
-$$ p'_i = \frac{p_i^\beta}{\sum_i p_i^\beta} = \frac{p_i^\beta}{Z}$$
-
-which has entropy
-
-$$ H' = \frac{1}{Z} \sum_i [p_i^\beta \beta \log p_i] - \log Z.$$
-
-That is, we can choose a parameter $\beta$ that renormalizes $P$ to achieve a target entropy $H'$.  In LDA, the target entropy is the expected entropy for topic-document distributions drawn from the Dirichlet prior.  `tmfast` provides convenience functions for calculating this expected entropy; compare this to the mean entropy of the distributions in `theta` above.  **In actual applications, where the Dirichlet prior is an idealization, choosing $\alpha$ to set the target entropy is an important researcher degree of freedom.**  It is equivalent to choosing prior parameters in other topic modeling packages.  
-
-```{r}
-peak_alpha(k, 1, topic_peak, topic_scale)
-expected_entropy(peak_alpha(k, 1, topic_peak, topic_scale))
-```
-
-Since solving the equation for $H'$ for $\beta$ requires numerical optimization, it's inefficient to do this every time we call `tidy()`, especially with large corpora.  Instead, `tmfast::target_power()` is used to run this optimization once, and then return the mean value across all documents.  We then use this single value of $\beta$ in all future calls to `tidy()`.  
-
-```{r}
-gamma_power = tidy(fitted, k, 'gamma') |>
-      target_power(
-            document,
-            gamma,
-            expected_entropy(peak_alpha(k, 1, topic_peak, topic_scale))
-      )
-gamma_power
-```
-
-The renormalized topic-document distributions have closer entropy to theta.  The `keep_original` argument lets us compare the original and renormalized distributions. 
-
-```{r}
-gamma_df = tidy(
-      fitted,
-      k,
-      'gamma',
-      rotation = soln$solution,
-      exponent = gamma_power,
-      keep_original = TRUE
-)
-
-gamma_df |>
-      group_by(document) |>
-      summarize(across(c(gamma, gamma_rn), entropy)) |>
-      summarize(across(c(gamma, gamma_rn), mean))
-```
-
-
-We can now assess accuracy of the topic-document distributions.  Above we used the `hellinger()` method for two matrices.  The method for two dataframes requires specifying the id, topic, and probability columns.  The tile plot shows that the true and fitted topics are aligned (because we used the rotation when extracting `gamma_df` above), and so again we can get an overall summary from the diagonal.  Without renormalization, in the current simulation the mean Hellinger distance is 0.24 — not too bad, but perhaps larger than one would like.  With larger values of $k$, this accuracy increases significantly.  Renormalization keeps the mean distance around 0.13, slightly better the the word-topic distributions.  
-
-```{r}
-## w/o renormalization, mean distance is .24
 hellinger(
       theta_df,
-      doc,
+      id1 = doc,
       topicsdf2 = gamma_df,
       id2 = document,
       prob2 = gamma,
@@ -434,32 +455,9 @@ hellinger(
 ) |>
       diag() |>
       summary()
-
-## w/ renormalization, mean distance drops to .13
-doc_compare = hellinger(
-      theta_df,
-      doc,
-      topicsdf2 = gamma_df,
-      id2 = document,
-      prob2 = gamma_rn,
-      df = TRUE
-)
-
-doc_compare |>
-      filter(doc == document) |>
-      pull(dist) |>
-      summary()
-
-ggplot(
-      doc_compare,
-      aes(as.integer(doc), as.integer(document), fill = 1 - dist)
-) +
-      geom_raster() +
-      scale_x_discrete(breaks = NULL, name = 'true') +
-      scale_y_discrete(breaks = NULL, name = 'fitted')
 ```
 
-STM has a slightly closer fit, with a mean Hellinger distance of 0.08.  
+STM has a closer fit, with a mean Hellinger distance of 0.08.  
 
 ```{r}
 fitted_stm_gamma = tidy(fitted_stm, matrix = 'gamma') |>

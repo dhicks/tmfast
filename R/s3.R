@@ -83,17 +83,22 @@ rotation.varimaxes = function(x, k, ...) {
 #' @importFrom stats predict
 #' @export
 predict.varimaxes = function(object, newdata, ...) {
-    rlang::check_dots_empty()
-    nm = object$cols
-    if (!is.null(nm)) {
-        if (!all(nm %in% colnames(newdata)))
-            stop("'newdata' does not have named columns matching the original vocabulary")
-        newdata = newdata[, nm, drop = FALSE]
-    } else {
-        if (ncol(newdata) != nrow(object$rotation))
-            stop("'newdata' does not have the correct number of columns")
-    }
-    scale(newdata, center = object$center, scale = object$scale) %*% object$rotation
+      rlang::check_dots_empty()
+      nm = object$cols
+      if (!is.null(nm)) {
+            if (!all(nm %in% colnames(newdata))) {
+                  stop(
+                        "'newdata' does not have named columns matching the original vocabulary"
+                  )
+            }
+            newdata = newdata[, nm, drop = FALSE]
+      } else {
+            if (ncol(newdata) != nrow(object$rotation)) {
+                  stop("'newdata' does not have the correct number of columns")
+            }
+      }
+      scale(newdata, center = object$center, scale = object$scale) %*%
+            object$rotation
 }
 
 #' Make colnames
@@ -109,6 +114,7 @@ make_colnames = function(names, prefix = 'V') {
 }
 
 
+#' Softmax transformation
 #' @noRd
 softmax = function(x) {
       e = exp(x - max(x))

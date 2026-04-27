@@ -4,6 +4,8 @@
 
 - need to be updated in light of shift to softmax
     - in particular, beta distributions need renormalization
+    -[X] simulated.Rmd
+- arXiv paper as well? 
 
 
 ## CRAN blockers
