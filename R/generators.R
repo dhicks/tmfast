@@ -34,7 +34,7 @@ rdirichlet = function (n, alpha, k = NULL)
         alpha = rep(alpha, k)
     }
     l <- length(alpha)
-    x <- matrix(rgamma(l * n, alpha), ncol = l, byrow = TRUE)
+    x <- matrix(stats::rgamma(l * n, alpha), ncol = l, byrow = TRUE)
     sm <- x %*% rep(1, l)
     x/as.vector(sm)
 }
@@ -75,12 +75,8 @@ draw_corpus = function(N, theta, phi) {
                    .id = 'doc',
                    .options = furrr::furrr_options(seed = TRUE),
                    .progress = TRUE)|>
-        dplyr::mutate(doc = as.integer(doc))
+        dplyr::mutate(doc = as.integer(.data$doc))
 }
-
-#' @import magrittr
-NULL
-#> NULL
 
 #' "Journal-specific" simulation scenario
 #'
@@ -110,8 +106,8 @@ journal_specific = function(k = 5,
     theta = purrr::map(1:k,
                        ~rdirichlet(Mj, peak_alpha(k, .x,
                                                   peak = topic_peak,
-                                                  scale = topic_scale))) %>%
-        do.call(rbind, .)
+                                                  scale = topic_scale))) |>
+        purrr::reduce(rbind)
     theta_df = theta |>
         tibble::as_tibble(rownames = 'document', .name_repair = make_colnames) |>
         tidyr::pivot_longer(tidyselect::starts_with('V'),
@@ -120,14 +116,14 @@ journal_specific = function(k = 5,
     ## phi_j:  Word distribution for topic j
     phi = rdirichlet(k, word_beta, k = vocab)
     ## N_i:  Length of document i
-    N = rnbinom(M, size = size, mu = mu)
+    N = stats::rnbinom(M, size = size, mu = mu)
     if (bigjournal) {
         N[1:Mj] = 10*N[1:Mj]
     }
     ## Draw corpus
     if (verbose) message('Drawing corpus')
     corpus = draw_corpus(N, theta, phi)
-    dtm = dplyr::mutate(corpus, n = log1p(n))
+    dtm = dplyr::mutate(corpus, n = log1p(.data$n))
 
     ## Fit tm
     if (verbose) message('Fitting topic model')
@@ -137,10 +133,10 @@ journal_specific = function(k = 5,
     ## Hellinger distance of word-topic distributions
     beta_mx = beta |>
         ## Fix order of words
-        dplyr::mutate(token = as.integer(token)) |>
-        dplyr::arrange(token) |>
+        dplyr::mutate(token = as.integer(.data$token)) |>
+        dplyr::arrange(.data$token) |>
         ## And dropped words
-        tidyr::complete(token = 1:vocab) |>
+        tidyr::complete("token" = 1:vocab) |>
         tidyr::pivot_wider(names_from = 'topic',
                            values_from = 'beta', values_fill = 0,
                            names_sort = TRUE) |>
@@ -157,11 +153,12 @@ journal_specific = function(k = 5,
     ## Topic-doc distributions
     gamma_df = tidy(fitted, k, 'gamma', rotation = soln$solution)
 
-    theta_accuracy = hellinger(theta_df, id1 = document, prob1 = prob,
-                               topicsdf2 = gamma_df, id2 = document, prob2 = gamma,
+    theta_accuracy = hellinger(theta_df,
+                               id1 = 'document', prob1 = 'prob',
+                               topicsdf2 = gamma_df, id2 = 'document', prob2 = 'gamma',
                                df = TRUE) |>
-        dplyr::filter(document_x == document_y) |>
-        dplyr::pull(dist)
+        dplyr::filter(.data$document_x == .data$document_y) |>
+        dplyr::pull("dist")
 
     tibble::tibble(phi = mean(phi_accuracy),
                    phi_vec = list(phi_accuracy),
