@@ -20,12 +20,12 @@ compare_betas = function(beta1, beta2 = NULL, vocab) {
       fill = function(beta) {
             beta |>
                   tidyr::complete(
-                        token = vocab,
-                        topic,
+                        "token" = vocab,
+                        .data$topic,
                         fill = list(beta = 0)
                   ) |>
-                  build_matrix(topic, token, beta) %>%
-                  .[, vocab]
+                  build_matrix("topic", "token", "beta") |>
+                  (\(x) x[, vocab])()
       }
       beta1 = fill(beta1)
       if (is.null(beta2)) {
