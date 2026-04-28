@@ -1,3 +1,6 @@
+#' @importFrom rlang .data
+NULL
+
 #' Information gain (uniform distribution)
 #'
 #' Calculates \eqn{\log_2 n \times \delta H}, the log total occurrence times information gain (relative to the uniform distribution) for each term. I prefer this for vocabulary selection over methods such as TF-IDF.
@@ -33,8 +36,8 @@ ndH = function(dataf, doc_col, term_col, count_col) {
                          dH = log2(n_docs) - H,
                          n = sum({{ count_col }})) |>
         dplyr::ungroup() |>
-        dplyr::mutate(ndH = log2(n)*dH) |>
-        dplyr::arrange(desc(ndH))
+        dplyr::mutate(ndH = log2(.data$n) * .data$dH) |>
+        dplyr::arrange(dplyr::desc(.data$ndH))
 }
 
 ndH.ArrowObject = function(dataset, doc_col, term_col, count_col) {
@@ -50,13 +53,13 @@ ndH.ArrowObject = function(dataset, doc_col, term_col, count_col) {
         dplyr::left_join(totals,
                          by = rlang::as_label(rlang::enquo(term_col))) |>
         dplyr::group_by({{ term_col }}) |>
-        dplyr::mutate(p = {{ count_col }} / n_tot) |>
+        dplyr::mutate(p = {{ count_col }} / .data$n_tot) |>
         dplyr::summarize(H = entropy(p),
                   n = sum({{ count_col }})) |>
         dplyr::ungroup() |>
-        dplyr::mutate(dH = log2(n_docs) - H,
-               ndH = log2(n) * dH) |>
-        dplyr::arrange(desc(ndH))
+        dplyr::mutate(dH = log2(n_docs) - .data$H,
+               ndH = log2(.data$n) * .data$dH) |>
+        dplyr::arrange(dplyr::desc(.data$ndH))
     return(result)
 }
 
@@ -94,7 +97,7 @@ ndR = function(dataf, doc_col, term_col, count_col) {
         dplyr::group_by({{ doc_col }}) |>
         dplyr::summarize(len = sum({{ count_col }})) |>
         dplyr::ungroup() |>
-        dplyr::mutate(r = len/alpha)
+        dplyr::mutate(r = .data$len / alpha)
 
     ## Termwise total occurrences
     totals = dataf |>
@@ -105,14 +108,13 @@ ndR = function(dataf, doc_col, term_col, count_col) {
     result = dataf |>
         dplyr::left_join(r_df, by = rlang::as_name(rlang::enquo(doc_col))) |>
         dplyr::left_join(totals, by = rlang::as_name(rlang::enquo(term_col))) |>
-        dplyr::mutate(p = {{ count_col }} / n_tot,
-                      dR_term = p * log2(p / r)) |>
+        dplyr::mutate(p = {{ count_col }} / .data$n_tot,
+                      dR_term = .data$p * log2(.data$p / .data$r)) |>
         dplyr::group_by({{ term_col }}) |>
         dplyr::summarize(n = sum({{ count_col }}),
-                         dR = sum(dR_term)) |>
+                         dR = sum(.data$dR_term)) |>
         dplyr::ungroup() |>
-        dplyr::mutate(ndR = log2(n)*dR) |>
-        dplyr::arrange(desc(ndR))
+        dplyr::mutate(ndR = log2(.data$n) * .data$dR) |>
+        dplyr::arrange(dplyr::desc(.data$ndR))
     return(result)
 }
-
