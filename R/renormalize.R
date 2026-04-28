@@ -45,7 +45,7 @@ solve_power = function(p, target_H, return_full = FALSE) {
             }
       }
 
-      soln = purrr::possibly(uniroot, otherwise = NA_real_)(
+      soln = purrr::possibly(stats::uniroot, otherwise = NA_real_)(
             \(beta) {
                   transformed_entropy(p)(beta) - target_H
             },
@@ -78,11 +78,11 @@ target_power = function(tidy_df, group_col, p_col, target_entropy) {
                   H = entropy({{ p_col }}),
                   power = solve_power({{ p_col }}, target_entropy)
             ) |>
-            dplyr::pull(power)
+            dplyr::pull("power")
       if (sum(is.na(powers)) > 0.1 * length(powers)) {
             warning('More than 10% of powers could not be calculated')
       }
-      median(powers, na.rm = TRUE)
+      stats::median(powers, na.rm = TRUE)
 }
 
 #' Renormalize tidied distributions
@@ -94,6 +94,7 @@ target_power = function(tidy_df, group_col, p_col, target_entropy) {
 #' @param exponent Exponent to use in renormalization
 #' @param keep_original Keep original probabilities?
 #' @returns A dataframe with (if `keep_original` is `TRUE`) an added column of the form `p_col_rn` containing the renormalized probabilities or (if `keep_original` is `FALSE`) renormalized values in `p_col`.
+#' @importFrom rlang :=
 #' @export
 renorm = function(tidy_df, group_col, p_col, exponent, keep_original = FALSE) {
       if (keep_original) {
