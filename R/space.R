@@ -41,7 +41,7 @@ tsne.data.frame = function(
             perplexity = min(30, floor((ndocs - 1) / 3) - 1)
       }
       fitted_tsne = gamma_df |>
-            hellinger(id1 = document, prob1 = gamma) |>
+            hellinger(id1 = 'document', prob1 = 'gamma') |>
             Rtsne::Rtsne(perplexity = perplexity, is_distance = TRUE)
       if (!df) {
             return(fitted_tsne)
