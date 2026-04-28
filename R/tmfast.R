@@ -172,9 +172,9 @@ fit_varimax = function(
 tmfast = function(
       dtm,
       n,
-      row = doc,
-      column = word,
-      value = n,
+      row = 'doc',
+      column = 'word',
+      value = 'n',
       verbose = FALSE,
       ...
 ) {
