@@ -248,22 +248,22 @@ topic_author = tribble(
 )
 ```
 
-To explore these topics further, we turn to the word-topic distribution.  These distributions could be renormalized, as with the topic-doc distributions.  But the exponent for the word-topic distributions is usually quite close to 1, meaning renormalization doesn't change these distributions very much.  
+To explore these topics further, we turn to the word-topic distribution.  We renormalize these distributions, as with the topic-doc distributions. 
 
 ```{r}
-target_entropy_term = expected_entropy(.1, k = vocab_size)
+target_entropy_term = expected_entropy(5, k = vocab_size)
 target_entropy_term
 
 exponent_term = tidy(fitted_tmf, n_authors, 'beta') |>
       target_power(topic, beta, target_entropy_term)
 exponent_term
+
+beta_df = tidy(fitted_tmf, n_authors, 'beta', exponent = exponent_term)
 ```
 
-We therefore skip renormalization and move directly to a Silge plot, showing the top 10 terms for each topic.  `tidytext::reorder_within()` and `tidytext::scale_x_reordered()` are useful for constructing this plot. 
+After renormalization we construct a Silge plot, showing the top 10 terms for each topic.  `tidytext::reorder_within()` and `tidytext::scale_x_reordered()` are useful for constructing this plot. 
 
 ```{r}
-beta_df = tidy(fitted_tmf, n_authors, 'beta')
-
 top_terms = beta_df |>
       group_by(topic) |>
       arrange(topic, desc(beta)) |>
