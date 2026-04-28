@@ -109,8 +109,8 @@ make_colnames = function(names, prefix = 'V') {
       n = length(names)
       1:n |>
             as.character() |>
-            stringr::str_pad(stringr::str_length(n), pad = '0') %>%
-            stringr::str_c(prefix, .)
+            stringr::str_pad(stringr::str_length(n), pad = '0') |>
+            (\(x) stringr::str_c(prefix, x))()
 }
 
 
@@ -176,11 +176,11 @@ tidy.tmfast = function(
                         .name_repair = make_colnames
                   ) |>
                   tidyr::pivot_longer(
-                        starts_with('V'),
+                        tidyselect::starts_with('V'),
                         names_to = 'topic',
                         values_to = 'beta'
                   ) |>
-                  dplyr::group_by(topic) |>
+                  dplyr::group_by(.data$topic) |>
                   dplyr::mutate(beta = softmax(beta)) |>
                   dplyr::ungroup()
             if (!is.null(exponent)) {
@@ -206,11 +206,11 @@ tidy.tmfast = function(
                         .name_repair = make_colnames
                   ) |>
                   tidyr::pivot_longer(
-                        starts_with('V'),
+                        tidyselect::starts_with('V'),
                         names_to = 'topic',
                         values_to = 'gamma'
                   ) |>
-                  dplyr::group_by(document) |>
+                  dplyr::group_by(.data$document) |>
                   dplyr::mutate(gamma = softmax(gamma)) |>
                   dplyr::ungroup()
             if (!is.null(exponent)) {
