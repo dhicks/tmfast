@@ -18,21 +18,6 @@
 - Revisit the auto-memory rule about bumping `Version` to today's date; it predates CRAN-prep.
     [We'll continue doing this for development versions, but again use the three integer-dots for CRAN releases]
 
-### 3. Make Suggests packages conditional (CRAN Policy §1.1.3.1)
-Add `requireNamespace()` guards for Suggests-only packages. `Rtsne`, `umap`, `furrr`, `lpSolve` are reasonable to keep in Suggests with guards. (`tidyr` has been moved to Imports.)
-
-- [R/generators.R:72](R/generators.R#L72) — `draw_corpus` uses `furrr::future_map_dfr`
-- [R/generators.R:156](R/generators.R#L156), [R/generators.R:169](R/generators.R#L169) — `journal_specific` uses `lpSolve::lp.assign`
-- [R/space.R:49](R/space.R#L49) — `tsne.data.frame` calls `Rtsne::Rtsne`
-- [R/space.R:104](R/space.R#L104) — `umap.matrix` calls `umap::umap`
-
-### 4. Guard examples that depend on Suggests
-Wrap in `\donttest{}` plus `requireNamespace()` checks, or rewrite using only Imports.
-
-- [R/information_gain.R:18-25](R/information_gain.R#L18-L25) and [R/information_gain.R:85-92](R/information_gain.R#L85-L92) — examples use `library(tidytext); library(janeaustenr)`
-- [R/hellinger.R:90-108](R/hellinger.R#L90-L108) — example uses `tidyr::pivot_longer`
-- [R/compare_betas.R:19-31](R/compare_betas.R#L19-L31) — example uses `tidyr::pivot_longer` and `tidyr::complete`
-
 ### 5. Replace `\dontrun{}` with self-contained `\donttest{}` examples
 - [R/space.R:17](R/space.R#L17) (tsne) and [R/space.R:122](R/space.R#L122) (umap): both reference undefined symbols (`fitted_tmf`, `meta`, `fitted`) — rewrite self-contained (along the lines of the `umap.matrix` example) and switch to `\donttest{}`.
 
