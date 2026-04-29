@@ -15,7 +15,7 @@ NULL
 #'     - `n`, total count of term occurrence
 #'     - `ndH`, \eqn{\log_2 n \times \delta H}
 #' @examples
-#' library(tidyverse)
+#' library(dplyr)
 #' library(tidytext)
 #' library(janeaustenr)
 #' austen_df = austen_books() |>
@@ -82,7 +82,7 @@ ndH.ArrowObject = function(dataset, doc_col, term_col, count_col) {
 #'     - `dR`, information gain relative to length-proportional distribution over documents
 #'     - `ndR`, \eqn{\log_2 n \times \delta R}
 #' @examples
-#' library(tidyverse)
+#' library(dplyr)
 #' library(tidytext)
 #' library(janeaustenr)
 #' austen_df = austen_books() |>

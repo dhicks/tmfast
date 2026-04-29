@@ -28,7 +28,7 @@ Dataframe with columns
 An alternative to \code{ndH()} that uses information gain relative to a distribution of documents that is proportional to length.  With the uniform distribution and dramatic differences in document lengths (eg, over a few orders of magnitude), high-ndH terms tend to be distinctive terms from very long documents.  With the length-proportional distribution, high information-gain terms are more likely to come from shorter documents. Informal testing suggests this approach performs better than the \code{ndH()} uniform distribution when documents have widely varying lengths, eg, over a few orders of magnitude.
 }
 \examples{
-library(tidyverse)
+library(dplyr)
 library(tidytext)
 library(janeaustenr)
 austen_df = austen_books() |>

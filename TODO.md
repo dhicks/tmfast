@@ -18,26 +18,18 @@
 - Revisit the auto-memory rule about bumping `Version` to today's date; it predates CRAN-prep.
     [We'll continue doing this for development versions, but again use the three integer-dots for CRAN releases]
 
-### 2. Drop `tidyverse` from Suggests
-- [DESCRIPTION:37](DESCRIPTION#L37): CRAN policy forbids depending on `tidyverse` at any level. Replace with the specific packages actually used in code/examples (`dplyr`, `tidyr`, `ggplot2`, `stringr`, etc.).
-    [I can't confirm that this is actual CRAN policy, but the tidyverse dev team recommends listing the individual packages rather than tidyverse]
-
 ### 3. Make Suggests packages conditional (CRAN Policy §1.1.3.1)
-Either move `tidyr` to Imports (clearly load-bearing) or add `requireNamespace()` guards. `Rtsne`, `umap`, `furrr`, `lpSolve` are reasonable to keep in Suggests with guards.
+Add `requireNamespace()` guards for Suggests-only packages. `Rtsne`, `umap`, `furrr`, `lpSolve` are reasonable to keep in Suggests with guards. (`tidyr` has been moved to Imports.)
 
-- [R/hellinger.R:66](R/hellinger.R#L66) — `build_matrix(..., sparse = FALSE)` uses `tidyr::pivot_wider`
-- [R/hellinger.R:145](R/hellinger.R#L145) — `hellinger.data.frame` uses `tidyr::pivot_longer`
-- [R/compare_betas.R:36](R/compare_betas.R#L36) — `compare_betas` uses `tidyr::complete`
-- [R/s3.R:196](R/s3.R#L196), [R/s3.R:232](R/s3.R#L232) — `tidy.tmfast` uses `tidyr::pivot_longer`
 - [R/generators.R:72](R/generators.R#L72) — `draw_corpus` uses `furrr::future_map_dfr`
-- [R/generators.R:156](R/generators.R#L156), [R/generators.R:169](R/generators.R#L169) — `journal_specific` uses `tidyr::*` and `lpSolve::lp.assign`
+- [R/generators.R:156](R/generators.R#L156), [R/generators.R:169](R/generators.R#L169) — `journal_specific` uses `lpSolve::lp.assign`
 - [R/space.R:49](R/space.R#L49) — `tsne.data.frame` calls `Rtsne::Rtsne`
 - [R/space.R:104](R/space.R#L104) — `umap.matrix` calls `umap::umap`
 
 ### 4. Guard examples that depend on Suggests
 Wrap in `\donttest{}` plus `requireNamespace()` checks, or rewrite using only Imports.
 
-- [R/information_gain.R:18-25](R/information_gain.R#L18-L25) and [R/information_gain.R:85-92](R/information_gain.R#L85-L92) — examples open with `library(tidyverse); library(tidytext); library(janeaustenr)`
+- [R/information_gain.R:18-25](R/information_gain.R#L18-L25) and [R/information_gain.R:85-92](R/information_gain.R#L85-L92) — examples use `library(tidytext); library(janeaustenr)`
 - [R/hellinger.R:90-108](R/hellinger.R#L90-L108) — example uses `tidyr::pivot_longer`
 - [R/compare_betas.R:19-31](R/compare_betas.R#L19-L31) — example uses `tidyr::pivot_longer` and `tidyr::complete`
 

@@ -28,7 +28,7 @@ Dataframe with columns
 Calculates \eqn{\log_2 n \times \delta H}, the log total occurrence times information gain (relative to the uniform distribution) for each term. I prefer this for vocabulary selection over methods such as TF-IDF.
 }
 \examples{
-library(tidyverse)
+library(dplyr)
 library(tidytext)
 library(janeaustenr)
 austen_df = austen_books() |>
