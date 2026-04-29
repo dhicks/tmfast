@@ -25,42 +25,47 @@ NULL
 #' ndH(austen_df, book, term, n)
 #' @export
 ndH = function(dataf, doc_col, term_col, count_col) {
-    n_docs = dataf |>
-        dplyr::pull({{ doc_col }}) |>
-        dplyr::n_distinct()
+      n_docs = dataf |>
+            dplyr::pull({{ doc_col }}) |>
+            dplyr::n_distinct()
 
-    dataf |>
-        dplyr::group_by({{ term_col }}) |>
-        dplyr::mutate(p = {{ count_col }} / sum({{ count_col }})) |>
-        dplyr::summarize(H = entropy(p),
-                         dH = log2(n_docs) - H,
-                         n = sum({{ count_col }})) |>
-        dplyr::ungroup() |>
-        dplyr::mutate(ndH = log2(.data$n) * .data$dH) |>
-        dplyr::arrange(dplyr::desc(.data$ndH))
+      dataf |>
+            dplyr::group_by({{ term_col }}) |>
+            dplyr::mutate(p = {{ count_col }} / sum({{ count_col }})) |>
+            dplyr::summarize(
+                  H = entropy(.data$p),
+                  dH = log2(n_docs) - .data$H,
+                  n = sum({{ count_col }})
+            ) |>
+            dplyr::ungroup() |>
+            dplyr::mutate(ndH = log2(.data$n) * .data$dH) |>
+            dplyr::arrange(dplyr::desc(.data$ndH))
 }
 
 ndH.ArrowObject = function(dataset, doc_col, term_col, count_col) {
-    n_docs = dataset |>
-        dplyr::pull({{ doc_col }}) |>
-        dplyr::n_distinct()
+      n_docs = dataset |>
+            dplyr::pull({{ doc_col }}) |>
+            dplyr::n_distinct()
 
-    totals = dataset |>
-        dplyr::group_by({{ term_col }}) |>
-        dplyr::summarize(n_tot = sum({{ count_col }}))
+      totals = dataset |>
+            dplyr::group_by({{ term_col }}) |>
+            dplyr::summarize(n_tot = sum({{ count_col }}))
 
-    result = dataset |>
-        dplyr::left_join(totals,
-                         by = rlang::as_label(rlang::enquo(term_col))) |>
-        dplyr::group_by({{ term_col }}) |>
-        dplyr::mutate(p = {{ count_col }} / .data$n_tot) |>
-        dplyr::summarize(H = entropy(p),
-                  n = sum({{ count_col }})) |>
-        dplyr::ungroup() |>
-        dplyr::mutate(dH = log2(n_docs) - .data$H,
-               ndH = log2(.data$n) * .data$dH) |>
-        dplyr::arrange(dplyr::desc(.data$ndH))
-    return(result)
+      result = dataset |>
+            dplyr::left_join(
+                  totals,
+                  by = rlang::as_label(rlang::enquo(term_col))
+            ) |>
+            dplyr::group_by({{ term_col }}) |>
+            dplyr::mutate(p = {{ count_col }} / .data$n_tot) |>
+            dplyr::summarize(H = entropy(.data$p), n = sum({{ count_col }})) |>
+            dplyr::ungroup() |>
+            dplyr::mutate(
+                  dH = log2(n_docs) - .data$H,
+                  ndH = log2(.data$n) * .data$dH
+            ) |>
+            dplyr::arrange(dplyr::desc(.data$ndH))
+      return(result)
 }
 
 #' Information gain (length-proportional distribution)
@@ -87,34 +92,44 @@ ndH.ArrowObject = function(dataset, doc_col, term_col, count_col) {
 #' ndR(austen_df, book, term, n)
 #' @export
 ndR = function(dataf, doc_col, term_col, count_col) {
-    ## Document lengths
-    ## len: Length of doc_j
-    ## r: Probability of drawing doc_j, len / sum(len) across all docs
-    alpha = dataf |>
-        dplyr::pull({{ count_col }}) |>
-        sum()
-    r_df = dataf |>
-        dplyr::group_by({{ doc_col }}) |>
-        dplyr::summarize(len = sum({{ count_col }})) |>
-        dplyr::ungroup() |>
-        dplyr::mutate(r = .data$len / alpha)
+      ## Document lengths
+      ## len: Length of doc_j
+      ## r: Probability of drawing doc_j, len / sum(len) across all docs
+      alpha = dataf |>
+            dplyr::pull({{ count_col }}) |>
+            sum()
+      r_df = dataf |>
+            dplyr::group_by({{ doc_col }}) |>
+            dplyr::summarize(len = sum({{ count_col }})) |>
+            dplyr::ungroup() |>
+            dplyr::mutate(r = .data$len / alpha)
 
-    ## Termwise total occurrences
-    totals = dataf |>
-        dplyr::group_by({{ term_col }}) |>
-        dplyr::summarize(n_tot = sum({{ count_col }}))
+      ## Termwise total occurrences
+      totals = dataf |>
+            dplyr::group_by({{ term_col }}) |>
+            dplyr::summarize(n_tot = sum({{ count_col }}))
 
-    ## Conditional entropy for each term, and KL divergence wrt r/R
-    result = dataf |>
-        dplyr::left_join(r_df, by = rlang::as_name(rlang::enquo(doc_col))) |>
-        dplyr::left_join(totals, by = rlang::as_name(rlang::enquo(term_col))) |>
-        dplyr::mutate(p = {{ count_col }} / .data$n_tot,
-                      dR_term = .data$p * log2(.data$p / .data$r)) |>
-        dplyr::group_by({{ term_col }}) |>
-        dplyr::summarize(n = sum({{ count_col }}),
-                         dR = sum(.data$dR_term)) |>
-        dplyr::ungroup() |>
-        dplyr::mutate(ndR = log2(.data$n) * .data$dR) |>
-        dplyr::arrange(dplyr::desc(.data$ndR))
-    return(result)
+      ## Conditional entropy for each term, and KL divergence wrt r/R
+      result = dataf |>
+            dplyr::left_join(
+                  r_df,
+                  by = rlang::as_name(rlang::enquo(doc_col))
+            ) |>
+            dplyr::left_join(
+                  totals,
+                  by = rlang::as_name(rlang::enquo(term_col))
+            ) |>
+            dplyr::mutate(
+                  p = {{ count_col }} / .data$n_tot,
+                  dR_term = .data$p * log2(.data$p / .data$r)
+            ) |>
+            dplyr::group_by({{ term_col }}) |>
+            dplyr::summarize(
+                  n = sum({{ count_col }}),
+                  dR = sum(.data$dR_term)
+            ) |>
+            dplyr::ungroup() |>
+            dplyr::mutate(ndR = log2(.data$n) * .data$dR) |>
+            dplyr::arrange(dplyr::desc(.data$ndR))
+      return(result)
 }

@@ -1,11 +1,10 @@
 # TODO
 
+- test coverage for `R/renormalize.R`
+
 ## Vignettes
 
-- need to be updated in light of shift to softmax
-    - in particular, beta distributions need renormalization
-    -[X] simulated.Rmd
-- arXiv paper as well? 
+- update arXiv paper
 
 
 ## CRAN blockers
@@ -24,9 +23,5 @@
   `model`, `tm`). Fix: rename the first argument in each method to `x`.
 
 ### NOTEs
-- Many "no visible binding" warnings (`dH`, `doc`, `document`, `n`, `p`, etc.) — tidy eval
-  variables used bare inside `dplyr` verbs. Fix with `utils::globalVariables()` declaration
-  or `.data$` pronoun.
-- `TODO.md` at top level is non-standard. Can move to `inst/` or add to `.Rbuildignore`.
 - Some exported functions have incomplete or missing documentation; internal functions could
   use comments for future developers.

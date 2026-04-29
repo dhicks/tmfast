@@ -4,7 +4,7 @@
 \alias{tmfast}
 \title{Fit a topic model using PCA+varimax}
 \usage{
-tmfast(dtm, n, row = doc, column = word, value = n, verbose = FALSE, ...)
+tmfast(dtm, n, row = "doc", column = "word", value = "n", verbose = FALSE, ...)
 }
 \arguments{
 \item{dtm}{Document-term matrix.  Either an object inheriting from \code{Matrix} or a long dataframe representation with row column \code{row}, column column \code{column}, and value column \code{n}.}

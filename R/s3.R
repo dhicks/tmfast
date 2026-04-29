@@ -184,7 +184,13 @@ tidy.tmfast = function(
                   dplyr::mutate(beta = softmax(beta)) |>
                   dplyr::ungroup()
             if (!is.null(exponent)) {
-                  dataf = renorm(dataf, topic, beta, exponent, keep_original)
+                  dataf = renorm(
+                        dataf,
+                        .data$topic,
+                        beta,
+                        exponent,
+                        keep_original
+                  )
             }
             return(dataf)
       }
@@ -216,7 +222,7 @@ tidy.tmfast = function(
             if (!is.null(exponent)) {
                   dataf = renorm(
                         dataf,
-                        document,
+                        .data$document,
                         gamma,
                         exponent,
                         keep_original
