@@ -44,6 +44,10 @@ tsne.data.frame = function(
             ndocs = length(doc_ids)
             perplexity = min(30, floor((ndocs - 1) / 3) - 1)
       }
+      if (!requireNamespace("Rtsne", quietly = TRUE)) {
+            stop("Package 'Rtsne' is required for tsne(). ",
+                 "Install it with: install.packages('Rtsne')")
+      }
       fitted_tsne = x |>
             hellinger(id1 = 'document', prob1 = 'gamma') |>
             Rtsne::Rtsne(perplexity = perplexity, is_distance = TRUE)
@@ -101,6 +105,10 @@ umap = function(x, ...) {
 #' umap(h_gamma, df = TRUE)
 #' @export
 umap.matrix = function(x, include_data = FALSE, df = TRUE, ...) {
+      if (!requireNamespace("umap", quietly = TRUE)) {
+            stop("Package 'umap' is required for umap(). ",
+                 "Install it with: install.packages('umap')")
+      }
       embedding = umap::umap(x, input = 'dist', ...)
       if (!include_data) {
             embedding$data = NULL

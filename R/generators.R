@@ -69,13 +69,21 @@ draw_words = function(Ni, theta, phi) {
 #' @export
 #' @family generators
 draw_corpus = function(N, theta, phi) {
-      furrr::future_map_dfr(
-            1:length(N),
-            ~ draw_words(N[.x], theta[.x, ], phi),
-            .id = 'doc',
-            .options = furrr::furrr_options(seed = TRUE),
-            .progress = TRUE
-      ) |>
+      (if (requireNamespace("furrr", quietly = TRUE)) {
+            furrr::future_map_dfr(
+                  1:length(N),
+                  ~ draw_words(N[.x], theta[.x, ], phi),
+                  .id = 'doc',
+                  .options = furrr::furrr_options(seed = TRUE),
+                  .progress = TRUE
+            )
+      } else {
+            purrr::map_dfr(
+                  1:length(N),
+                  ~ draw_words(N[.x], theta[.x, ], phi),
+                  .id = 'doc'
+            )
+      }) |>
             dplyr::mutate(doc = as.integer(.data$doc))
 }
 
@@ -165,6 +173,10 @@ journal_specific = function(
             tibble::column_to_rownames('token') |>
             as.matrix()
       ## Use lpSolve to match fitted topics to true topics
+      if (!requireNamespace("lpSolve", quietly = TRUE)) {
+            stop("Package 'lpSolve' is required for journal_specific(). ",
+                 "Install it with: install.packages('lpSolve')")
+      }
       dist = hellinger(phi, t(beta_mx))
       soln = lpSolve::lp.assign(dist)
       phi_accuracy = hellinger(phi, soln$solution %*% t(beta_mx)) |>
