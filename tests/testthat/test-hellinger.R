@@ -55,7 +55,7 @@ test_that('Hellinger distance for data frames', {
     docs2 = paste0('doc', 26:50)
     half1 = dplyr::filter(gamma_df, document %in% docs1)
     half2 = dplyr::filter(gamma_df, document %in% docs2)
-    cross = hellinger(half1, prob1 = 'gamma', topicsdf2 = half2, prob2 = 'gamma')
+    cross = hellinger(half1, prob1 = 'gamma', topics2 = half2, prob2 = 'gamma')
     expect_equal(dim(cross), c(25L, 25L))
 
     ## df = TRUE → tidy dataframe; id cols renamed (both default to 'document')

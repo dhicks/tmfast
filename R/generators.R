@@ -177,7 +177,7 @@ journal_specific = function(
             theta_df,
             id1 = 'document',
             prob1 = 'prob',
-            topicsdf2 = gamma_df,
+            topics2 = gamma_df,
             id2 = 'document',
             prob2 = 'gamma',
             df = TRUE

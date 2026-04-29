@@ -9,29 +9,24 @@
 \usage{
 tsne(x, ...)
 
-\method{tsne}{data.frame}(gamma_df, doc_ids, perplexity = NULL, df = TRUE, ...)
+\method{tsne}{data.frame}(x, doc_ids, perplexity = NULL, df = TRUE, ...)
 
-\method{tsne}{tmfast}(tm, k, perplexity = NULL, df = TRUE, ...)
+\method{tsne}{tmfast}(x, k, perplexity = NULL, df = TRUE, ...)
 
-\method{tsne}{STM}(tm, doc_ids, perplexity = NULL, df = TRUE, ...)
+\method{tsne}{STM}(x, doc_ids, perplexity = NULL, df = TRUE, ...)
 }
 \arguments{
-\item{x}{Object to dispatch on}
+\item{x}{Fitted topic model (\code{tmfast} or \code{STM})}
 
 \item{...}{Passed to methods}
 
-\item{gamma_df}{Tidied document-topic gamma dataframe, as returned by
-\code{tidy(model, matrix = 'gamma')}}
-
-\item{doc_ids}{Vector of document IDs, in the same order as rows in \code{gamma_df}}
+\item{doc_ids}{Vector of document IDs, in the same order as rows in \code{x}}
 
 \item{perplexity}{Perplexity parameter for t-SNE. By default, minimum of 30
 and \code{floor((length(doc_ids) - 1)/3) - 1}.}
 
 \item{df}{Return a dataframe with columns \code{document}, \code{x}, and \code{y} (default)
 or the raw output of \code{Rtsne}.}
-
-\item{tm}{Fitted topic model (\code{tmfast} or \code{STM})}
 
 \item{k}{Number of topics}
 }

@@ -483,7 +483,7 @@ We can now assess accuracy of the topic-document distributions.  Above we used t
 ```{r}
 ## w/o renormalization, mean distance is .24
 hellinger(theta_df, doc, prob1 = theta,
-          topicsdf2 = gamma_df, 
+          topics2 = gamma_df,
           id2 = document, 
           prob2 = gamma, df = FALSE) |> 
     diag() |> 
@@ -491,7 +491,7 @@ hellinger(theta_df, doc, prob1 = theta,
 
 ## w/ renormalization, mean distance drops to .13
 doc_compare = hellinger(theta_df, doc, prob1 = theta,
-                        topicsdf2 = gamma_df, 
+                        topics2 = gamma_df,
                         id2 = document, 
                         prob2 = gamma_rn, df = TRUE)
 

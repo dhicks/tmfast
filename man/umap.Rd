@@ -9,18 +9,16 @@
 \usage{
 umap(x, ...)
 
-\method{umap}{matrix}(dist_mx, include_data = FALSE, df = TRUE, ...)
+\method{umap}{matrix}(x, include_data = FALSE, df = TRUE, ...)
 
-\method{umap}{tmfast}(model, k, ...)
+\method{umap}{tmfast}(x, k, ...)
 
-\method{umap}{STM}(tm, doc_ids, ...)
+\method{umap}{STM}(x, doc_ids, ...)
 }
 \arguments{
-\item{x}{Object to dispatch on}
+\item{x}{Fitted \code{STM} object}
 
 \item{...}{Passed to methods}
-
-\item{dist_mx}{Square distance matrix (documents x documents)}
 
 \item{include_data}{Return the distance matrix inside the umap object?
 Default \code{FALSE} to save memory.}
@@ -28,11 +26,7 @@ Default \code{FALSE} to save memory.}
 \item{df}{Return a tibble with columns \code{document}, \code{x}, and \code{y} (default) or
 the raw \code{umap} object.}
 
-\item{model}{\code{tmfast} object}
-
 \item{k}{Number of topics}
-
-\item{tm}{Fitted \code{STM} object}
 
 \item{doc_ids}{Character vector of document IDs}
 }

@@ -11,11 +11,3 @@
 ## CRAN blockers
 ---
 
-## Documentation issues
-(`devtools::check()` as of 2026-03-24)
-
-### WARNINGs
-- S3 generic/method consistency: `hellinger`, `umap`, and `tsne` generics use `function(x,
-  ...)` but methods use different first-argument names (`topicsdf1`, `mx1`, `dist_mx`,
-  `model`, `tm`). Fix: rename the first argument in each method to `x`.
-

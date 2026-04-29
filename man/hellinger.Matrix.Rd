@@ -4,12 +4,12 @@
 \alias{hellinger.Matrix}
 \title{Hellinger distance for matrices}
 \usage{
-\method{hellinger}{Matrix}(mx1, mx2 = NULL, ...)
+\method{hellinger}{Matrix}(topics1, topics2 = NULL, ...)
 }
 \arguments{
-\item{mx1}{First matrix, \eqn{n_1 \times k}}
+\item{topics1}{First matrix, \eqn{n_1 \times k}}
 
-\item{mx2}{Optional second matrix, \eqn{n_2 \times k}}
+\item{topics2}{Optional second matrix, \eqn{n_2 \times k}}
 
 \item{...}{Not used; required for S3 method compatibility}
 }
@@ -21,8 +21,8 @@ Calculates Hellinger distance for each pair of rows in the given matrix, or each
 }
 \examples{
 set.seed(2022-06-09)
-mx1 = rdirichlet(3, rep(5, 5))
-mx2 = rdirichlet(3, rep(5, 5))
-hellinger(mx1)
-hellinger(mx1, mx2)
+topics1 = rdirichlet(3, rep(5, 5))
+topics2 = rdirichlet(3, rep(5, 5))
+hellinger(topics1)
+hellinger(topics1, topics2)
 }

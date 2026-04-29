@@ -4,10 +4,10 @@
 \alias{hellinger}
 \title{Hellinger distances}
 \usage{
-hellinger(x, ...)
+hellinger(topics1, ...)
 }
 \arguments{
-\item{x}{Object to dispatch on}
+\item{topics1}{Object to dispatch on}
 
 \item{...}{Passed to methods}
 }

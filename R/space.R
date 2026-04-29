@@ -28,12 +28,12 @@ tsne = function(x, ...) {
 }
 
 #' @describeIn tsne Method for tidied gamma dataframes
-#' @param gamma_df Tidied document-topic gamma dataframe, as returned by
+#' @param x Tidied document-topic gamma dataframe, as returned by
 #'   `tidy(model, matrix = 'gamma')`
-#' @param doc_ids Vector of document IDs, in the same order as rows in `gamma_df`
+#' @param doc_ids Vector of document IDs, in the same order as rows in `x`
 #' @export
 tsne.data.frame = function(
-      gamma_df,
+      x,
       doc_ids,
       perplexity = NULL,
       df = TRUE,
@@ -44,7 +44,7 @@ tsne.data.frame = function(
             ndocs = length(doc_ids)
             perplexity = min(30, floor((ndocs - 1) / 3) - 1)
       }
-      fitted_tsne = gamma_df |>
+      fitted_tsne = x |>
             hellinger(id1 = 'document', prob1 = 'gamma') |>
             Rtsne::Rtsne(perplexity = perplexity, is_distance = TRUE)
       if (!df) {
@@ -57,20 +57,20 @@ tsne.data.frame = function(
             })
 }
 #' @describeIn tsne Method for fitted `tmfast` objects
-#' @param tm Fitted topic model (`tmfast` or `STM`)
+#' @param x Fitted topic model (`tmfast` or `STM`)
 #' @param k Number of topics
 #' @export
-tsne.tmfast = function(tm, k, perplexity = NULL, df = TRUE, ...) {
+tsne.tmfast = function(x, k, perplexity = NULL, df = TRUE, ...) {
       rlang::check_dots_empty()
-      doc_ids = rownames(scores(tm, k))
-      gamma_df = tidy(tm, k, matrix = 'gamma')
+      doc_ids = rownames(scores(x, k))
+      gamma_df = tidy(x, k, matrix = 'gamma')
       tsne.data.frame(gamma_df, doc_ids, perplexity, df)
 }
 #' @describeIn tsne Method for fitted `STM` objects
 #' @export
-tsne.STM = function(tm, doc_ids, perplexity = NULL, df = TRUE, ...) {
+tsne.STM = function(x, doc_ids, perplexity = NULL, df = TRUE, ...) {
       rlang::check_dots_empty()
-      gamma_df = tidy(tm, matrix = 'gamma')
+      gamma_df = tidy(x, matrix = 'gamma')
       tsne.data.frame(gamma_df, doc_ids, perplexity, df)
 }
 
@@ -91,7 +91,7 @@ umap = function(x, ...) {
 }
 
 #' @describeIn umap Method for distance matrices
-#' @param dist_mx Square distance matrix (documents x documents)
+#' @param x Square distance matrix (documents x documents)
 #' @param include_data Return the distance matrix inside the umap object?
 #'   Default `FALSE` to save memory.
 #' @examples
@@ -100,12 +100,12 @@ umap = function(x, ...) {
 #' h_gamma = hellinger(gamma)
 #' umap(h_gamma, df = TRUE)
 #' @export
-umap.matrix = function(dist_mx, include_data = FALSE, df = TRUE, ...) {
-      embedding = umap::umap(dist_mx, input = 'dist', ...)
+umap.matrix = function(x, include_data = FALSE, df = TRUE, ...) {
+      embedding = umap::umap(x, input = 'dist', ...)
       if (!include_data) {
             embedding$data = NULL
       }
-      rownames(embedding$layout) = rownames(dist_mx)
+      rownames(embedding$layout) = rownames(x)
       if (df) {
             embedding = embedding$layout |>
                   tibble::as_tibble(rownames = 'document', .name_repair = \(x) {
@@ -116,27 +116,27 @@ umap.matrix = function(dist_mx, include_data = FALSE, df = TRUE, ...) {
 }
 
 #' @describeIn umap Method for fitted `tmfast` objects
-#' @param model `tmfast` object
+#' @param x `tmfast` object
 #' @param k Number of topics
 #' @examples
 #' \dontrun{
 #' umap(fitted, 10, verbose = TRUE)
 #' }
 #' @export
-umap.tmfast = function(model, k, ...) {
-      distances = tidy(model, k, matrix = 'gamma') |>
+umap.tmfast = function(x, k, ...) {
+      distances = tidy(x, k, matrix = 'gamma') |>
             hellinger(prob1 = 'gamma', df = FALSE)
       embedding = umap.matrix(distances, ...)
       return(embedding)
 }
 
 #' @describeIn umap Method for fitted `STM` objects
-#' @param tm Fitted `STM` object
+#' @param x Fitted `STM` object
 #' @param doc_ids Character vector of document IDs
 #' @export
-umap.STM = function(tm, doc_ids, ...) {
-      k = ncol(tm$theta)
-      distances = tidy(tm, matrix = 'gamma') |>
+umap.STM = function(x, doc_ids, ...) {
+      k = ncol(x$theta)
+      distances = tidy(x, matrix = 'gamma') |>
             hellinger(prob1 = 'gamma', df = FALSE)
       rownames(distances) = doc_ids
       embedding = umap.matrix(distances, ...)

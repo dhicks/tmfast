@@ -5,11 +5,11 @@
 \title{Hellinger distance for dataframes}
 \usage{
 \method{hellinger}{data.frame}(
-  topicsdf1,
+  topics1,
   id1 = "document",
   cat1 = "topic",
   prob1 = "prob",
-  topicsdf2 = NULL,
+  topics2 = NULL,
   id2 = "document",
   cat2 = "topic",
   prob2 = "prob",
@@ -18,21 +18,21 @@
 )
 }
 \arguments{
-\item{topicsdf1}{First tidied topic model dataframe}
+\item{topics1}{First tidied topic model dataframe}
 
-\item{id1}{Unit identifier column in \code{topicsdf1} (DOIs, auids, ORU name, etc.)}
+\item{id1}{Unit identifier column in \code{topics1} (DOIs, auids, ORU name, etc.)}
 
-\item{cat1}{Category identifier column in \code{topicsdf1} (topics)}
+\item{cat1}{Category identifier column in \code{topics1} (topics)}
 
-\item{prob1}{Probability value column in \code{topicsdf1} (gamma)}
+\item{prob1}{Probability value column in \code{topics1} (gamma)}
 
-\item{topicsdf2}{Optional second tidied topic model dataframe}
+\item{topics2}{Optional second tidied topic model dataframe}
 
-\item{id2}{Unit identifier column in \code{topicsdf2}}
+\item{id2}{Unit identifier column in \code{topics2}}
 
-\item{cat2}{Category identifier column in \code{topicsdf2}}
+\item{cat2}{Category identifier column in \code{topics2}}
 
-\item{prob2}{Probability value column in \code{topicsdf2}}
+\item{prob2}{Probability value column in \code{topics2}}
 
 \item{df}{Should the function return the matrix of Hellinger distances (default) or a tidy dataframe?}
 
@@ -62,5 +62,5 @@ topics2 = rdirichlet(3, rep(5, 5)) |>
                         values_to = 'gamma')
 hellinger(topics1, doc_id, prob1 = 'gamma', df = TRUE)
 hellinger(topics1, doc_id, prob1 = 'gamma',
-          topicsdf2 = topics2, id2 = doc_id, prob2 = 'gamma')
+          topics2 = topics2, id2 = doc_id, prob2 = 'gamma')
 }

@@ -1,9 +1,9 @@
 #' Hellinger distances
 #'
-#' @param x Object to dispatch on
+#' @param topics1 Object to dispatch on
 #' @param ... Passed to methods
 #' @export
-hellinger = function(x, ...) {
+hellinger = function(topics1, ...) {
     UseMethod("hellinger")
 }
 
@@ -16,23 +16,23 @@ NULL
 #' Hellinger distance for matrices
 #'
 #' Calculates Hellinger distance for each pair of rows in the given matrix, or each combination of rows from the two matrices
-#' @param mx1 First matrix, \eqn{n_1 \times k}
-#' @param mx2 Optional second matrix, \eqn{n_2 \times k}
+#' @param topics1 First matrix, \eqn{n_1 \times k}
+#' @param topics2 Optional second matrix, \eqn{n_2 \times k}
 #' @param ... Not used; required for S3 method compatibility
 #' @returns Matrix of size \eqn{n_1 \times n_1} or \eqn{n_1 \times n_2}
 #' @export
 #' @examples
 #' set.seed(2022-06-09)
-#' mx1 = rdirichlet(3, rep(5, 5))
-#' mx2 = rdirichlet(3, rep(5, 5))
-#' hellinger(mx1)
-#' hellinger(mx1, mx2)
-hellinger.Matrix = function(mx1, mx2 = NULL, ...) {
+#' topics1 = rdirichlet(3, rep(5, 5))
+#' topics2 = rdirichlet(3, rep(5, 5))
+#' hellinger(topics1)
+#' hellinger(topics1, topics2)
+hellinger.Matrix = function(topics1, topics2 = NULL, ...) {
     rlang::check_dots_empty()
-    if (is.null(mx2)) {
-        crossed = 1 - tcrossprod(sqrt(mx1))
+    if (is.null(topics2)) {
+        crossed = 1 - tcrossprod(sqrt(topics1))
     } else {
-        crossed = 1 - tcrossprod(sqrt(mx1), sqrt(mx2))
+        crossed = 1 - tcrossprod(sqrt(topics1), sqrt(topics2))
     }
     crossed[which(crossed < 0)] = 0
     crossed = sqrt(crossed)
@@ -75,14 +75,14 @@ build_matrix = function(data, row, column, value, ..., sparse = TRUE) {
 #' Hellinger distance for dataframes
 #'
 #' Hellinger distances, either pairwise within a single tidied topic model dataframe or between two tidied topic model dataframes
-#' @param topicsdf1 First tidied topic model dataframe
-#' @param id1 Unit identifier column in `topicsdf1` (DOIs, auids, ORU name, etc.)
-#' @param cat1 Category identifier column in `topicsdf1` (topics)
-#' @param prob1 Probability value column in `topicsdf1` (gamma)
-#' @param topicsdf2 Optional second tidied topic model dataframe
-#' @param id2 Unit identifier column in `topicsdf2`
-#' @param cat2 Category identifier column in `topicsdf2`
-#' @param prob2 Probability value column in `topicsdf2`
+#' @param topics1 First tidied topic model dataframe
+#' @param id1 Unit identifier column in `topics1` (DOIs, auids, ORU name, etc.)
+#' @param cat1 Category identifier column in `topics1` (topics)
+#' @param prob1 Probability value column in `topics1` (gamma)
+#' @param topics2 Optional second tidied topic model dataframe
+#' @param id2 Unit identifier column in `topics2`
+#' @param cat2 Category identifier column in `topics2`
+#' @param prob2 Probability value column in `topics2`
 #' @param df Should the function return the matrix of Hellinger distances (default) or a tidy dataframe?
 #' @param ... Not used; required for S3 method compatibility
 #' @return matrix or tidy dataframe (default) of Hellinger distances
@@ -105,12 +105,12 @@ build_matrix = function(data, row, column, value, ..., sparse = TRUE) {
 #'                         values_to = 'gamma')
 #' hellinger(topics1, doc_id, prob1 = 'gamma', df = TRUE)
 #' hellinger(topics1, doc_id, prob1 = 'gamma',
-#'           topicsdf2 = topics2, id2 = doc_id, prob2 = 'gamma')
-hellinger.data.frame = function(topicsdf1,
+#'           topics2 = topics2, id2 = doc_id, prob2 = 'gamma')
+hellinger.data.frame = function(topics1,
                                 id1 = 'document',
                                 cat1 = 'topic',
                                 prob1 = 'prob',
-                                topicsdf2 = NULL,
+                                topics2 = NULL,
                                 id2 = 'document',
                                 cat2 = 'topic',
                                 prob2 = 'prob',
@@ -118,13 +118,13 @@ hellinger.data.frame = function(topicsdf1,
                                 ...) {
     rlang::check_dots_empty()
     id1 = rlang::enquo(id1)
-    matrix1 = build_matrix(topicsdf1, {{id1}}, {{cat1}}, {{prob1}},
+    matrix1 = build_matrix(topics1, {{id1}}, {{cat1}}, {{prob1}},
                            sparse = FALSE)
     id2 = rlang::enquo(id2)
-    if (is.null(topicsdf2)) {
+    if (is.null(topics2)) {
         hellinger_matrix = hellinger(matrix1)
     } else {
-        matrix2 = build_matrix(topicsdf2, {{id2}}, {{cat2}}, {{prob2}},
+        matrix2 = build_matrix(topics2, {{id2}}, {{cat2}}, {{prob2}},
                                sparse = FALSE)
         hellinger_matrix = hellinger(matrix1, matrix2)
     }
