@@ -16,6 +16,20 @@
 #' @return Numeric matrix of Hellinger distances. Dimensions are k1 × k1 when
 #'   `beta2 = NULL`, or k1 × k2 when two beta dataframes are supplied, where
 #'   k1 and k2 are the number of topics in each model.
+#' @examples
+#' set.seed(42)
+#' vocab = letters[1:5]
+#' make_beta = function(k) {
+#'   rdirichlet(k, rep(1, length(vocab))) |>
+#'     tibble::as_tibble(.name_repair = ~vocab) |>
+#'     dplyr::mutate(topic = paste0('t', dplyr::row_number())) |>
+#'     tidyr::pivot_longer(-topic, names_to = 'token', values_to = 'beta')
+#' }
+#' beta1 = make_beta(3)
+#' beta2 = make_beta(4)
+#' compare_betas(beta1, vocab = vocab)
+#' compare_betas(beta1, beta2, vocab = vocab)
+#' @export
 compare_betas = function(beta1, beta2 = NULL, vocab) {
       fill = function(beta) {
             beta |>

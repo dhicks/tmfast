@@ -19,3 +19,11 @@ A long dataframe, with one row per word-topic or topic-doc combination. Column n
 \description{
 Extract gamma or beta matrices for all topics
 }
+\examples{
+set.seed(42)
+dtm = matrix(rpois(50 * 20, lambda = 3), nrow = 50,
+             dimnames = list(paste0('doc', 1:50), paste0('w', 1:20))) |>
+      Matrix::Matrix(sparse = TRUE)
+model = tmfast(dtm, n = c(3, 4))
+tidy_all(model, matrix = 'beta')
+}

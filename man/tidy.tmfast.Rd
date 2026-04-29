@@ -41,3 +41,12 @@ Extract beta and gamma matrices from \code{tmfast} objects
 \details{
 If \code{rotation} is not \code{NULL}, loadings/scores will be rotated.  This might be used to align the fitted topics with known true topics, as in the \code{journal_specific} simulation.  Loadings are left-multiplied by the given rotation, while scores are right-multiplied by the transpose of the given rotation.
 }
+\examples{
+set.seed(42)
+dtm = matrix(rpois(50 * 20, lambda = 3), nrow = 50,
+             dimnames = list(paste0('doc', 1:50), paste0('w', 1:20))) |>
+      Matrix::Matrix(sparse = TRUE)
+model = tmfast(dtm, n = 3)
+tidy(model, k = 3, matrix = 'beta')
+tidy(model, k = 3, matrix = 'gamma')
+}

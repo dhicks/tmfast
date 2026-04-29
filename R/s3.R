@@ -80,6 +80,16 @@ rotation.varimaxes = function(x, k, ...) {
 #'   on demand.
 #' @param ... Not used; included for S3 method compatibility.
 #' @return Matrix of PCA scores (n_obs x max_k)
+#' @examples
+#' set.seed(42)
+#' dtm = matrix(rpois(50 * 20, lambda = 3), nrow = 50,
+#'              dimnames = list(paste0('doc', 1:50), paste0('w', 1:20))) |>
+#'       Matrix::Matrix(sparse = TRUE)
+#' model = tmfast(dtm, n = 3)
+#' newdocs = matrix(rpois(5 * 20, lambda = 3), nrow = 5,
+#'                  dimnames = list(paste0('new', 1:5), paste0('w', 1:20))) |>
+#'           Matrix::Matrix(sparse = TRUE)
+#' predict(model, newdocs)
 #' @importFrom stats predict
 #' @export
 predict.varimaxes = function(object, newdata, ...) {
@@ -138,6 +148,14 @@ generics::tidy
 #' @param ... Not used; required for S3 method compatibility
 #' @return A long dataframe, with one row per word-topic or topic-doc combination. Column names depend on the value of `matrix`.
 #' @details If `rotation` is not `NULL`, loadings/scores will be rotated.  This might be used to align the fitted topics with known true topics, as in the `journal_specific` simulation.  Loadings are left-multiplied by the given rotation, while scores are right-multiplied by the transpose of the given rotation.
+#' @examples
+#' set.seed(42)
+#' dtm = matrix(rpois(50 * 20, lambda = 3), nrow = 50,
+#'              dimnames = list(paste0('doc', 1:50), paste0('w', 1:20))) |>
+#'       Matrix::Matrix(sparse = TRUE)
+#' model = tmfast(dtm, n = 3)
+#' tidy(model, k = 3, matrix = 'beta')
+#' tidy(model, k = 3, matrix = 'gamma')
 #' @export
 tidy.tmfast = function(
       x,
@@ -239,6 +257,13 @@ tidy.tmfast = function(
 #' @param matrix Desired matrix, `'beta'` or `'gamma'`
 #' @param ... Other arguments, passed to `tidy.tmfast()`
 #' @return A long dataframe, with one row per word-topic or topic-doc combination. Column names depend on the value of `matrix`.
+#' @examples
+#' set.seed(42)
+#' dtm = matrix(rpois(50 * 20, lambda = 3), nrow = 50,
+#'              dimnames = list(paste0('doc', 1:50), paste0('w', 1:20))) |>
+#'       Matrix::Matrix(sparse = TRUE)
+#' model = tmfast(dtm, n = c(3, 4))
+#' tidy_all(model, matrix = 'beta')
 #' @export
 tidy_all = function(x, matrix = 'beta', ...) {
       k = x$n |>

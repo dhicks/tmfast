@@ -31,3 +31,14 @@ this can be a substantial memory hazard. This mirrors the behavior of \code{prco
 itself, which is why PCA scores are computed once at fit time and not re-projected
 on demand.
 }
+\examples{
+set.seed(42)
+dtm = matrix(rpois(50 * 20, lambda = 3), nrow = 50,
+             dimnames = list(paste0('doc', 1:50), paste0('w', 1:20))) |>
+      Matrix::Matrix(sparse = TRUE)
+model = tmfast(dtm, n = 3)
+newdocs = matrix(rpois(5 * 20, lambda = 3), nrow = 5,
+                 dimnames = list(paste0('new', 1:5), paste0('w', 1:20))) |>
+          Matrix::Matrix(sparse = TRUE)
+predict(model, newdocs)
+}

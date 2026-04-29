@@ -29,3 +29,17 @@ Computes pairwise Hellinger distances between topics from one or two fitted
 models. Tokens missing from a beta dataframe are filled with probability 0
 before comparison, so both models need not share the same vocabulary.
 }
+\examples{
+set.seed(42)
+vocab = letters[1:5]
+make_beta = function(k) {
+  rdirichlet(k, rep(1, length(vocab))) |>
+    tibble::as_tibble(.name_repair = ~vocab) |>
+    dplyr::mutate(topic = paste0('t', dplyr::row_number())) |>
+    tidyr::pivot_longer(-topic, names_to = 'token', values_to = 'beta')
+}
+beta1 = make_beta(3)
+beta2 = make_beta(4)
+compare_betas(beta1, vocab = vocab)
+compare_betas(beta1, beta2, vocab = vocab)
+}
