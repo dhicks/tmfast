@@ -19,6 +19,7 @@ In this vignette, we demonstrate a basic workflow using `tmfast`to fit topic mod
 library(dplyr)
 library(tidyr)
 library(tibble)
+library(purrr)
 library(stringr)
 library(ggplot2)
 library(lpSolve) # For matching fitted and trust topics
