@@ -2,15 +2,68 @@
 % Please edit documentation in R/space.R
 \name{tsne}
 \alias{tsne}
+\alias{tsne.data.frame}
+\alias{tsne.tmfast}
+\alias{tsne.STM}
 \title{Discursive space using t-SNE}
 \usage{
 tsne(x, ...)
+
+\method{tsne}{data.frame}(gamma_df, doc_ids, perplexity = NULL, df = TRUE, ...)
+
+\method{tsne}{tmfast}(tm, k, perplexity = NULL, df = TRUE, ...)
+
+\method{tsne}{STM}(tm, doc_ids, perplexity = NULL, df = TRUE, ...)
 }
 \arguments{
 \item{x}{Object to dispatch on}
 
 \item{...}{Passed to methods}
+
+\item{gamma_df}{Tidied document-topic gamma dataframe, as returned by
+\code{tidy(model, matrix = 'gamma')}}
+
+\item{doc_ids}{Vector of document IDs, in the same order as rows in \code{gamma_df}}
+
+\item{perplexity}{Perplexity parameter for t-SNE. By default, minimum of 30
+and \code{floor((length(doc_ids) - 1)/3) - 1}.}
+
+\item{df}{Return a dataframe with columns \code{document}, \code{x}, and \code{y} (default)
+or the raw output of \code{Rtsne}.}
+
+\item{tm}{Fitted topic model (\code{tmfast} or \code{STM})}
+
+\item{k}{Number of topics}
+}
+\value{
+See \code{df}
 }
 \description{
-Discursive space using t-SNE
+2-dimensional "discursive space" representation of relationships between
+documents using Hellinger distances and t-SNE.
+}
+\details{
+Algorithm checks distances to 3*perplexity nearest neighbors. Rtsne
+loses rownames (document IDs); these are either extracted from the \code{tmfast}
+object or passed separately for an \code{STM} object. Use \code{set.seed()} before
+calling for reproducibility.
+}
+\section{Methods (by class)}{
+\itemize{
+\item \code{tsne(data.frame)}: Method for tidied gamma dataframes
+
+\item \code{tsne(tmfast)}: Method for fitted \code{tmfast} objects
+
+\item \code{tsne(STM)}: Method for fitted \code{STM} objects
+
+}}
+\examples{
+\dontrun{
+## From the real books vignette
+set.seed(42)
+tsne(fitted_tmf, k = 4, df = TRUE) |>
+    left_join(meta, by = c('document' = 'book')) |>
+    ggplot(aes(x, y, color = author)) +
+    geom_point()
+}
 }

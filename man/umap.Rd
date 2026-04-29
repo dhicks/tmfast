@@ -2,15 +2,63 @@
 % Please edit documentation in R/space.R
 \name{umap}
 \alias{umap}
+\alias{umap.matrix}
+\alias{umap.tmfast}
+\alias{umap.STM}
 \title{Discursive space using UMAP}
 \usage{
 umap(x, ...)
+
+\method{umap}{matrix}(dist_mx, include_data = FALSE, df = TRUE, ...)
+
+\method{umap}{tmfast}(model, k, ...)
+
+\method{umap}{STM}(tm, doc_ids, ...)
 }
 \arguments{
 \item{x}{Object to dispatch on}
 
 \item{...}{Passed to methods}
+
+\item{dist_mx}{Square distance matrix (documents x documents)}
+
+\item{include_data}{Return the distance matrix inside the umap object?
+Default \code{FALSE} to save memory.}
+
+\item{df}{Return a tibble with columns \code{document}, \code{x}, and \code{y} (default) or
+the raw \code{umap} object.}
+
+\item{model}{\code{tmfast} object}
+
+\item{k}{Number of topics}
+
+\item{tm}{Fitted \code{STM} object}
+
+\item{doc_ids}{Character vector of document IDs}
+}
+\value{
+Tibble with columns \code{document}, \code{x}, \code{y} when \code{df = TRUE}; otherwise
+an object of class \code{umap} with components \code{layout}, \code{knn}, and \code{config}.
 }
 \description{
-2-dimensional "discursive space" representation of relationships between documents using Hellinger distances and UMAP
+2-dimensional "discursive space" representation of relationships between
+documents using Hellinger distances and UMAP.
+}
+\section{Methods (by class)}{
+\itemize{
+\item \code{umap(matrix)}: Method for distance matrices
+
+\item \code{umap(tmfast)}: Method for fitted \code{tmfast} objects
+
+\item \code{umap(STM)}: Method for fitted \code{STM} objects
+
+}}
+\examples{
+gamma = rdirichlet(26, 1, 5)
+rownames(gamma) = letters
+h_gamma = hellinger(gamma)
+umap(h_gamma, df = TRUE)
+\dontrun{
+umap(fitted, 10, verbose = TRUE)
+}
 }
