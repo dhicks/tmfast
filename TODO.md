@@ -2,6 +2,9 @@
 
 - test coverage for `R/renormalize.R`
 
+- exclude `TODO.md` from `pkgdown`
+    - see <https://github.com/r-lib/pkgdown/issues/2959>
+
 ## Vignettes
 
 - update arXiv paper

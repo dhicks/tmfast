@@ -1,15 +1,15 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://dhicks.github.io/tmfast/404.html</loc></url>
-<url><loc>https://dhicks.github.io/tmfast/LICENSE-text.html</loc></url>
 <url><loc>https://dhicks.github.io/tmfast/LICENSE.html</loc></url>
 <url><loc>https://dhicks.github.io/tmfast/TODO.html</loc></url>
 <url><loc>https://dhicks.github.io/tmfast/articles/index.html</loc></url>
 <url><loc>https://dhicks.github.io/tmfast/articles/realbooks.html</loc></url>
 <url><loc>https://dhicks.github.io/tmfast/articles/simulated.html</loc></url>
-<url><loc>https://dhicks.github.io/tmfast/articles/test 2.html</loc></url>
 <url><loc>https://dhicks.github.io/tmfast/authors.html</loc></url>
 <url><loc>https://dhicks.github.io/tmfast/index.html</loc></url>
+<url><loc>https://dhicks.github.io/tmfast/news/index.html</loc></url>
 <url><loc>https://dhicks.github.io/tmfast/reference/build_matrix.html</loc></url>
+<url><loc>https://dhicks.github.io/tmfast/reference/compare_betas.html</loc></url>
 <url><loc>https://dhicks.github.io/tmfast/reference/draw_a_word.html</loc></url>
 <url><loc>https://dhicks.github.io/tmfast/reference/draw_corpus.html</loc></url>
 <url><loc>https://dhicks.github.io/tmfast/reference/draw_words.html</loc></url>
@@ -23,10 +23,10 @@
 <url><loc>https://dhicks.github.io/tmfast/reference/insert_topics.html</loc></url>
 <url><loc>https://dhicks.github.io/tmfast/reference/journal_specific.html</loc></url>
 <url><loc>https://dhicks.github.io/tmfast/reference/loadings.html</loc></url>
-<url><loc>https://dhicks.github.io/tmfast/reference/make_colnames.html</loc></url>
 <url><loc>https://dhicks.github.io/tmfast/reference/ndH.html</loc></url>
 <url><loc>https://dhicks.github.io/tmfast/reference/ndR.html</loc></url>
 <url><loc>https://dhicks.github.io/tmfast/reference/peak_alpha.html</loc></url>
+<url><loc>https://dhicks.github.io/tmfast/reference/predict.varimaxes.html</loc></url>
 <url><loc>https://dhicks.github.io/tmfast/reference/rdirichlet.html</loc></url>
 <url><loc>https://dhicks.github.io/tmfast/reference/reexports.html</loc></url>
 <url><loc>https://dhicks.github.io/tmfast/reference/renorm.html</loc></url>

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">tmfast</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.2026-03-22</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.2026-04-28</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -21,6 +21,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/realbooks.html">Fast topic modeling with real books</a></li>
     <li><a class="dropdown-item" href="../articles/simulated.html">Fitting topic models (and simulating text data) with `tmfast`</a></li>
   </ul></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/dhicks/tmfast/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
@@ -64,7 +65,7 @@
 
 
 <dt id="arg-pca">pca<a class="anchor" aria-label="anchor" href="#arg-pca"></a></dt>
-<dd><p>Fitted PCA model</p></dd>
+<dd><p>Fitted PCA model or <code>varimaxes</code> object</p></dd>
 
 
 <dt id="arg-feature-names">feature_names<a class="anchor" aria-label="anchor" href="#arg-feature-names"></a></dt>
@@ -88,7 +89,7 @@
 
 
 <dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>Original data matrix; passed here if not included in <code>pca</code> (eg, via <code>retx = TRUE</code>)</p></dd>
+<dd><p>PCA scores matrix (n_obs x max_k), as returned by <code>predict(fitted, newdata)</code>. Used when the fitted <code>pca</code> object does not contain scores.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -100,7 +101,9 @@
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>After the initial rotation, factors with negative skew (left tails) are flipped</p>
+    <p>After the initial rotation, factors with negative skew (left tails) are flipped
+<code>pca</code> must contain <code>$rotation</code> (feature loadings matrix) and <code>$sdev</code> (standard deviations
+per PC); <code>$x</code> (PC scores matrix) is also required unless <code>x</code> is supplied directly.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

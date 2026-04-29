@@ -24,12 +24,13 @@ reference:
   - ndH
   - ndR
 - title: tmfast
-  desc: Fitting "topic models" with PCA+varimax
+  desc: Fitting topic models with PCA+varimax
   contents:
   - tmfast
   - insert_topics
   - varimax_irlba
   - fit_varimax
+  - predict.varimaxes
 - title: Tidiers
   desc: Extract beta and gamma matrices from `tmfast` objects
   contents:
@@ -44,6 +45,7 @@ reference:
   desc:  Calculate Hellinger distances between distributions
   contents:
   - starts_with('hellinger')
+  - compare_betas
 
 - title: Discursive space visualizations
   contents:
@@ -58,7 +60,6 @@ reference:
   - starts_with('loadings')
   - starts_with('scores')
   - starts_with('rotation')
-  - make_colnames
 
 - title: Package
   contents:

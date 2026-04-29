@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">tmfast</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.2026-03-22</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.2026-04-28</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -21,6 +21,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/realbooks.html">Fast topic modeling with real books</a></li>
     <li><a class="dropdown-item" href="../articles/simulated.html">Fitting topic models (and simulating text data) with `tmfast`</a></li>
   </ul></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/dhicks/tmfast/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
@@ -69,6 +70,14 @@
 <dd><p>Number of documents from each journal</p></dd>
 
 
+<dt id="arg-topic-peak">topic_peak<a class="anchor" aria-label="anchor" href="#arg-topic-peak"></a></dt>
+<dd><p>Peak value for the asymmetric Dirichlet prior for true topic-doc distributions</p></dd>
+
+
+<dt id="arg-topic-scale">topic_scale<a class="anchor" aria-label="anchor" href="#arg-topic-scale"></a></dt>
+<dd><p>Scale for the asymmetric Dirichlet prior for true topic-doc distributions</p></dd>
+
+
 <dt id="arg-word-beta">word_beta<a class="anchor" aria-label="anchor" href="#arg-word-beta"></a></dt>
 <dd><p>Parameter for the symmetric Dirichlet prior for true word-doc distributions</p></dd>
 
@@ -77,20 +86,20 @@
 <dd><p>Size of the vocabulary</p></dd>
 
 
+<dt id="arg-size">size<a class="anchor" aria-label="anchor" href="#arg-size"></a></dt>
+<dd><p>Size parameter for the negative binomial distribution of document lengths</p></dd>
+
+
+<dt id="arg-mu">mu<a class="anchor" aria-label="anchor" href="#arg-mu"></a></dt>
+<dd><p>Mean parameter for the negative binomial distribution of document lengths</p></dd>
+
+
 <dt id="arg-bigjournal">bigjournal<a class="anchor" aria-label="anchor" href="#arg-bigjournal"></a></dt>
 <dd><p>Should the first journal have documents 10x as long (on average) as the others?</p></dd>
 
 
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
 <dd><p>When TRUE, sends messages about the progress of the simulation</p></dd>
-
-
-<dt id="arg-topic-peak-topic-scale">topic_peak, topic_scale<a class="anchor" aria-label="anchor" href="#arg-topic-peak-topic-scale"></a></dt>
-<dd><p>Parameters for the asymmetric Dirichlet prior for true topic-doc distributions</p></dd>
-
-
-<dt id="arg-size-mu">size, mu<a class="anchor" aria-label="anchor" href="#arg-size-mu"></a></dt>
-<dd><p>Parameters for the negative binomial distribution of document lengths</p></dd>
 
 </dl></div>
     <div class="section level2">

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">tmfast</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.2026-04-20</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.2026-04-28</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,12 +39,11 @@
 
 <div id="todo" class="section level1">
 
-<div class="section level2">
+<ul><li>test coverage for <code>R/renormalize.R</code>
+</li>
+</ul><div class="section level2">
 <h2 id="vignettes">Vignettes<a class="anchor" aria-label="anchor" href="#vignettes"></a></h2>
-<ul><li>need to be updated in light of shift to softmax
-<ul><li>in particular, beta distributions need renormalization -[X] simulated.Rmd</li>
-</ul></li>
-<li>arXiv paper as well?</li>
+<ul><li>update arXiv paper</li>
 </ul></div>
 <div class="section level2">
 <h2 id="id_-cran-blockers">## CRAN blockers<a class="anchor" aria-label="anchor" href="#id_-cran-blockers"></a></h2>
@@ -60,10 +59,7 @@
 </ul></div>
 <div class="section level3">
 <h3 id="notes">NOTEs<a class="anchor" aria-label="anchor" href="#notes"></a></h3>
-<ul><li>Many “no visible binding” warnings (<code>dH</code>, <code>doc</code>, <code>document</code>, <code>n</code>, <code>p</code>, etc.) — tidy eval variables used bare inside <code>dplyr</code> verbs. Fix with <code><a href="https://rdrr.io/r/utils/globalVariables.html" class="external-link">utils::globalVariables()</a></code> declaration or <code>.data$</code> pronoun.</li>
-<li>
-<code>TODO.md</code> at top level is non-standard. Can move to <code>inst/</code> or add to <code>.Rbuildignore</code>.</li>
-<li>Some exported functions have incomplete or missing documentation; internal functions could use comments for future developers.</li>
+<ul><li>Some exported functions have incomplete or missing documentation; internal functions could use comments for future developers.</li>
 </ul></div>
 </div>
 </div>
