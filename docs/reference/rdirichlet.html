@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">tmfast</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.2026-04-28</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.2026-04-29</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,28 +80,28 @@ If length 1, assumes symmetric Dirichlet; <code>k</code> must not be null</p></d
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>  <span class="fu">rdirichlet</span><span class="op">(</span><span class="fl">10</span>, <span class="fl">.1</span>, <span class="fl">5</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>               [,1]         [,2]         [,3]         [,4]         [,5]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 1.532803e-12 2.169466e-06 7.406266e-01 2.593712e-01 2.624708e-08</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] 9.977698e-01 2.041237e-03 7.547927e-05 8.240927e-07 1.126776e-04</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] 9.046657e-05 9.149266e-12 1.369167e-17 6.126945e-06 9.999034e-01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] 1.644043e-02 6.617479e-04 1.413637e-03 3.338899e-04 9.811503e-01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] 7.659434e-03 9.048060e-03 3.313666e-01 6.519259e-01 8.077258e-10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] 1.145890e-04 7.392255e-02 3.694376e-07 9.259611e-01 1.395315e-06</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] 7.163768e-09 2.523227e-07 9.276730e-01 7.220412e-02 1.226443e-04</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] 9.785355e-01 1.145658e-03 4.768537e-03 1.554207e-02 8.257981e-06</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] 2.071258e-03 9.659243e-01 1.175474e-02 2.024974e-02 1.213172e-11</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10,] 9.647006e-02 2.556884e-03 1.855148e-02 5.378448e-01 3.445768e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 5.071567e-04 5.582769e-08 4.570383e-10 9.994928e-01 2.260864e-08</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] 2.957701e-01 4.105868e-01 9.182457e-04 5.023741e-02 2.424874e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] 2.329585e-02 1.409179e-19 8.873328e-01 6.110969e-07 8.937078e-02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] 9.909146e-01 2.356654e-09 1.369088e-08 9.083787e-03 1.624780e-06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] 4.908405e-02 8.272385e-01 3.162313e-03 1.152631e-01 5.252029e-03</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] 1.060480e-01 6.778384e-05 8.081440e-01 8.489166e-02 8.485468e-04</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] 4.082384e-01 2.796672e-01 1.590733e-01 1.530211e-01 1.057206e-12</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] 3.864185e-13 1.461245e-04 9.072749e-01 9.591006e-06 9.256938e-02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] 2.935170e-04 3.527584e-01 1.964353e-01 4.502104e-01 3.023284e-04</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [10,] 1.009150e-03 3.520542e-05 2.442496e-01 5.067560e-05 7.546554e-01</span>
 <span class="r-in"><span>  <span class="fu">rdirichlet</span><span class="op">(</span><span class="fl">10</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">.8</span>, <span class="fl">.1</span>, <span class="fl">.1</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             [,1]         [,2]         [,3]</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 0.89489435 1.051047e-01 9.937702e-07</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] 0.99999997 2.546939e-08 5.208616e-16</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] 0.99995797 4.202902e-05 2.243478e-16</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] 0.86415746 1.231873e-01 1.265520e-02</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] 0.05493031 6.767110e-01 2.683587e-01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] 0.14377540 8.483355e-01 7.889068e-03</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] 0.97931985 1.905010e-02 1.630049e-03</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] 0.27276990 4.473032e-02 6.824998e-01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] 0.85135935 1.486406e-01 5.826725e-09</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10,] 0.96300713 8.924995e-03 2.806787e-02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            [,1]         [,2]         [,3]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,] 0.9989931 4.569611e-04 5.499605e-04</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,] 0.9863030 1.369196e-02 5.055577e-06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] 0.9766773 1.779894e-02 5.523789e-03</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] 0.9837678 2.822720e-07 1.623191e-02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] 0.9844800 1.546674e-02 5.324203e-05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,] 0.9542920 4.569957e-02 8.455559e-06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,] 0.1216107 5.367906e-07 8.783888e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,] 0.5552514 4.407998e-01 3.948873e-03</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,] 0.9649433 1.618000e-05 3.504047e-02</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [10,] 0.5436980 4.541715e-01 2.130510e-03</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

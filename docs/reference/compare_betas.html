@@ -11,7 +11,7 @@ before comparison, so both models need not share the same vocabulary."></head><b
 
     <a class="navbar-brand me-2" href="../index.html">tmfast</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.2026-04-28</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.2026-04-29</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -82,6 +82,32 @@ probability 0.</p></dd>
 k1 and k2 are the number of topics in each model.</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">vocab</span> <span class="op">=</span> <span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">make_beta</span> <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">k</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="rdirichlet.html">rdirichlet</a></span><span class="op">(</span><span class="va">k</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">vocab</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>    <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span>.name_repair <span class="op">=</span> <span class="op">~</span><span class="va">vocab</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>topic <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">'t'</span>, <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/row_number.html" class="external-link">row_number</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>    <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span><span class="op">-</span><span class="va">topic</span>, names_to <span class="op">=</span> <span class="st">'token'</span>, values_to <span class="op">=</span> <span class="st">'beta'</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span><span class="va">beta1</span> <span class="op">=</span> <span class="fu">make_beta</span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">beta2</span> <span class="op">=</span> <span class="fu">make_beta</span><span class="op">(</span><span class="fl">4</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">compare_betas</span><span class="op">(</span><span class="va">beta1</span>, vocab <span class="op">=</span> <span class="va">vocab</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 x 3 Matrix of class "dgeMatrix"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           t1           t2        t3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> t1 0.0000000 5.934778e-01 0.2699147</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> t2 0.5934778 1.825012e-08 0.4786181</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> t3 0.2699147 4.786181e-01 0.0000000</span>
+<span class="r-in"><span><span class="fu">compare_betas</span><span class="op">(</span><span class="va">beta1</span>, <span class="va">beta2</span>, vocab <span class="op">=</span> <span class="va">vocab</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 x 4 Matrix of class "dgeMatrix"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           t1        t2        t3        t4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> t1 0.3477229 0.3744788 0.3449200 0.6172048</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> t2 0.4991166 0.3211290 0.4987743 0.4733966</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> t3 0.2468361 0.2657232 0.2429489 0.4208010</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

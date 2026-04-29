@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">tmfast</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.2026-04-28</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.2026-04-29</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -81,6 +81,25 @@ itself, which is why PCA scores are computed once at fit time and not re-project
 on demand.</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">dtm</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span><span class="fl">50</span> <span class="op">*</span> <span class="fl">20</span>, lambda <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">50</span>,</span></span>
+<span class="r-in"><span>             dimnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">'doc'</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">50</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">'w'</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>      <span class="fu">Matrix</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/Matrix.html" class="external-link">Matrix</a></span><span class="op">(</span>sparse <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">model</span> <span class="op">=</span> <span class="fu"><a href="tmfast.html">tmfast</a></span><span class="op">(</span><span class="va">dtm</span>, n <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">newdocs</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span><span class="fl">5</span> <span class="op">*</span> <span class="fl">20</span>, lambda <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">5</span>,</span></span>
+<span class="r-in"><span>                 dimnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">'new'</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">'w'</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>          <span class="fu">Matrix</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/Matrix.html" class="external-link">Matrix</a></span><span class="op">(</span>sparse <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">newdocs</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             PC1        PC2        PC3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> new1  0.2258281  0.4576578 -1.7488032</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> new2  2.3028337 -0.1419313  3.0613022</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> new3  0.1053719  0.2918948 -1.3574614</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> new4 -0.7096987 -0.5643858 -1.8293312</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> new5  0.2224496 -0.8920900  0.2413426</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">tmfast</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.2026-04-28</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.2026-04-29</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -319,7 +319,7 @@ substantially on exactly one factor (topic).&lt;/p&gt;'><sup>1</sup></a></p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">tic</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">fitted</span> <span class="op">=</span> <span class="fu"><a href="../reference/tmfast.html">tmfast</a></span><span class="op">(</span><span class="va">dtm</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span>, <span class="va">k</span>, <span class="fl">2</span> <span class="op">*</span> <span class="va">k</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## 0.236 sec elapsed</span></span></code></pre>
+<pre><code><span><span class="co">## 0.195 sec elapsed</span></span></code></pre>
 <p>The object returned by <code><a href="../reference/tmfast.html">tmfast()</a></code> has a simple structure.
 <code>totalvar</code> and <code>sdev</code> come from the PCA step,
 giving the total variance across all feature variables and the standard
@@ -426,7 +426,7 @@ seconds, about an order of magnitude slower than
 <span>      <span class="fu"><a href="https://juliasilge.github.io/tidytext/reference/cast_sparse.html" class="external-link">cast_sparse</a></span><span class="op">(</span><span class="va">doc</span>, <span class="va">word</span>, <span class="va">n</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>      <span class="fu"><a href="https://rdrr.io/pkg/stm/man/stm.html" class="external-link">stm</a></span><span class="op">(</span>K <span class="op">=</span> <span class="va">k</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/tictoc/man/tic.html" class="external-link">toc</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## 1.966 sec elapsed</span></span></code></pre>
+<pre><code><span><span class="co">## 1.772 sec elapsed</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 id="assessing-accuracy">Assessing accuracy<a class="anchor" aria-label="anchor" href="#assessing-accuracy"></a>
