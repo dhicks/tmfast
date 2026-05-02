@@ -62,10 +62,32 @@ draw_words = function(Ni, theta, phi) {
 }
 
 #' Draw a collection of documents
+#'
 #' @param N Length of documents
 #' @param theta Topic distribution for all documents, \eqn{n \times k} matrix
 #' @param phi Word distribution for all topics, \eqn{k \times v} matrix
 #' @return Document-term matrix, as a tibble, with columns `doc`, `word`, and `n`
+#' @details
+#' Standard pattern for generating a simulated DTM suitable for `tmfast()`:
+#' ```r
+#' set.seed(42)
+#' theta  = rdirichlet(n_docs,   alpha = 1,   k = n_topics)
+#' phi    = rdirichlet(n_topics, alpha = 0.1, k = vocab_size)
+#' corpus = draw_corpus(rep(doc_length, n_docs), theta, phi)
+#' model  = tmfast(corpus, n = n_topics)
+#' ```
+#' `alpha = 1` for `theta` gives uniform topic mixing; `alpha = 0.1` for `phi`
+#' gives sparse, topic-specific word distributions.  `doc_length` should be large
+#' enough that the full vocabulary is likely to appear (50–200 words per document
+#' is typical for a small simulated example).
+#' @examples
+#' \donttest{
+#' set.seed(42)
+#' theta  = rdirichlet(30, 1, k = 3)
+#' phi    = rdirichlet(3, 0.1, k = 20)
+#' corpus = draw_corpus(rep(50L, 30), theta, phi)
+#' head(corpus)
+#' }
 #' @export
 #' @family generators
 draw_corpus = function(N, theta, phi) {

@@ -81,16 +81,17 @@ rotation.varimaxes = function(x, k, ...) {
 #' @param ... Not used; included for S3 method compatibility.
 #' @return Matrix of PCA scores (n_obs x max_k)
 #' @examples
+#' \donttest{
 #' set.seed(42)
-#' phi     = rdirichlet(3, alpha = 0.1, k = 20)
-#' dtm     = Matrix::Matrix(round(100 * rdirichlet(50, 0.1, k = 3) %*% phi),
-#'                          sparse = TRUE,
-#'                          dimnames = list(paste0('doc', 1:50), paste0('w', 1:20)))
-#' model   = tmfast(dtm, n = 3)
-#' newdocs = Matrix::Matrix(round(100 * rdirichlet(5, 0.1, k = 3) %*% phi),
-#'                          sparse = TRUE,
-#'                          dimnames = list(paste0('new', 1:5), paste0('w', 1:20)))
+#' theta   = rdirichlet(50, 1, k = 3)
+#' phi     = rdirichlet(3, 0.1, k = 20)
+#' corpus  = draw_corpus(rep(50L, 50), theta, phi)
+#' model   = tmfast(corpus, n = 3)
+#' theta2  = rdirichlet(5, 1, k = 3)
+#' newdocs = draw_corpus(rep(200L, 5), theta2, phi) |>
+#'     tidytext::cast_sparse(doc, word, n)
 #' predict(model, newdocs)
+#' }
 #' @importFrom stats predict
 #' @export
 predict.varimaxes = function(object, newdata, ...) {
@@ -150,14 +151,15 @@ generics::tidy
 #' @return A long dataframe, with one row per word-topic or topic-doc combination. Column names depend on the value of `matrix`.
 #' @details If `rotation` is not `NULL`, loadings/scores will be rotated.  This might be used to align the fitted topics with known true topics, as in the `journal_specific` simulation.  Loadings are left-multiplied by the given rotation, while scores are right-multiplied by the transpose of the given rotation.
 #' @examples
+#' \donttest{
 #' set.seed(42)
-#' phi   = rdirichlet(3, alpha = 0.1, k = 20)
-#' dtm   = Matrix::Matrix(round(100 * rdirichlet(50, 0.1, k = 3) %*% phi),
-#'                        sparse = TRUE,
-#'                        dimnames = list(paste0('doc', 1:50), paste0('w', 1:20)))
-#' model = tmfast(dtm, n = 3)
+#' theta  = rdirichlet(50, 1, k = 3)
+#' phi    = rdirichlet(3, 0.1, k = 20)
+#' corpus = draw_corpus(rep(50L, 50), theta, phi)
+#' model  = tmfast(corpus, n = 3)
 #' tidy(model, k = 3, matrix = 'beta')
 #' tidy(model, k = 3, matrix = 'gamma')
+#' }
 #' @export
 tidy.tmfast = function(
       x,
@@ -260,13 +262,14 @@ tidy.tmfast = function(
 #' @param ... Other arguments, passed to `tidy.tmfast()`
 #' @return A long dataframe, with one row per word-topic or topic-doc combination. Column names depend on the value of `matrix`.
 #' @examples
+#' \donttest{
 #' set.seed(42)
-#' phi   = rdirichlet(4, alpha = 0.1, k = 20)
-#' dtm   = Matrix::Matrix(round(100 * rdirichlet(50, 0.1, k = 4) %*% phi),
-#'                        sparse = TRUE,
-#'                        dimnames = list(paste0('doc', 1:50), paste0('w', 1:20)))
-#' model = tmfast(dtm, n = c(3, 4))
+#' theta  = rdirichlet(50, 1, k = 4)
+#' phi    = rdirichlet(4, 0.1, k = 20)
+#' corpus = draw_corpus(rep(50L, 50), theta, phi)
+#' model  = tmfast(corpus, n = c(3, 4))
 #' tidy_all(model, matrix = 'beta')
+#' }
 #' @export
 tidy_all = function(x, matrix = 'beta', ...) {
       k = x$n |>
