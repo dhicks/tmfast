@@ -53,12 +53,12 @@ calling for reproducibility.
 
 }}
 \examples{
-\dontrun{
-## From the real books vignette
+\donttest{
 set.seed(42)
-tsne(fitted_tmf, k = 4, df = TRUE) |>
-    left_join(meta, by = c('document' = 'book')) |>
-    ggplot(aes(x, y, color = author)) +
-    geom_point()
+theta = rdirichlet(50, 1, k = 3)
+phi   = rdirichlet(3, 0.1, k = 30)
+corpus = draw_corpus(rep(50L, 50), theta, phi)
+fitted = tmfast(corpus, n = 3)
+tsne(fitted, k = 3, df = TRUE)
 }
 }

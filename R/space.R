@@ -14,13 +14,13 @@
 #'   calling for reproducibility.
 #' @return See `df`
 #' @examples
-#' \dontrun{
-#' ## From the real books vignette
+#' \donttest{
 #' set.seed(42)
-#' tsne(fitted_tmf, k = 4, df = TRUE) |>
-#'     left_join(meta, by = c('document' = 'book')) |>
-#'     ggplot(aes(x, y, color = author)) +
-#'     geom_point()
+#' theta = rdirichlet(50, 1, k = 3)
+#' phi   = rdirichlet(3, 0.1, k = 30)
+#' corpus = draw_corpus(rep(50L, 50), theta, phi)
+#' fitted = tmfast(corpus, n = 3)
+#' tsne(fitted, k = 3, df = TRUE)
 #' }
 #' @export
 tsne = function(x, ...) {
@@ -127,8 +127,13 @@ umap.matrix = function(x, include_data = FALSE, df = TRUE, ...) {
 #' @param x `tmfast` object
 #' @param k Number of topics
 #' @examples
-#' \dontrun{
-#' umap(fitted, 10, verbose = TRUE)
+#' \donttest{
+#' set.seed(42)
+#' theta = rdirichlet(30, 1, k = 3)
+#' phi   = rdirichlet(3, 0.1, k = 30)
+#' corpus = draw_corpus(rep(50L, 30), theta, phi)
+#' fitted = tmfast(corpus, n = 3)
+#' umap(fitted, 3)
 #' }
 #' @export
 umap.tmfast = function(x, k, ...) {

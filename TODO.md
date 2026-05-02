@@ -18,9 +18,6 @@
 - Revisit the auto-memory rule about bumping `Version` to today's date; it predates CRAN-prep.
     [We'll continue doing this for development versions, but again use the three integer-dots for CRAN releases]
 
-### 5. Replace `\dontrun{}` with self-contained `\donttest{}` examples
-- [R/space.R:17](R/space.R#L17) (tsne) and [R/space.R:122](R/space.R#L122) (umap): both reference undefined symbols (`fitted_tmf`, `meta`, `fitted`) — rewrite self-contained (along the lines of the `umap.matrix` example) and switch to `\donttest{}`.
-
 ## CRAN review nags (not blockers)
 ---
 

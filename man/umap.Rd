@@ -52,7 +52,12 @@ gamma = rdirichlet(26, 1, 5)
 rownames(gamma) = letters
 h_gamma = hellinger(gamma)
 umap(h_gamma, df = TRUE)
-\dontrun{
-umap(fitted, 10, verbose = TRUE)
+\donttest{
+set.seed(42)
+theta = rdirichlet(30, 1, k = 3)
+phi   = rdirichlet(3, 0.1, k = 30)
+corpus = draw_corpus(rep(50L, 30), theta, phi)
+fitted = tmfast(corpus, n = 3)
+umap(fitted, 3)
 }
 }
