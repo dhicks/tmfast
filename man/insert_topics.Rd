@@ -19,3 +19,13 @@ insert_topics(fitted, k, x = NULL)
 \description{
 Apply varimax rotation for a value of k less than the maximum already included in the tmfast.
 }
+\examples{
+\donttest{
+set.seed(42)
+theta  = rdirichlet(50, 1, k = 4)
+phi    = rdirichlet(4, 0.1, k = 20)
+corpus = draw_corpus(rep(50L, 50), theta, phi)
+model  = tmfast(corpus, n = c(3, 4))
+insert_topics(model, k = 2)
+}
+}

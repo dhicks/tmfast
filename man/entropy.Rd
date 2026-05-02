@@ -17,3 +17,7 @@ Calculated Shannon entropy
 \description{
 Entropy of a distribution
 }
+\examples{
+entropy(c(0.5, 0.5))
+entropy(c(0.9, 0.1))
+}

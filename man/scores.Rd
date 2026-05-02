@@ -14,3 +14,13 @@ scores(x, ...)
 \description{
 Extract item scores from a fitted PCA/varimax model
 }
+\examples{
+\donttest{
+set.seed(42)
+theta  = rdirichlet(50, 1, k = 3)
+phi    = rdirichlet(3, 0.1, k = 20)
+corpus = draw_corpus(rep(50L, 50), theta, phi)
+model  = tmfast(corpus, n = 3)
+scores(model, k = 3)
+}
+}

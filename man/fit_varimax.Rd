@@ -46,3 +46,16 @@ After the initial rotation, factors with negative skew (left tails) are flipped
 \code{pca} must contain \verb{$rotation} (feature loadings matrix) and \verb{$sdev} (standard deviations
 per PC); \verb{$x} (PC scores matrix) is also required unless \code{x} is supplied directly.
 }
+\examples{
+\donttest{
+set.seed(42)
+theta  = rdirichlet(50, 1, k = 3)
+phi    = rdirichlet(3, 0.1, k = 20)
+corpus = draw_corpus(rep(50L, 50), theta, phi)
+dtm    = tidytext::cast_sparse(corpus, doc, word, n)
+pca    = irlba::prcomp_irlba(dtm, n = 5)
+fit_varimax(k = 3, pca = pca,
+            feature_names = colnames(dtm),
+            obs_names = rownames(dtm))
+}
+}

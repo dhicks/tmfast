@@ -35,6 +35,9 @@ expected_entropy = function(alpha, k = NULL) {
 #' @param target_H Desired entropy for the transformed distribution
 #' @param return_full Return the full uniroot() output?
 #' @return Numeric value of the desired exponent
+#' @examples
+#' p = c(0.5, 0.3, 0.2)
+#' solve_power(p, target_H = 1.0)
 #' @export
 solve_power = function(p, target_H, return_full = FALSE) {
       ## Entropy of the distribution after transformation
@@ -70,6 +73,16 @@ solve_power = function(p, target_H, return_full = FALSE) {
 #' @param p_col Column containing the probability for each category (eg, word) conditional on the group (eg, topic)
 #' @param target_entropy Target entropy
 #' @returns Mean exponent to renormalize to the target entropy
+#' @examples
+#' \donttest{
+#' set.seed(42)
+#' theta  = rdirichlet(50, 1, k = 3)
+#' phi    = rdirichlet(3, 0.1, k = 20)
+#' corpus = draw_corpus(rep(50L, 50), theta, phi)
+#' model  = tmfast(corpus, n = 3)
+#' beta   = tidy(model, matrix = 'beta')
+#' target_power(beta, topic, beta, target_entropy = 2)
+#' }
 #' @export
 target_power = function(tidy_df, group_col, p_col, target_entropy) {
       powers = tidy_df |>
@@ -94,6 +107,17 @@ target_power = function(tidy_df, group_col, p_col, target_entropy) {
 #' @param exponent Exponent to use in renormalization
 #' @param keep_original Keep original probabilities?
 #' @returns A dataframe with (if `keep_original` is `TRUE`) an added column of the form `p_col_rn` containing the renormalized probabilities or (if `keep_original` is `FALSE`) renormalized values in `p_col`.
+#' @examples
+#' \donttest{
+#' set.seed(42)
+#' theta  = rdirichlet(50, 1, k = 3)
+#' phi    = rdirichlet(3, 0.1, k = 20)
+#' corpus = draw_corpus(rep(50L, 50), theta, phi)
+#' model  = tmfast(corpus, n = 3)
+#' beta   = tidy(model, matrix = 'beta')
+#' pwr    = target_power(beta, topic, beta, target_entropy = 2)
+#' renorm(beta, topic, beta, exponent = pwr)
+#' }
 #' @importFrom rlang :=
 #' @export
 renorm = function(tidy_df, group_col, p_col, exponent, keep_original = FALSE) {

@@ -21,6 +21,15 @@
 #'       - `loadings`: Varimax-rotated standardized loadings
 #'       - `rotmat`:  Varimax rotation matrix
 #'       - `scores`:  Varimax-rotated observation scores
+#' @examples
+#' \donttest{
+#' set.seed(42)
+#' theta  = rdirichlet(50, 1, k = 3)
+#' phi    = rdirichlet(3, 0.1, k = 20)
+#' corpus = draw_corpus(rep(50L, 50), theta, phi)
+#' dtm    = tidytext::cast_sparse(corpus, doc, word, n)
+#' varimax_irlba(dtm, n = 3)
+#' }
 #' @export
 varimax_irlba = function(
       mx,
@@ -85,6 +94,18 @@ varimax_irlba = function(
 #' @details After the initial rotation, factors with negative skew (left tails) are flipped
 #'   `pca` must contain `$rotation` (feature loadings matrix) and `$sdev` (standard deviations
 #'   per PC); `$x` (PC scores matrix) is also required unless `x` is supplied directly.
+#' @examples
+#' \donttest{
+#' set.seed(42)
+#' theta  = rdirichlet(50, 1, k = 3)
+#' phi    = rdirichlet(3, 0.1, k = 20)
+#' corpus = draw_corpus(rep(50L, 50), theta, phi)
+#' dtm    = tidytext::cast_sparse(corpus, doc, word, n)
+#' pca    = irlba::prcomp_irlba(dtm, n = 5)
+#' fit_varimax(k = 3, pca = pca,
+#'             feature_names = colnames(dtm),
+#'             obs_names = rownames(dtm))
+#' }
 #' @export
 fit_varimax = function(
       k,
@@ -206,6 +227,15 @@ tmfast = function(
 #' @param k Desired number of topics for new model
 #' @param x Data matrix (document-term matrix), as Matrix object (eg, using `build_matrix()`)
 #' @return `tmfast` object, as `fitted`, with additional topic model inserted
+#' @examples
+#' \donttest{
+#' set.seed(42)
+#' theta  = rdirichlet(50, 1, k = 4)
+#' phi    = rdirichlet(4, 0.1, k = 20)
+#' corpus = draw_corpus(rep(50L, 50), theta, phi)
+#' model  = tmfast(corpus, n = c(3, 4))
+#' insert_topics(model, k = 2)
+#' }
 #' @export
 insert_topics = function(fitted, k, x = NULL) {
       if (k %in% fitted$n) {

@@ -23,3 +23,15 @@ A dataframe with (if \code{keep_original} is \code{TRUE}) an added column of the
 \description{
 Given a tidied dataframe of topic-doc or word-topic distributions and a exponent, renormalizes the distributions.
 }
+\examples{
+\donttest{
+set.seed(42)
+theta  = rdirichlet(50, 1, k = 3)
+phi    = rdirichlet(3, 0.1, k = 20)
+corpus = draw_corpus(rep(50L, 50), theta, phi)
+model  = tmfast(corpus, n = 3)
+beta   = tidy(model, matrix = 'beta')
+pwr    = target_power(beta, topic, beta, target_entropy = 2)
+renorm(beta, topic, beta, exponent = pwr)
+}
+}

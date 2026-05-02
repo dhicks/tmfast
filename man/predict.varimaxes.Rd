@@ -32,13 +32,15 @@ itself, which is why PCA scores are computed once at fit time and not re-project
 on demand.
 }
 \examples{
+\donttest{
 set.seed(42)
-dtm = matrix(rpois(50 * 20, lambda = 3), nrow = 50,
-             dimnames = list(paste0('doc', 1:50), paste0('w', 1:20))) |>
-      Matrix::Matrix(sparse = TRUE)
-model = tmfast(dtm, n = 3)
-newdocs = matrix(rpois(5 * 20, lambda = 3), nrow = 5,
-                 dimnames = list(paste0('new', 1:5), paste0('w', 1:20))) |>
-          Matrix::Matrix(sparse = TRUE)
+theta   = rdirichlet(50, 1, k = 3)
+phi     = rdirichlet(3, 0.1, k = 20)
+corpus  = draw_corpus(rep(50L, 50), theta, phi)
+model   = tmfast(corpus, n = 3)
+theta2  = rdirichlet(5, 1, k = 3)
+newdocs = draw_corpus(rep(200L, 5), theta2, phi) |>
+    tidytext::cast_sparse(doc, word, n)
 predict(model, newdocs)
+}
 }

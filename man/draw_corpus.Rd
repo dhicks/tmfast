@@ -19,6 +19,30 @@ Document-term matrix, as a tibble, with columns \code{doc}, \code{word}, and \co
 \description{
 Draw a collection of documents
 }
+\details{
+Standard pattern for generating a simulated DTM suitable for \code{tmfast()}:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{set.seed(42)
+theta  = rdirichlet(n_docs,   alpha = 1,   k = n_topics)
+phi    = rdirichlet(n_topics, alpha = 0.1, k = vocab_size)
+corpus = draw_corpus(rep(doc_length, n_docs), theta, phi)
+model  = tmfast(corpus, n = n_topics)
+}\if{html}{\out{</div>}}
+
+\code{alpha = 1} for \code{theta} gives uniform topic mixing; \code{alpha = 0.1} for \code{phi}
+gives sparse, topic-specific word distributions.  \code{doc_length} should be large
+enough that the full vocabulary is likely to appear (50–200 words per document
+is typical for a small simulated example).
+}
+\examples{
+\donttest{
+set.seed(42)
+theta  = rdirichlet(30, 1, k = 3)
+phi    = rdirichlet(3, 0.1, k = 20)
+corpus = draw_corpus(rep(50L, 30), theta, phi)
+head(corpus)
+}
+}
 \seealso{
 Other generators: 
 \code{\link{journal_specific}()},

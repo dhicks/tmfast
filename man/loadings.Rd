@@ -2,9 +2,12 @@
 % Please edit documentation in R/s3.R
 \name{loadings}
 \alias{loadings}
+\alias{loadings.default}
 \title{Extract a PCA/varimax loadings matrix}
 \usage{
 loadings(x, ...)
+
+\method{loadings}{default}(x, ...)
 }
 \arguments{
 \item{x}{Object to dispatch on}
@@ -13,4 +16,16 @@ loadings(x, ...)
 }
 \description{
 Extract a PCA/varimax loadings matrix
+}
+\examples{
+\donttest{
+set.seed(42)
+theta  = rdirichlet(50, 1, k = 3)
+phi    = rdirichlet(3, 0.1, k = 20)
+corpus = draw_corpus(rep(50L, 50), theta, phi)
+model  = tmfast(corpus, n = 3)
+loadings(model, k = 3)
+}
+v = stats::varimax(matrix(runif(20), nrow = 5))
+loadings(v)
 }

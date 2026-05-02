@@ -19,3 +19,7 @@ Numeric value of the desired exponent
 \description{
 After \url{https://stats.stackexchange.com/questions/521582/controlling-the-entropy-of-a-distribution}
 }
+\examples{
+p = c(0.5, 0.3, 0.2)
+solve_power(p, target_H = 1.0)
+}

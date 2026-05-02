@@ -20,10 +20,12 @@ A long dataframe, with one row per word-topic or topic-doc combination. Column n
 Extract gamma or beta matrices for all topics
 }
 \examples{
+\donttest{
 set.seed(42)
-dtm = matrix(rpois(50 * 20, lambda = 3), nrow = 50,
-             dimnames = list(paste0('doc', 1:50), paste0('w', 1:20))) |>
-      Matrix::Matrix(sparse = TRUE)
-model = tmfast(dtm, n = c(3, 4))
+theta  = rdirichlet(50, 1, k = 4)
+phi    = rdirichlet(4, 0.1, k = 20)
+corpus = draw_corpus(rep(50L, 50), theta, phi)
+model  = tmfast(corpus, n = c(3, 4))
 tidy_all(model, matrix = 'beta')
+}
 }

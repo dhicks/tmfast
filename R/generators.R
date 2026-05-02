@@ -8,6 +8,9 @@
 #' @param scale Scaling factor applied to all concentration parameters
 #' @export
 #' @return Vector of length `k`
+#' @examples
+#' peak_alpha(5, 2)
+#' peak_alpha(5, 2, peak = 0.9, scale = 10)
 #' @family generators
 peak_alpha = function(k, i, peak = .8, scale = 1) {
       alpha = rep((1 - peak) / (k - 1), k)

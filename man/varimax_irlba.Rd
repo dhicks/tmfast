@@ -47,3 +47,13 @@ A list of class \code{varimaxes}, with elements
 \description{
 Extract \code{n} principal components from the matrix \code{mx} using \code{irlba}, then rotate the solution using \code{varimax}
 }
+\examples{
+\donttest{
+set.seed(42)
+theta  = rdirichlet(50, 1, k = 3)
+phi    = rdirichlet(3, 0.1, k = 20)
+corpus = draw_corpus(rep(50L, 50), theta, phi)
+dtm    = tidytext::cast_sparse(corpus, doc, word, n)
+varimax_irlba(dtm, n = 3)
+}
+}

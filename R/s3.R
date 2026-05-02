@@ -2,10 +2,23 @@
 #'
 #' @param x Object to dispatch on
 #' @param ... Passed to methods
+#' @examples
+#' \donttest{
+#' set.seed(42)
+#' theta  = rdirichlet(50, 1, k = 3)
+#' phi    = rdirichlet(3, 0.1, k = 20)
+#' corpus = draw_corpus(rep(50L, 50), theta, phi)
+#' model  = tmfast(corpus, n = 3)
+#' loadings(model, k = 3)
+#' }
 #' @export
 loadings = function(x, ...) {
       UseMethod("loadings")
 }
+#' @rdname loadings
+#' @examples
+#' v = stats::varimax(matrix(runif(20), nrow = 5))
+#' loadings(v)
 #' @export
 loadings.default = function(x, ...) {
       rlang::check_dots_empty()
@@ -29,6 +42,15 @@ loadings.varimaxes = function(x, k, ...) {
 #'
 #' @param x Object to dispatch on
 #' @param ... Passed to methods
+#' @examples
+#' \donttest{
+#' set.seed(42)
+#' theta  = rdirichlet(50, 1, k = 3)
+#' phi    = rdirichlet(3, 0.1, k = 20)
+#' corpus = draw_corpus(rep(50L, 50), theta, phi)
+#' model  = tmfast(corpus, n = 3)
+#' scores(model, k = 3)
+#' }
 #' @export
 scores = function(x, ...) {
       UseMethod("scores")
@@ -49,6 +71,15 @@ scores.varimaxes = function(x, k, ...) {
 #'
 #' @param x Object to dispatch on
 #' @param ... Passed to methods
+#' @examples
+#' \donttest{
+#' set.seed(42)
+#' theta  = rdirichlet(50, 1, k = 3)
+#' phi    = rdirichlet(3, 0.1, k = 20)
+#' corpus = draw_corpus(rep(50L, 50), theta, phi)
+#' model  = tmfast(corpus, n = 3)
+#' rotation(model, k = 3)
+#' }
 #' @export
 rotation = function(x, ...) {
       UseMethod('rotation')

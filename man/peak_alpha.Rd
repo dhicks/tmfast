@@ -21,6 +21,10 @@ Vector of length \code{k}
 \description{
 This function allows us to quickly define an \code{alpha} parameter for a Dirichlet distribution with a single (presumably high) \code{peak*scale} value at component \code{i} and all other components a uniform (presumably low) value \code{(1-peak)/(k-1)*scale}.
 }
+\examples{
+peak_alpha(5, 2)
+peak_alpha(5, 2, peak = 0.9, scale = 10)
+}
 \seealso{
 Other generators: 
 \code{\link{draw_corpus}()},
