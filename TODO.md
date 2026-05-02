@@ -24,10 +24,6 @@
 ### 6. Expand `Description:` field
 - [DESCRIPTION:7](DESCRIPTION#L7): currently a single sentence. CRAN reviewers will ask for a multi-sentence description, single quotes around package/software names, and a methods reference in `<doi:...>` or `<arXiv:...>` form (e.g. Rohe & Zheng's vintage-factor-analysis paper).
 
-### 7. Verify `Additional_repositories` drat is reachable
-- [DESCRIPTION:43](DESCRIPTION#L43): `https://dhicks.github.io/drat/` must serve a valid `PACKAGES` index for `tmfast.realbooks`, or CRAN's check farm will warn. The realbooks vignette already gates on `requireNamespace('tmfast.realbooks')`, which is good.
-    [This is already done; but could we potentially include an access check as a test, with a warning on failure, so that we can be alerted if it's not reachable? Need to consider pros and cons.]
-
 ### 8. Tighten `.Rbuildignore` and clean stray files
 - `data/` contains only `profiling_cache/*.rds` (~14 MB) and is already build-ignored — move outside the package root.
 - Add to [.Rbuildignore](.Rbuildignore):
