@@ -15,3 +15,8 @@
 ^vignettes/simulated_cache$
 ^tmfast_realbooks$
 ^TODO.md$
+^vignettes/.*\.html$
+^vignettes/.*_files$
+^tmfast\.Rcheck$
+^tests/testthat/testthat-problems\.rds$
+^.*\.DS_Store$

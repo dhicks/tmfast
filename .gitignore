@@ -22,3 +22,6 @@ paper/*.zip
 
 tmfast_realbooks
 tmfast.Rcheck
+
+**/.DS_Store
+tests/testthat/testthat-problems.rds

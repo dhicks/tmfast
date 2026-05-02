@@ -24,15 +24,6 @@
 ### 6. Expand `Description:` field
 - [DESCRIPTION:7](DESCRIPTION#L7): currently a single sentence. CRAN reviewers will ask for a multi-sentence description, single quotes around package/software names, and a methods reference in `<doi:...>` or `<arXiv:...>` form (e.g. Rohe & Zheng's vintage-factor-analysis paper).
 
-### 8. Tighten `.Rbuildignore` and clean stray files
-- `data/` contains only `profiling_cache/*.rds` (~14 MB) and is already build-ignored — move outside the package root.
-- Add to [.Rbuildignore](.Rbuildignore):
-    - `^vignettes/.*\.html$` (pre-rendered vignette HTML)
-    - `^vignettes/.*_files$` (vignette asset directories)
-    - `^tmfast\.Rcheck$`
-    - `^tests/testthat/testthat-problems\.rds$`
-    - `^.*\.DS_Store$` (multiple `.DS_Store` files in tree)
-
 ### 9. Minor doc/metadata polish
 - [NEWS.md:1](NEWS.md#L1) header date `2026-04-20` differs from DESCRIPTION's date. Reconcile, and add an "Initial CRAN release" entry on submission.
 - [R/utility.R:1-11](R/utility.R#L1-L11): `entropy()`'s `assertthat::are_equal(sum(p), 1)` is exact-equality; floating-point round-off could trigger spurious failures. Consider `isTRUE(all.equal(sum(p), 1))`. [I believe this is spurious, because are_equal already calls all.equal under the hood. Need to confirm.]
@@ -43,5 +34,5 @@
 ---
 
 - [ ] Run `R CMD check --as-cran` clean after items 1–5
-- [ ] Rebuild tarball and confirm no stray files after item 8
+- [x] Rebuild tarball and confirm no stray files after item 8
 - [ ] Update `NEWS.md` with "Initial CRAN release"
