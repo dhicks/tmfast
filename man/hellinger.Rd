@@ -2,15 +2,89 @@
 % Please edit documentation in R/hellinger.R
 \name{hellinger}
 \alias{hellinger}
+\alias{hellinger.Matrix}
+\alias{hellinger.matrix}
+\alias{hellinger.data.frame}
 \title{Hellinger distances}
 \usage{
 hellinger(topics1, ...)
+
+\method{hellinger}{Matrix}(topics1, topics2 = NULL, ...)
+
+\method{hellinger}{matrix}(...)
+
+\method{hellinger}{data.frame}(
+  topics1,
+  id1 = "document",
+  cat1 = "topic",
+  prob1 = "prob",
+  topics2 = NULL,
+  id2 = "document",
+  cat2 = "topic",
+  prob2 = "prob",
+  df = FALSE,
+  ...
+)
 }
 \arguments{
-\item{topics1}{Object to dispatch on}
+\item{topics1}{First matrix (\eqn{n_1 \times k}), base R matrix, or tidied
+topic model dataframe.}
 
-\item{...}{Passed to methods}
+\item{...}{Not used; required for S3 method compatibility.}
+
+\item{topics2}{Optional second matrix (\eqn{n_2 \times k}) or dataframe of
+the same type as \code{topics1}. When \code{NULL} (default), pairwise distances
+within \code{topics1} are returned.}
+
+\item{id1}{Unit identifier column in \code{topics1} (data.frame method only).}
+
+\item{cat1}{Category identifier column in \code{topics1} (data.frame method only).}
+
+\item{prob1}{Probability value column in \code{topics1} (data.frame method only).}
+
+\item{id2}{Unit identifier column in \code{topics2} (data.frame method only).}
+
+\item{cat2}{Category identifier column in \code{topics2} (data.frame method only).}
+
+\item{prob2}{Probability value column in \code{topics2} (data.frame method only).}
+
+\item{df}{Should the function return the matrix of Hellinger distances
+(default) or a tidy dataframe? (data.frame method only)}
+}
+\value{
+Matrix of size \eqn{n_1 \times n_1} or \eqn{n_1 \times n_2}
+(Matrix/matrix methods), or a matrix or tidy dataframe of Hellinger
+distances (data.frame method).
 }
 \description{
-Hellinger distances
+Calculates Hellinger distance between rows of one or two matrices or
+tidied topic model dataframes.
+}
+\examples{
+# Matrix / matrix method
+set.seed(2022-06-09)
+topics1 = rdirichlet(3, rep(5, 5))
+topics2 = rdirichlet(3, rep(5, 5))
+hellinger(topics1)
+hellinger(topics1, topics2)
+
+# data.frame method
+set.seed(2022-06-09)
+topics1 = rdirichlet(3, rep(5, 5)) |>
+    tibble::as_tibble(rownames = 'doc_id',
+                      .name_repair = tmfast:::make_colnames) |>
+    dplyr::mutate(doc_id = stringr::str_c('doc_', doc_id)) |>
+    tidyr::pivot_longer(tidyselect::starts_with('V'),
+                        names_to = 'topic',
+                        values_to = 'gamma')
+topics2 = rdirichlet(3, rep(5, 5)) |>
+    tibble::as_tibble(rownames = 'doc_id',
+                      .name_repair = tmfast:::make_colnames) |>
+    dplyr::mutate(doc_id = stringr::str_c('doc_', as.integer(doc_id) + 5)) |>
+    tidyr::pivot_longer(tidyselect::starts_with('V'),
+                        names_to = 'topic',
+                        values_to = 'gamma')
+hellinger(topics1, doc_id, prob1 = 'gamma', df = TRUE)
+hellinger(topics1, doc_id, prob1 = 'gamma',
+          topics2 = topics2, id2 = doc_id, prob2 = 'gamma')
 }

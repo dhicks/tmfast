@@ -1,8 +1,53 @@
 #' Hellinger distances
 #'
-#' @param topics1 Object to dispatch on
-#' @param ... Passed to methods
+#' Calculates Hellinger distance between rows of one or two matrices or
+#' tidied topic model dataframes.
+#'
+#' @param topics1 First matrix (\eqn{n_1 \times k}), base R matrix, or tidied
+#'   topic model dataframe.
+#' @param topics2 Optional second matrix (\eqn{n_2 \times k}) or dataframe of
+#'   the same type as `topics1`. When `NULL` (default), pairwise distances
+#'   within `topics1` are returned.
+#' @param id1 Unit identifier column in `topics1` (data.frame method only).
+#' @param cat1 Category identifier column in `topics1` (data.frame method only).
+#' @param prob1 Probability value column in `topics1` (data.frame method only).
+#' @param id2 Unit identifier column in `topics2` (data.frame method only).
+#' @param cat2 Category identifier column in `topics2` (data.frame method only).
+#' @param prob2 Probability value column in `topics2` (data.frame method only).
+#' @param df Should the function return the matrix of Hellinger distances
+#'   (default) or a tidy dataframe? (data.frame method only)
+#' @param ... Not used; required for S3 method compatibility.
+#' @returns Matrix of size \eqn{n_1 \times n_1} or \eqn{n_1 \times n_2}
+#'   (Matrix/matrix methods), or a matrix or tidy dataframe of Hellinger
+#'   distances (data.frame method).
 #' @export
+#' @examples
+#' # Matrix / matrix method
+#' set.seed(2022-06-09)
+#' topics1 = rdirichlet(3, rep(5, 5))
+#' topics2 = rdirichlet(3, rep(5, 5))
+#' hellinger(topics1)
+#' hellinger(topics1, topics2)
+#'
+#' # data.frame method
+#' set.seed(2022-06-09)
+#' topics1 = rdirichlet(3, rep(5, 5)) |>
+#'     tibble::as_tibble(rownames = 'doc_id',
+#'                       .name_repair = tmfast:::make_colnames) |>
+#'     dplyr::mutate(doc_id = stringr::str_c('doc_', doc_id)) |>
+#'     tidyr::pivot_longer(tidyselect::starts_with('V'),
+#'                         names_to = 'topic',
+#'                         values_to = 'gamma')
+#' topics2 = rdirichlet(3, rep(5, 5)) |>
+#'     tibble::as_tibble(rownames = 'doc_id',
+#'                       .name_repair = tmfast:::make_colnames) |>
+#'     dplyr::mutate(doc_id = stringr::str_c('doc_', as.integer(doc_id) + 5)) |>
+#'     tidyr::pivot_longer(tidyselect::starts_with('V'),
+#'                         names_to = 'topic',
+#'                         values_to = 'gamma')
+#' hellinger(topics1, doc_id, prob1 = 'gamma', df = TRUE)
+#' hellinger(topics1, doc_id, prob1 = 'gamma',
+#'           topics2 = topics2, id2 = doc_id, prob2 = 'gamma')
 hellinger = function(topics1, ...) {
     UseMethod("hellinger")
 }
@@ -13,20 +58,8 @@ hellinger = function(topics1, ...) {
 #' @importFrom Matrix which
 NULL
 
-#' Hellinger distance for matrices
-#'
-#' Calculates Hellinger distance for each pair of rows in the given matrix, or each combination of rows from the two matrices
-#' @param topics1 First matrix, \eqn{n_1 \times k}
-#' @param topics2 Optional second matrix, \eqn{n_2 \times k}
-#' @param ... Not used; required for S3 method compatibility
-#' @returns Matrix of size \eqn{n_1 \times n_1} or \eqn{n_1 \times n_2}
+#' @rdname hellinger
 #' @export
-#' @examples
-#' set.seed(2022-06-09)
-#' topics1 = rdirichlet(3, rep(5, 5))
-#' topics2 = rdirichlet(3, rep(5, 5))
-#' hellinger(topics1)
-#' hellinger(topics1, topics2)
 hellinger.Matrix = function(topics1, topics2 = NULL, ...) {
     rlang::check_dots_empty()
     if (is.null(topics2)) {
@@ -38,6 +71,7 @@ hellinger.Matrix = function(topics1, topics2 = NULL, ...) {
     crossed = sqrt(crossed)
     return(crossed)
 }
+#' @rdname hellinger
 #' @export
 hellinger.matrix = function(...) hellinger.Matrix(...)
 
@@ -72,40 +106,8 @@ build_matrix = function(data, row, column, value, ..., sparse = TRUE) {
     }
 }
 
-#' Hellinger distance for dataframes
-#'
-#' Hellinger distances, either pairwise within a single tidied topic model dataframe or between two tidied topic model dataframes
-#' @param topics1 First tidied topic model dataframe
-#' @param id1 Unit identifier column in `topics1` (DOIs, auids, ORU name, etc.)
-#' @param cat1 Category identifier column in `topics1` (topics)
-#' @param prob1 Probability value column in `topics1` (gamma)
-#' @param topics2 Optional second tidied topic model dataframe
-#' @param id2 Unit identifier column in `topics2`
-#' @param cat2 Category identifier column in `topics2`
-#' @param prob2 Probability value column in `topics2`
-#' @param df Should the function return the matrix of Hellinger distances (default) or a tidy dataframe?
-#' @param ... Not used; required for S3 method compatibility
-#' @return matrix or tidy dataframe (default) of Hellinger distances
+#' @rdname hellinger
 #' @export
-#' @examples
-#' set.seed(2022-06-09)
-#' topics1 = rdirichlet(3, rep(5, 5)) |>
-#'     tibble::as_tibble(rownames = 'doc_id',
-#'                       .name_repair = tmfast:::make_colnames) |>
-#'     dplyr::mutate(doc_id = stringr::str_c('doc_', doc_id)) |>
-#'     tidyr::pivot_longer(tidyselect::starts_with('V'),
-#'                         names_to = 'topic',
-#'                         values_to = 'gamma')
-#' topics2 = rdirichlet(3, rep(5, 5)) |>
-#'     tibble::as_tibble(rownames = 'doc_id',
-#'                       .name_repair = tmfast:::make_colnames) |>
-#'     dplyr::mutate(doc_id = stringr::str_c('doc_', as.integer(doc_id) + 5)) |>
-#'     tidyr::pivot_longer(tidyselect::starts_with('V'),
-#'                         names_to = 'topic',
-#'                         values_to = 'gamma')
-#' hellinger(topics1, doc_id, prob1 = 'gamma', df = TRUE)
-#' hellinger(topics1, doc_id, prob1 = 'gamma',
-#'           topics2 = topics2, id2 = doc_id, prob2 = 'gamma')
 hellinger.data.frame = function(topics1,
                                 id1 = 'document',
                                 cat1 = 'topic',

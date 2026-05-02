@@ -26,9 +26,6 @@
 
 ### 9. Minor doc/metadata polish
 - [NEWS.md:1](NEWS.md#L1) header date `2026-04-20` differs from DESCRIPTION's date. Reconcile, and add an "Initial CRAN release" entry on submission.
-- [R/hellinger.R:42](R/hellinger.R#L42): `hellinger.matrix = function(...) hellinger.Matrix(...)` — works, but `?hellinger.matrix` won't show real arg names. Consider `hellinger.matrix <- hellinger.Matrix` or duplicating the signature.
-    [Instead, consolidate documentation for the S3 methods together on to a single man page]
-
 ## Final submission checklist
 ---
 
