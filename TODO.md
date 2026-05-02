@@ -26,7 +26,6 @@
 
 ### 9. Minor doc/metadata polish
 - [NEWS.md:1](NEWS.md#L1) header date `2026-04-20` differs from DESCRIPTION's date. Reconcile, and add an "Initial CRAN release" entry on submission.
-- [R/utility.R:1-11](R/utility.R#L1-L11): `entropy()`'s `assertthat::are_equal(sum(p), 1)` is exact-equality; floating-point round-off could trigger spurious failures. Consider `isTRUE(all.equal(sum(p), 1))`. [I believe this is spurious, because are_equal already calls all.equal under the hood. Need to confirm.]
 - [R/hellinger.R:42](R/hellinger.R#L42): `hellinger.matrix = function(...) hellinger.Matrix(...)` — works, but `?hellinger.matrix` won't show real arg names. Consider `hellinger.matrix <- hellinger.Matrix` or duplicating the signature.
     [Instead, consolidate documentation for the S3 methods together on to a single man page]
 
