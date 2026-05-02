@@ -1,0 +1,17 @@
+name: Check drat reachability
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'  # every Monday at 9am UTC
+  workflow_dispatch:
+
+jobs:
+  check-drat:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PACKAGES index
+        run: |
+          curl --fail --silent --head \
+            https://dhicks.github.io/drat/src/contrib/PACKAGES \
+          && echo "drat reachable" \
+          || (echo "drat UNREACHABLE" && exit 1)
