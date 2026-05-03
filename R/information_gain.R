@@ -45,32 +45,6 @@ ndH = function(dataf, doc_col, term_col, count_col) {
             dplyr::arrange(dplyr::desc(.data$ndH))
 }
 
-ndH.ArrowObject = function(dataset, doc_col, term_col, count_col) {
-      n_docs = dataset |>
-            dplyr::pull({{ doc_col }}) |>
-            dplyr::n_distinct()
-
-      totals = dataset |>
-            dplyr::group_by({{ term_col }}) |>
-            dplyr::summarize(n_tot = sum({{ count_col }}))
-
-      result = dataset |>
-            dplyr::left_join(
-                  totals,
-                  by = rlang::as_label(rlang::enquo(term_col))
-            ) |>
-            dplyr::group_by({{ term_col }}) |>
-            dplyr::mutate(p = {{ count_col }} / .data$n_tot) |>
-            dplyr::summarize(H = entropy(.data$p), n = sum({{ count_col }})) |>
-            dplyr::ungroup() |>
-            dplyr::mutate(
-                  dH = log2(n_docs) - .data$H,
-                  ndH = log2(.data$n) * .data$dH
-            ) |>
-            dplyr::arrange(dplyr::desc(.data$ndH))
-      return(result)
-}
-
 #' Information gain (length-proportional distribution)
 #'
 #' An alternative to `ndH()` that uses information gain relative to a distribution of documents that is proportional to length.  With the uniform distribution and dramatic differences in document lengths (eg, over a few orders of magnitude), high-ndH terms tend to be distinctive terms from very long documents.  With the length-proportional distribution, high information-gain terms are more likely to come from shorter documents. Informal testing suggests this approach performs better than the `ndH()` uniform distribution when documents have widely varying lengths, eg, over a few orders of magnitude.

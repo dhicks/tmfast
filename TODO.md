@@ -27,11 +27,8 @@
 
 ### 16. Add `inst/CITATION`
 - Given the arXiv preprint reference being added in item 6, also add `inst/CITATION` so `citation("tmfast")` returns the methods paper.
+    [We'll use the JOSS paper; but that's after CRAN submission]
 
-
-### 19. Dead code: `ndH.ArrowObject` is unreachable
-- [R/information_gain.R:48](R/information_gain.R#L48): defines `ndH.ArrowObject`, but `ndH()` ([R/information_gain.R:30](R/information_gain.R#L30)) is *not* a generic — it has no `UseMethod('ndH')` call, and `S3method(ndH, ArrowObject)` is not in [NAMESPACE](NAMESPACE). The function is never dispatched. Either delete it, or convert `ndH()` to a generic (`UseMethod('ndH')`) and add the `S3method` registration via roxygen.
-    [Need to test whether the "default" version works as expected on an arrow dataset.]
 
 ### 20. Vignette uses pandoc citation without a bibliography
 - [vignettes/simulated.Rmd:16](vignettes/simulated.Rmd#L16): `@RoheVintageFactorAnalysis2020` is a pandoc citation key, but the YAML header declares no `bibliography:` field and there is no `.bib` file in `vignettes/`. The rendered HTML shows the raw `@key` instead of a formatted citation. Either add a `bibliography: refs.bib` (and `csl:`) to the YAML and ship the `.bib`, or replace the citation with an inline reference (e.g., "Rohe & Zang (\<arXiv:2004.05387\>)").
