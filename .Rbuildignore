@@ -20,3 +20,5 @@
 ^tmfast\.Rcheck$
 ^tests/testthat/testthat-problems\.rds$
 ^.*\.DS_Store$
+^doc$
+^Meta$

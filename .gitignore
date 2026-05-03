@@ -25,3 +25,5 @@ tmfast.Rcheck
 
 **/.DS_Store
 tests/testthat/testthat-problems.rds
+/doc/
+/Meta/

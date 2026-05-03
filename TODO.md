@@ -30,10 +30,6 @@
     [We'll use the JOSS paper; but that's after CRAN submission]
 
 
-### 20. Vignette uses pandoc citation without a bibliography
-- [vignettes/simulated.Rmd:16](vignettes/simulated.Rmd#L16): `@RoheVintageFactorAnalysis2020` is a pandoc citation key, but the YAML header declares no `bibliography:` field and there is no `.bib` file in `vignettes/`. The rendered HTML shows the raw `@key` instead of a formatted citation. Either add a `bibliography: refs.bib` (and `csl:`) to the YAML and ship the `.bib`, or replace the citation with an inline reference (e.g., "Rohe & Zang (\<arXiv:2004.05387\>)").
-    [Likely because the vignettes were originally created by splitting what's now the arXiv preprint into two parts]
-
 ## Final submission checklist
 ---
 

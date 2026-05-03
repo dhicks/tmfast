@@ -7,6 +7,7 @@ output:
     html_document:
         toc: true
         toc_float: true
+bibliography: ../paper/tmfast.yaml
 vignette: >
   %\VignetteIndexEntry{Fitting topic models with tmfast}
   %\VignetteEngine{knitr::rmarkdown}
