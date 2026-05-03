@@ -80,7 +80,7 @@ solve_power = function(p, target_H, return_full = FALSE) {
 #' phi    = rdirichlet(3, 0.1, k = 20)
 #' corpus = draw_corpus(rep(50L, 50), theta, phi)
 #' model  = tmfast(corpus, n = 3)
-#' beta   = tidy(model, matrix = 'beta')
+#' beta   = tidy(model, matrix = 'beta', k = 3)
 #' target_power(beta, topic, beta, target_entropy = 2)
 #' }
 #' @export
@@ -114,7 +114,7 @@ target_power = function(tidy_df, group_col, p_col, target_entropy) {
 #' phi    = rdirichlet(3, 0.1, k = 20)
 #' corpus = draw_corpus(rep(50L, 50), theta, phi)
 #' model  = tmfast(corpus, n = 3)
-#' beta   = tidy(model, matrix = 'beta')
+#' beta   = tidy(model, matrix = 'beta', k = 3)
 #' pwr    = target_power(beta, topic, beta, target_entropy = 2)
 #' renorm(beta, topic, beta, exponent = pwr)
 #' }

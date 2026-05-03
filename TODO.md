@@ -18,9 +18,6 @@
 - Revisit the auto-memory rule about bumping `Version` to today's date; it predates CRAN-prep.
     [We'll continue doing this for development versions, but again use the three integer-dots for CRAN releases]
 
-### 10. Fix `insert_topics` example (current `R CMD check --as-cran` ERROR)
-- [man/insert_topics.Rd:29](man/insert_topics.Rd#L29) / [R/tmfast.R:237](R/tmfast.R#L237): example fails under `--run-donttest` with `Data matrix missing; pass using x`. `tmfast()` calls `varimax_irlba()` without `retx = TRUE`, so `model$x` is `NULL`. Fix the example by either threading `retx = TRUE` (need to confirm `tmfast()` forwards it via `...`) or by building the dtm explicitly with `build_matrix()` and passing `x = ...`.
-
 ## CRAN review nags (not blockers)
 ---
 

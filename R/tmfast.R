@@ -38,7 +38,7 @@ varimax_irlba = function(
       prcomp_opts = NULL,
       varimax_fn = stats::varimax,
       varimax_opts = NULL,
-      retx = FALSE
+      retx = TRUE
 ) {
       ## prcomp_irlba loses names
       rows = rownames(mx)

@@ -11,7 +11,7 @@ varimax_irlba(
   prcomp_opts = NULL,
   varimax_fn = stats::varimax,
   varimax_opts = NULL,
-  retx = FALSE
+  retx = TRUE
 )
 }
 \arguments{
