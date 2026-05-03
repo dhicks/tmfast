@@ -18,6 +18,9 @@
 - Revisit the auto-memory rule about bumping `Version` to today's date; it predates CRAN-prep.
     [We'll continue doing this for development versions, but again use the three integer-dots for CRAN releases]
 
+### 10. Fix `insert_topics` example (current `R CMD check --as-cran` ERROR)
+- [man/insert_topics.Rd:29](man/insert_topics.Rd#L29) / [R/tmfast.R:237](R/tmfast.R#L237): example fails under `--run-donttest` with `Data matrix missing; pass using x`. `tmfast()` calls `varimax_irlba()` without `retx = TRUE`, so `model$x` is `NULL`. Fix the example by either threading `retx = TRUE` (need to confirm `tmfast()` forwards it via `...`) or by building the dtm explicitly with `build_matrix()` and passing `x = ...`.
+
 ## CRAN review nags (not blockers)
 ---
 
@@ -26,6 +29,35 @@
 
 ### 9. Minor doc/metadata polish
 - [NEWS.md:1](NEWS.md#L1) header date `2026-04-20` differs from DESCRIPTION's date. Reconcile, and add an "Initial CRAN release" entry on submission.
+
+### 11. Fix non-canonical CRAN URL
+- [vignettes/simulated.Rmd:148](vignettes/simulated.Rmd#L148): `https://cran.r-project.org/web/packages/irlba/vignettes/irlba.pdf` → `https://CRAN.R-project.org/package=irlba` (canonical form). Flagged by `urlchecker::url_check()`.
+
+### 12. Add `BugReports:` field to DESCRIPTION
+- [DESCRIPTION](DESCRIPTION): add `BugReports: https://github.com/dhicks/tmfast/issues`. Standard CRAN ask.
+
+
+### 14. Document `journal_specific()` properly
+- [R/generators.R:115-141](R/generators.R#L115-L141): exported function has no `@return` and no `@examples`. CRAN policy expects both on user-facing functions. The function is slow; an example would need `\donttest{}`.
+
+### 15. Mark internal helpers
+- [R/generators.R](R/generators.R): `draw_a_word()` and `draw_words()` are not exported but generate man pages ([man/draw_a_word.Rd](man/draw_a_word.Rd), [man/draw_words.Rd](man/draw_words.Rd)). Add `@keywords internal` (or `@noRd` to drop the man pages entirely) to keep the index clean.
+
+### 16. Add `inst/CITATION`
+- Given the arXiv preprint reference being added in item 6, also add `inst/CITATION` so `citation("tmfast")` returns the methods paper.
+
+### 17. Cosmetic: typo in vignette
+- [vignettes/simulated.Rmd:148](vignettes/simulated.Rmd#L148): `stats:varimax()` → `stats::varimax()` (single colon). Body text only, not a code chunk.
+
+
+### 19. Dead code: `ndH.ArrowObject` is unreachable
+- [R/information_gain.R:48](R/information_gain.R#L48): defines `ndH.ArrowObject`, but `ndH()` ([R/information_gain.R:30](R/information_gain.R#L30)) is *not* a generic — it has no `UseMethod('ndH')` call, and `S3method(ndH, ArrowObject)` is not in [NAMESPACE](NAMESPACE). The function is never dispatched. Either delete it, or convert `ndH()` to a generic (`UseMethod('ndH')`) and add the `S3method` registration via roxygen.
+    [Need to test whether the "default" version works as expected on an arrow dataset.]
+
+### 20. Vignette uses pandoc citation without a bibliography
+- [vignettes/simulated.Rmd:16](vignettes/simulated.Rmd#L16): `@RoheVintageFactorAnalysis2020` is a pandoc citation key, but the YAML header declares no `bibliography:` field and there is no `.bib` file in `vignettes/`. The rendered HTML shows the raw `@key` instead of a formatted citation. Either add a `bibliography: refs.bib` (and `csl:`) to the YAML and ship the `.bib`, or replace the citation with an inline reference (e.g., "Rohe & Zang (\<arXiv:2004.05387\>)").
+    [Likely because the vignettes were originally created by splitting what's now the arXiv preprint into two parts]
+
 ## Final submission checklist
 ---
 
