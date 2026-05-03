@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">tmfast</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.2026-04-29</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.2026-05-03</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -83,21 +83,23 @@ on demand.</p>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">dtm</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span><span class="fl">50</span> <span class="op">*</span> <span class="fl">20</span>, lambda <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">50</span>,</span></span>
-<span class="r-in"><span>             dimnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">'doc'</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">50</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">'w'</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>      <span class="fu">Matrix</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/Matrix.html" class="external-link">Matrix</a></span><span class="op">(</span>sparse <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">model</span> <span class="op">=</span> <span class="fu"><a href="tmfast.html">tmfast</a></span><span class="op">(</span><span class="va">dtm</span>, n <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">newdocs</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Poisson.html" class="external-link">rpois</a></span><span class="op">(</span><span class="fl">5</span> <span class="op">*</span> <span class="fl">20</span>, lambda <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">5</span>,</span></span>
-<span class="r-in"><span>                 dimnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">'new'</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">'w'</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>          <span class="fu">Matrix</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/Matrix.html" class="external-link">Matrix</a></span><span class="op">(</span>sparse <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">theta</span>   <span class="op">=</span> <span class="fu"><a href="rdirichlet.html">rdirichlet</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">1</span>, k <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">phi</span>     <span class="op">=</span> <span class="fu"><a href="rdirichlet.html">rdirichlet</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">0.1</span>, k <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">corpus</span>  <span class="op">=</span> <span class="fu"><a href="draw_corpus.html">draw_corpus</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">50L</span>, <span class="fl">50</span><span class="op">)</span>, <span class="va">theta</span>, <span class="va">phi</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">model</span>   <span class="op">=</span> <span class="fu"><a href="tmfast.html">tmfast</a></span><span class="op">(</span><span class="va">corpus</span>, n <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">theta2</span>  <span class="op">=</span> <span class="fu"><a href="rdirichlet.html">rdirichlet</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">1</span>, k <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">newdocs</span> <span class="op">=</span> <span class="fu"><a href="draw_corpus.html">draw_corpus</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">200L</span>, <span class="fl">5</span><span class="op">)</span>, <span class="va">theta2</span>, <span class="va">phi</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>    <span class="fu">tidytext</span><span class="fu">::</span><span class="fu"><a href="https://juliasilge.github.io/tidytext/reference/cast_sparse.html" class="external-link">cast_sparse</a></span><span class="op">(</span><span class="va">doc</span>, <span class="va">word</span>, <span class="va">n</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">newdocs</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             PC1        PC2        PC3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> new1  0.2258281  0.4576578 -1.7488032</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> new2  2.3028337 -0.1419313  3.0613022</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> new3  0.1053719  0.2918948 -1.3574614</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> new4 -0.7096987 -0.5643858 -1.8293312</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> new5  0.2224496 -0.8920900  0.2413426</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        PC1        PC2         PC3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 73.45987 -10.315999  -2.8267179</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 26.61557  22.533310 -12.8102579</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 24.01242 -19.028145  -0.8185281</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 30.52516  31.905962  -7.9864402</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 60.10890   7.934742 -10.6114665</span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">tmfast</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.2026-04-29</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.2026-05-03</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -68,6 +68,19 @@
     <p>Document-term matrix, as a tibble, with columns <code>doc</code>, <code>word</code>, and <code>n</code></p>
     </div>
     <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>Standard pattern for generating a simulated DTM suitable for <code><a href="tmfast.html">tmfast()</a></code>:</p>
+<p></p><div class="sourceCode r"><pre><code><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span>
+<span><span class="va">theta</span>  <span class="op">=</span> <span class="fu"><a href="../reference/rdirichlet.html">rdirichlet</a></span><span class="op">(</span><span class="va">n_docs</span>,   alpha <span class="op">=</span> <span class="fl">1</span>,   k <span class="op">=</span> <span class="va">n_topics</span><span class="op">)</span></span>
+<span><span class="va">phi</span>    <span class="op">=</span> <span class="fu"><a href="../reference/rdirichlet.html">rdirichlet</a></span><span class="op">(</span><span class="va">n_topics</span>, alpha <span class="op">=</span> <span class="fl">0.1</span>, k <span class="op">=</span> <span class="va">vocab_size</span><span class="op">)</span></span>
+<span><span class="va">corpus</span> <span class="op">=</span> <span class="fu"><a href="../reference/draw_corpus.html">draw_corpus</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="va">doc_length</span>, <span class="va">n_docs</span><span class="op">)</span>, <span class="va">theta</span>, <span class="va">phi</span><span class="op">)</span></span>
+<span><span class="va">model</span>  <span class="op">=</span> <span class="fu"><a href="../reference/tmfast.html">tmfast</a></span><span class="op">(</span><span class="va">corpus</span>, n <span class="op">=</span> <span class="va">n_topics</span><span class="op">)</span></span></code></pre><p></p></div>
+<p><code>alpha = 1</code> for <code>theta</code> gives uniform topic mixing; <code>alpha = 0.1</code> for <code>phi</code>
+gives sparse, topic-specific word distributions.  <code>doc_length</code> should be large
+enough that the full vocabulary is likely to appear (50–200 words per document
+is typical for a small simulated example).</p>
+    </div>
+    <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other generators:
 <code><a href="journal_specific.html">journal_specific</a>()</code>,
@@ -75,6 +88,27 @@
 <code><a href="rdirichlet.html">rdirichlet</a>()</code></p></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">theta</span>  <span class="op">=</span> <span class="fu"><a href="rdirichlet.html">rdirichlet</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">1</span>, k <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">phi</span>    <span class="op">=</span> <span class="fu"><a href="rdirichlet.html">rdirichlet</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">0.1</span>, k <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">corpus</span> <span class="op">=</span> <span class="fu">draw_corpus</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">50L</span>, <span class="fl">30</span><span class="op">)</span>, <span class="va">theta</span>, <span class="va">phi</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>package ‘purrr’ was built under R version 4.5.2</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">corpus</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 3</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     doc  word     n</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>     1     1     3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span>     1     2    16</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span>     1    12     1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span>     1    15     6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span>     1    17     3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span>     1    19    17</span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

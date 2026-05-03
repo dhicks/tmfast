@@ -16,8 +16,6 @@
 <url><loc>https://dhicks.github.io/tmfast/reference/entropy.html</loc></url>
 <url><loc>https://dhicks.github.io/tmfast/reference/expected_entropy.html</loc></url>
 <url><loc>https://dhicks.github.io/tmfast/reference/fit_varimax.html</loc></url>
-<url><loc>https://dhicks.github.io/tmfast/reference/hellinger.Matrix.html</loc></url>
-<url><loc>https://dhicks.github.io/tmfast/reference/hellinger.data.frame.html</loc></url>
 <url><loc>https://dhicks.github.io/tmfast/reference/hellinger.html</loc></url>
 <url><loc>https://dhicks.github.io/tmfast/reference/index.html</loc></url>
 <url><loc>https://dhicks.github.io/tmfast/reference/insert_topics.html</loc></url>
@@ -38,12 +36,8 @@
 <url><loc>https://dhicks.github.io/tmfast/reference/tidy_all.html</loc></url>
 <url><loc>https://dhicks.github.io/tmfast/reference/tmfast-package.html</loc></url>
 <url><loc>https://dhicks.github.io/tmfast/reference/tmfast.html</loc></url>
-<url><loc>https://dhicks.github.io/tmfast/reference/tsne.data.frame.html</loc></url>
 <url><loc>https://dhicks.github.io/tmfast/reference/tsne.html</loc></url>
-<url><loc>https://dhicks.github.io/tmfast/reference/umap.STM.html</loc></url>
 <url><loc>https://dhicks.github.io/tmfast/reference/umap.html</loc></url>
-<url><loc>https://dhicks.github.io/tmfast/reference/umap.matrix.html</loc></url>
-<url><loc>https://dhicks.github.io/tmfast/reference/umap.tmfast.html</loc></url>
 <url><loc>https://dhicks.github.io/tmfast/reference/varimax_irlba.html</loc></url>
 </urlset>
 

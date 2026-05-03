@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">tmfast</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.2026-04-29</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.2026-05-03</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,6 +60,22 @@
 
 </dl></div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">theta</span>  <span class="op">=</span> <span class="fu"><a href="rdirichlet.html">rdirichlet</a></span><span class="op">(</span><span class="fl">50</span>, <span class="fl">1</span>, k <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">phi</span>    <span class="op">=</span> <span class="fu"><a href="rdirichlet.html">rdirichlet</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">0.1</span>, k <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">corpus</span> <span class="op">=</span> <span class="fu"><a href="draw_corpus.html">draw_corpus</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">50L</span>, <span class="fl">50</span><span class="op">)</span>, <span class="va">theta</span>, <span class="va">phi</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">model</span>  <span class="op">=</span> <span class="fu"><a href="tmfast.html">tmfast</a></span><span class="op">(</span><span class="va">corpus</span>, n <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">rotation</span><span class="op">(</span><span class="va">model</span>, k <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            [,1]       [,2]       [,3]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 0.74518686 -0.2724038  0.6086811</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 0.07016217  0.9397238  0.3346587</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,] 0.66315445  0.2066769 -0.7193823</span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

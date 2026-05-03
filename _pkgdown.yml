@@ -14,8 +14,6 @@ reference:
   - peak_alpha
   - expected_entropy
   - rdirichlet
-  - draw_a_word
-  - draw_words
   - draw_corpus
   - journal_specific
 - title: Information gain
