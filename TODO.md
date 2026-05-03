@@ -21,30 +21,12 @@
 ## CRAN review nags (not blockers)
 ---
 
-### 6. Expand `Description:` field
-- [DESCRIPTION:7](DESCRIPTION#L7): currently a single sentence. CRAN reviewers will ask for a multi-sentence description, single quotes around package/software names, and a methods reference in `<doi:...>` or `<arXiv:...>` form (e.g. Rohe & Zheng's vintage-factor-analysis paper).
-
 ### 9. Minor doc/metadata polish
 - [NEWS.md:1](NEWS.md#L1) header date `2026-04-20` differs from DESCRIPTION's date. Reconcile, and add an "Initial CRAN release" entry on submission.
 
-### 11. Fix non-canonical CRAN URL
-- [vignettes/simulated.Rmd:148](vignettes/simulated.Rmd#L148): `https://cran.r-project.org/web/packages/irlba/vignettes/irlba.pdf` → `https://CRAN.R-project.org/package=irlba` (canonical form). Flagged by `urlchecker::url_check()`.
-
-### 12. Add `BugReports:` field to DESCRIPTION
-- [DESCRIPTION](DESCRIPTION): add `BugReports: https://github.com/dhicks/tmfast/issues`. Standard CRAN ask.
-
-
-### 14. Document `journal_specific()` properly
-- [R/generators.R:115-141](R/generators.R#L115-L141): exported function has no `@return` and no `@examples`. CRAN policy expects both on user-facing functions. The function is slow; an example would need `\donttest{}`.
-
-### 15. Mark internal helpers
-- [R/generators.R](R/generators.R): `draw_a_word()` and `draw_words()` are not exported but generate man pages ([man/draw_a_word.Rd](man/draw_a_word.Rd), [man/draw_words.Rd](man/draw_words.Rd)). Add `@keywords internal` (or `@noRd` to drop the man pages entirely) to keep the index clean.
 
 ### 16. Add `inst/CITATION`
 - Given the arXiv preprint reference being added in item 6, also add `inst/CITATION` so `citation("tmfast")` returns the methods paper.
-
-### 17. Cosmetic: typo in vignette
-- [vignettes/simulated.Rmd:148](vignettes/simulated.Rmd#L148): `stats:varimax()` → `stats::varimax()` (single colon). Body text only, not a code chunk.
 
 
 ### 19. Dead code: `ndH.ArrowObject` is unreachable

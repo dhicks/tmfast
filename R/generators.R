@@ -46,6 +46,7 @@ rdirichlet = function(n, alpha, k = NULL) {
 #' @param theta Topic distribution, length \eqn{k} vector
 #' @param phi Word distribution for all topics, \eqn{k \times v} matrix
 #' @return Integer representation for a single word
+#' @noRd
 draw_a_word = function(theta, phi) {
       z = sample.int(length(theta), size = 1, prob = theta)
       w = sample.int(ncol(phi), size = 1, prob = phi[z, ])
@@ -58,6 +59,7 @@ draw_a_word = function(theta, phi) {
 #' @param theta `theta_i`, topic distribution for document i
 #' @param phi word distribution for all topics
 #' @return Document-term matrix (single document), as a tibble, with columns `word` and `n`
+#' @noRd
 draw_words = function(Ni, theta, phi) {
       word = purrr::map_int(1:Ni, ~ draw_a_word(theta, phi))
       tibble::tibble(word) |>
@@ -125,6 +127,15 @@ draw_corpus = function(N, theta, phi) {
 #' @param mu Mean parameter for the negative binomial distribution of document lengths
 #' @param bigjournal Should the first journal have documents 10x as long (on average) as the others?
 #' @param verbose When TRUE, sends messages about the progress of the simulation
+#' @return A one-row [tibble::tibble()] with columns:
+#'   \describe{
+#'     \item{phi}{Mean Hellinger distance between true and fitted word-topic distributions}
+#'     \item{phi_vec}{List-column of per-topic Hellinger distances}
+#'     \item{theta}{Mean Hellinger distance between true and fitted document-topic distributions}
+#'     \item{theta_vec}{List-column of per-document Hellinger distances}
+#'   }
+#' @examples
+#' journal_specific(k = 2, Mj = 10, vocab = 50, verbose = FALSE)
 #' @export
 #' @family generators
 journal_specific = function(

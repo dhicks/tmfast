@@ -38,8 +38,20 @@ journal_specific(
 
 \item{verbose}{When TRUE, sends messages about the progress of the simulation}
 }
+\value{
+A one-row \code{\link[tibble:tibble]{tibble::tibble()}} with columns:
+\describe{
+\item{phi}{Mean Hellinger distance between true and fitted word-topic distributions}
+\item{phi_vec}{List-column of per-topic Hellinger distances}
+\item{theta}{Mean Hellinger distance between true and fitted document-topic distributions}
+\item{theta_vec}{List-column of per-document Hellinger distances}
+}
+}
 \description{
 Generates a corpus with \code{Mj} documents from \code{k} journals, each of which has a characteristic topic.  Fits a varimax topic model of rank \code{k}, rotates the word-topic distribution to align with the true values, and reports Hellinger distance comparisons for each topic (word-topic) and document (topic-doc).
+}
+\examples{
+journal_specific(k = 2, Mj = 10, vocab = 50, verbose = FALSE)
 }
 \seealso{
 Other generators: 

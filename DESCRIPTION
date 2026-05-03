@@ -1,10 +1,17 @@
 Package: tmfast
 Title: Fast Topic Models Using Varimax
-Version: 0.0.0.2026-05-02
+Version: 0.0.0.2026-05-03
 Authors@R: 
     person("D.", "Hicks", , "hicks.daniel.j@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-7945-4416"))
-Description: Fit topic models fast using varimax-rotated PCA.
+Description: Fits topic models using varimax-rotated principal component
+    analysis (PCA), following the 'vintage factor analysis' approach of
+    Rohe & Zheng <arXiv:2004.05387>. Leverages truncated PCA via 'irlba'
+    for sparse matrices, enabling fast model fitting on large corpora.
+    Includes an information-theoretic approach to vocabulary selection,
+    'broom'-compatible tidiers for extracting word-topic and topic-document
+    matrices into a tidy data workflow, and samplers for constructing
+    simulated corpora for benchmarking and method evaluation.
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -44,3 +51,4 @@ Additional_repositories: https://dhicks.github.io/drat/
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 URL: https://dhicks.github.io/tmfast/, https://github.com/dhicks/tmfast
+BugReports: https://github.com/dhicks/tmfast/issues

@@ -5,13 +5,14 @@
 \alias{tmfast-package}
 \title{Fitting "topic models" with PCA+varimax}
 \description{
-Fit topic models fast using varimax-rotated PCA.
+Fits topic models using varimax-rotated principal component analysis (PCA), following the 'vintage factor analysis' approach of Rohe & Zheng \href{https://arxiv.org/abs/2004.05387}{arXiv:2004.05387}. Leverages truncated PCA via 'irlba' for sparse matrices, enabling fast model fitting on large corpora. Includes an information-theoretic approach to vocabulary selection, 'broom'-compatible tidiers for extracting word-topic and topic-document matrices into a tidy data workflow, and samplers for constructing simulated corpora for benchmarking and method evaluation.
 }
 \seealso{
 Useful links:
 \itemize{
   \item \url{https://dhicks.github.io/tmfast/}
   \item \url{https://github.com/dhicks/tmfast}
+  \item Report bugs at \url{https://github.com/dhicks/tmfast/issues}
 }
 
 }
