@@ -2,7 +2,7 @@ Package: tmfast
 Title: Fast Topic Models Using Varimax
 Version: 0.0.0.2026-05-03
 Authors@R: 
-    person("D.", "Hicks", , "hicks.daniel.j@gmail.com", role = c("aut", "cre"),
+    person("D.", "Hicks", , "hicks.daniel.j@gmail.com", role = c("aut", "cre", "cph"),
            comment = c(ORCID = "0000-0001-7945-4416"))
 Description: Fits topic models using varimax-rotated principal component
     analysis (PCA), following the 'vintage factor analysis' approach of

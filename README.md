@@ -9,7 +9,22 @@ A preprint discussing the package is available on [the arXiv](https://arxiv.org/
 ## Installation
 
 ```
+install.packages("tmfast")
+```
+
+Or the development version:
+```
 remotes::install_github("dhicks/tmfast")
 ```
 or fork <https://github.com/dhicks/tmfast>, clone, and install manually. 
 
+If you wish to build the "real books" vignette from scratch, you'll need the [`tmfast.realbooks` data package](https://github.com/dhicks/tmfast.realbooks). To install this data package use `remotes`: 
+```{r}
+#| eval: false
+remotes::install_github('dhicks/tmfast.realbooks')
+```
+or specify the drat repository:
+```{r}
+#| eval: false
+install.packages('tmfast.realbooks', repos = 'https://dhicks.github.io/drat/')
+```

@@ -31,8 +31,5 @@
 
 
 ## Final submission checklist
----
 
-- [ ] Run `R CMD check --as-cran` clean after items 1–5
-- [x] Rebuild tarball and confirm no stray files after item 8
-- [ ] Update `NEWS.md` with "Initial CRAN release"
+<https://github.com/dhicks/tmfast/issues/2>

@@ -49,7 +49,7 @@
 #' hellinger(topics1, doc_id, prob1 = 'gamma',
 #'           topics2 = topics2, id2 = doc_id, prob2 = 'gamma')
 hellinger = function(topics1, ...) {
-    UseMethod("hellinger")
+      UseMethod("hellinger")
 }
 
 #' @importFrom Matrix t
@@ -61,15 +61,15 @@ NULL
 #' @rdname hellinger
 #' @export
 hellinger.Matrix = function(topics1, topics2 = NULL, ...) {
-    rlang::check_dots_empty()
-    if (is.null(topics2)) {
-        crossed = 1 - tcrossprod(sqrt(topics1))
-    } else {
-        crossed = 1 - tcrossprod(sqrt(topics1), sqrt(topics2))
-    }
-    crossed[which(crossed < 0)] = 0
-    crossed = sqrt(crossed)
-    return(crossed)
+      rlang::check_dots_empty()
+      if (is.null(topics2)) {
+            crossed = 1 - tcrossprod(sqrt(topics1))
+      } else {
+            crossed = 1 - tcrossprod(sqrt(topics1), sqrt(topics2))
+      }
+      crossed[which(crossed < 0)] = 0
+      crossed = sqrt(crossed)
+      return(crossed)
 }
 #' @rdname hellinger
 #' @export
@@ -77,7 +77,7 @@ hellinger.matrix = function(...) hellinger.Matrix(...)
 
 #' Convert a long dataframe to a wide (sparse) matrix
 #'
-#' An alias for `tidytext::cast_sparse`
+#' For the sparse case, an alias for `tidytext::cast_sparse`
 #' @param data Dataframe
 #' @param row Column name to use as row names, as string or symbol
 #' @param column Column name to use as column names, as string or symbol
@@ -92,63 +92,83 @@ hellinger.matrix = function(...) hellinger.Matrix(...)
 #'     build_matrix(row = id, column = 'cols', value = vals)
 #' @export
 build_matrix = function(data, row, column, value, ..., sparse = TRUE) {
-    if (sparse) {
-        tidytext::cast_sparse(data, {{row}}, {{column}}, {{value}}, ...)
-    } else {
-        data |>
-            dplyr::select({{ row }}, {{ column }}, {{ value }}) |>
-            tidyr::pivot_wider(id_cols = {{ row }},
-                               names_from = {{ column }},
-                               values_from = {{ value }},
-                               values_fill = 0) |>
-            tibble::column_to_rownames(var = rlang::as_name(rlang::enquo(row))) |>
-            as.matrix()
-    }
+      if (sparse) {
+            tidytext::cast_sparse(
+                  data,
+                  {{ row }},
+                  {{ column }},
+                  {{ value }},
+                  ...
+            )
+      } else {
+            data |>
+                  dplyr::select({{ row }}, {{ column }}, {{ value }}) |>
+                  tidyr::pivot_wider(
+                        id_cols = {{ row }},
+                        names_from = {{ column }},
+                        values_from = {{ value }},
+                        values_fill = 0
+                  ) |>
+                  tibble::column_to_rownames(
+                        var = rlang::as_name(rlang::enquo(row))
+                  ) |>
+                  as.matrix()
+      }
 }
 
 #' @rdname hellinger
 #' @export
-hellinger.data.frame = function(topics1,
-                                id1 = 'document',
-                                cat1 = 'topic',
-                                prob1 = 'prob',
-                                topics2 = NULL,
-                                id2 = 'document',
-                                cat2 = 'topic',
-                                prob2 = 'prob',
-                                df = FALSE,
-                                ...) {
-    rlang::check_dots_empty()
-    id1 = rlang::enquo(id1)
-    matrix1 = build_matrix(topics1, {{id1}}, {{cat1}}, {{prob1}},
-                           sparse = FALSE)
-    id2 = rlang::enquo(id2)
-    if (is.null(topics2)) {
-        hellinger_matrix = hellinger(matrix1)
-    } else {
-        matrix2 = build_matrix(topics2, {{id2}}, {{cat2}}, {{prob2}},
-                               sparse = FALSE)
-        hellinger_matrix = hellinger(matrix1, matrix2)
-    }
+hellinger.data.frame = function(
+      topics1,
+      id1 = 'document',
+      cat1 = 'topic',
+      prob1 = 'prob',
+      topics2 = NULL,
+      id2 = 'document',
+      cat2 = 'topic',
+      prob2 = 'prob',
+      df = FALSE,
+      ...
+) {
+      rlang::check_dots_empty()
+      id1 = rlang::enquo(id1)
+      matrix1 = build_matrix(
+            topics1,
+            {{ id1 }},
+            {{ cat1 }},
+            {{ prob1 }},
+            sparse = FALSE
+      )
+      id2 = rlang::enquo(id2)
+      if (is.null(topics2)) {
+            hellinger_matrix = hellinger(matrix1)
+      } else {
+            matrix2 = build_matrix(
+                  topics2,
+                  {{ id2 }},
+                  {{ cat2 }},
+                  {{ prob2 }},
+                  sparse = FALSE
+            )
+            hellinger_matrix = hellinger(matrix1, matrix2)
+      }
 
-    if (!df) {
-        return(hellinger_matrix)
-    }
+      if (!df) {
+            return(hellinger_matrix)
+      }
 
-    id1 = rlang::as_name(id1)
-    id2 = rlang::as_name(id2)
-    if (assertthat::are_equal(id1, id2)) {
-        id1 = stringr::str_c(id1, '_x')
-        id2 = stringr::str_c(id2, '_y')
-    }
-    hellinger_matrix |>
-        as.matrix() |>
-        tibble::as_tibble(rownames = id1) |>
-        tidyr::pivot_longer(-tidyselect::all_of(id1),
-                            names_to = id2,
-                            values_to = 'dist')
+      id1 = rlang::as_name(id1)
+      id2 = rlang::as_name(id2)
+      if (assertthat::are_equal(id1, id2)) {
+            id1 = stringr::str_c(id1, '_x')
+            id2 = stringr::str_c(id2, '_y')
+      }
+      hellinger_matrix |>
+            as.matrix() |>
+            tibble::as_tibble(rownames = id1) |>
+            tidyr::pivot_longer(
+                  -tidyselect::all_of(id1),
+                  names_to = id2,
+                  values_to = 'dist'
+            )
 }
-
-
-
-

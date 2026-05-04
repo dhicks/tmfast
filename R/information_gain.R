@@ -15,17 +15,14 @@ NULL
 #'     - `n`, total count of term occurrence
 #'     - `ndH`, \eqn{\log_2 n \times \delta H}
 #' @examples
-#' \donttest{
-#' if (requireNamespace("janeaustenr", quietly = TRUE)) {
 #'   library(dplyr)
 #'   library(tidytext)
-#'   austen_df = janeaustenr::austen_books() |>
+#'   library(janeaustenr)
+#'   austen_df = austen_books() |>
 #'       unnest_tokens(term, text, token = 'words') |>
 #'       mutate(author = 'Jane Austen') |>
 #'       count(author, book, term)
 #'   ndH(austen_df, book, term, n)
-#' }
-#' }
 #' @export
 ndH = function(dataf, doc_col, term_col, count_col) {
       n_docs = dataf |>
@@ -59,17 +56,14 @@ ndH = function(dataf, doc_col, term_col, count_col) {
 #'     - `dR`, information gain relative to length-proportional distribution over documents
 #'     - `ndR`, \eqn{\log_2 n \times \delta R}
 #' @examples
-#' \donttest{
-#' if (requireNamespace("janeaustenr", quietly = TRUE)) {
 #'   library(dplyr)
 #'   library(tidytext)
-#'   austen_df = janeaustenr::austen_books() |>
+#'   library(janeaustenr)
+#'   austen_df = austen_books() |>
 #'       unnest_tokens(term, text, token = 'words') |>
 #'       mutate(author = 'Jane Austen') |>
 #'       count(author, book, term)
 #'   ndR(austen_df, book, term, n)
-#' }
-#' }
 #' @export
 ndR = function(dataf, doc_col, term_col, count_col) {
       ## Document lengths

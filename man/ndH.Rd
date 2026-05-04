@@ -28,15 +28,12 @@ Dataframe with columns
 Calculates \eqn{\log_2 n \times \delta H}, the log total occurrence times information gain (relative to the uniform distribution) for each term. I prefer this for vocabulary selection over methods such as TF-IDF.
 }
 \examples{
-\donttest{
-if (requireNamespace("janeaustenr", quietly = TRUE)) {
   library(dplyr)
   library(tidytext)
-  austen_df = janeaustenr::austen_books() |>
+  library(janeaustenr)
+  austen_df = austen_books() |>
       unnest_tokens(term, text, token = 'words') |>
       mutate(author = 'Jane Austen') |>
       count(author, book, term)
   ndH(austen_df, book, term, n)
-}
-}
 }
