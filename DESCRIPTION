@@ -46,6 +46,7 @@ Suggests:
     stm,
     tictoc,
     furrr,
+    reshape2,
     tmfast.realbooks
 Additional_repositories: https://dhicks.github.io/drat/
 VignetteBuilder: knitr
