@@ -38,6 +38,12 @@ jobs:
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
 
+      - name: Add drat repository
+        shell: Rscript {0}
+        run: |
+          cat('options(repos = c(drat = "https://dhicks.github.io/drat/", getOption("repos")))\n',
+              file = "~/.Rprofile", append = TRUE)
+
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::rcmdcheck
