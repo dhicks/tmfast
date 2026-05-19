@@ -23,7 +23,7 @@ build_matrix(data, row, column, value, ..., sparse = TRUE)
 A matrix or sparse Matrix object, with one row for each unique value in the row column, one column for each unique value in the column column, and with as many non-zero values as there are rows in data.
 }
 \description{
-An alias for \code{tidytext::cast_sparse}
+For the sparse case, an alias for \code{tidytext::cast_sparse}
 }
 \examples{
 data.frame(id = c(1, 1, 2, 2) + 4,

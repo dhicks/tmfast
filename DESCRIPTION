@@ -1,12 +1,12 @@
 Package: tmfast
 Title: Fast Topic Models Using Varimax
-Version: 0.0.0.2026-05-03
+Version: 0.1.0
 Authors@R: 
     person("D.", "Hicks", , "hicks.daniel.j@gmail.com", role = c("aut", "cre", "cph"),
            comment = c(ORCID = "0000-0001-7945-4416"))
 Description: Fits topic models using varimax-rotated principal component
     analysis (PCA), following the 'vintage factor analysis' approach of
-    Rohe & Zheng <arXiv:2004.05387>. Leverages truncated PCA via 'irlba'
+    Rohe & Zheng <doi:10.48550/arXiv.2004.05387>. Leverages truncated PCA via 'irlba'
     for sparse matrices, enabling fast model fitting on large corpora.
     Includes an information-theoretic approach to vocabulary selection,
     'broom'-compatible tidiers for extracting word-topic and topic-document

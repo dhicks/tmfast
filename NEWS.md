@@ -1,3 +1,7 @@
+# tmfast 0.1.0
+
+* Initial CRAN submission
+
 # tmfast 0.0.0.2026-04-20
 
 ## Breaking changes
