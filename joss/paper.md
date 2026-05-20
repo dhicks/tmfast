@@ -31,10 +31,41 @@ Topic modeling in R is dominated by packages implementing Latent Dirichlet Alloc
 
 @RoheVintageFactorAnalysis2020 propose an alternative approach, approaching topic modeling using principal component analysis (PCA) followed by a varimax rotation. They show (Lemma 5.2) that the term-document occurrence rate matrix can be approximately factored into term-topic and topic-document distributions — the same quantities estimated by LDA — and that PCA with varimax rotation provides statistically consistent estimates of these latent distributions. The varimax rotation promotes sparsity in the estimated factor loadings, giving topics the interpretability property that makes them useful: each topic is characterized by a small number of high-weight terms, and each document is associated with a small number of dominant topics.
 
-The PCA-based approach offers two practical advantages over LDA. First, it is algebraic rather than iterative, making it deterministic and fully reproducible without random seeds. Second, efficient partial SVD algorithms for sparse matrices [@BaglamaAugmentedImplicitlyRestarted2005] make it substantially faster than iterative Bayesian methods — in a test case, `tmfast` fits topic models approximately 20× faster than `stm`.
+The PCA-based approach offers two practical advantages over LDA. First, it is deterministic and fully reproducible without random seeds. Second, efficient partial SVD algorithms for sparse matrices [@BaglamaAugmentedImplicitlyRestarted2005] make it substantially faster than iterative Bayesian methods — in a test case, `tmfast` fits topic models approximately 20× faster than `stm`.
 
 # Software Design
 
+## Fitting pipeline
+
+`tmfast` fits topic models in two steps. First, `irlba::prcomp_irlba()` is used to compute a truncated PCA of the document-term matrix, retaining only the top principal components needed for the largest requested number of topics ($k$). Because PCA is computed only once, multiple topic numbers can be extracted from a single fit, applying varimax rotation at each requested $k$ without repeating the truncated PCA step.
+
+Second, `stats::varimax()` is used to apply an orthogonal rotation to the top-$k$ loading matrix for each value of $k$. To ensure consistent sign conventions, factors with negative skew are automatically reflected; this makes topics "peak" rather than "valley" shaped without affecting any statistical properties.
+
+The output is a `tmfast` object storing the PCA fit, varimax rotation matrices, and rotated loadings and scores for each requested $k$.
+
+## Vocabulary selection
+
+For large corpora, restricting the vocabulary before fitting substantially reduces memory use and fitting time. `tmfast` provides two information-theoretic vocabulary selection metrics as alternatives to TF-IDF.
+
+`ndH()` measures how much information a term carries beyond what would be expected if it were distributed uniformly across documents. More precisely, it computes $\Delta H = \log_2(D) - H(p)$, where $D$ is the number of documents, $H(p)$ is the observed entropy of the term's document distribution, and the result is weighted by $\log_2(n)$ (total term count) to down-weight rare terms that may be OCR artifacts or misspellings: $\mathit{ndH} = \log_2(n) \cdot \Delta H$.
+
+`ndR()` uses a length-proportional document distribution as the baseline rather than a uniform one, computing the KL divergence of the observed distribution from the baseline: $\Delta R = \sum_d p(d \mid w) \log_2 [p(d \mid w) / p(d)]$, then weighted by $\log_2(n)$ as before. `ndR` is preferable when documents vary significantly in length, e.g., mixing short news articles with long books, because a term concentrated in short documents scores higher under `ndR` than under `ndH`.
+
+In practice, analysts select a target vocabulary size and retain the top-ranked terms by either metric.
+
+## Tidiers and post-processing
+
+`tmfast` implements `broom`-compatible a `tidy()` method that extracts word-topic ($\beta$) and topic-document ($\gamma$) distributions as long-format data frames, compatible with `tidyverse` [@WickhamWelcomeTidyverse2019] workflows and the `tidytext` package [@SilgeTextMiningTidy2017]. The `tidy()` method requires specifying the value of $k$; `tidy_all()` is provided as a convenience for extracting all values of $k$ included in the `tmfast` object in a single line. 
+
+Because varimax loadings can be negative and do not sum to one, the tidiers apply a softmax transformation: $\beta_{wt} = \exp(L_{wt}) / \sum_w \exp(L_{wt})$ for word $w$ and topic $t$, converting raw loadings into proper probability distributions. The same transformation is applied to document scores for $\gamma$.
+
+Softmax-normalized distributions tend to be flatter than the Dirichlet distributions that LDA assumes. To address this, `tidy()` accepts an optional `exponent` argument that applies a power renormalization: $\beta'_{wt} = \beta_{wt}^e / \sum_w \beta_{wt}^e$. Higher exponents sharpen distributions toward fewer dominant terms. `target_power()` automates the choice of exponent by finding the value whose output matches a researcher-specified target entropy, with the target computed using `expected_entropy()` (the expected Shannon entropy of a symmetric Dirichlet with concentration parameter $\alpha$). This replaces Bayesian prior specification in LDA, with a similar effect: the analyst chooses how concentrated or spread they want topics and documents to be. This also introduces an important research degree of freedom. 
+
+## Simulation samplers
+
+`tmfast` includes a suite of simulation tools for benchmarking and method evaluation. `rdirichlet()` samples from the Dirichlet distribution with symmetric or asymmetric concentration parameters. `peak_alpha()` constructs an asymmetric concentration vector with a single dominant component, useful for generating "pure" documents that belong primarily to one topic. `draw_corpus()` implements the standard LDA generative process: for each document, it draws a topic mixture $\theta_d \sim \text{Dirichlet}(\alpha)$, then draws each word from the corresponding topic-word distribution $\phi_k$. When the `furrr` package is available, corpus generation is parallelized automatically.
+
+`journal_specific()` provides a complete benchmarking simulation: it generates a corpus with known true topic and word distributions ("specific" to each simulated "journal"), fits `tmfast`, aligns fitted topics to true topics as the linear assignment problem , and returns recovery accuracy as mean Hellinger distances for both $\phi$ (true word-topic) and $\theta$ (true topic-document) distributions. This enables systematic evaluation of how recovery accuracy scales with corpus size, vocabulary size, and number of topics.
 
 # Research Impact Statement
 
