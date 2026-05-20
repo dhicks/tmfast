@@ -12,13 +12,15 @@ vignettes/simulated_files/
 data
 scratch
 
-paper/paper_cache/
-paper/paper_files/
-paper/realbooks/
-paper/*.html
-paper/*.tex
-paper/*.spl
-paper/*.zip
+arxiv/paper_cache/
+arxiv/paper_files/
+arxiv/realbooks/
+arxiv/*.html
+arxiv/*.tex
+arxiv/*.spl
+arxiv/*.zip
+
+joss/paper_files/
 
 tmfast_realbooks
 tmfast.Rcheck
