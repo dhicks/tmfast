@@ -27,6 +27,11 @@ However, standard topic modeling packages are slow, stochastic, and introduce re
 
 # State of the Field
 
+Topic modeling in R is dominated by packages implementing Latent Dirichlet Allocation (LDA)-based approaches [@BleiLatentDirichletAllocation2003]. The `topicmodels` package [@GrunTopicmodels2011] provides LDA and correlated topic models via variational Bayes and Gibbs sampling. The `stm` package [@RobertsStmPackageStructural2019] extends LDA to incorporate document-level metadata as covariates on topic prevalence and content, and is generally regarded as the state of the art for social-scientific text analysis in R. Both packages rely on iterative Bayesian inference, which is computationally intensive, stochastic (requiring random seeds for reproducibility), and sensitive to prior specification.
+
+@RoheVintageFactorAnalysis2020 propose an alternative approach, approaching topic modeling using principal component analysis (PCA) followed by a varimax rotation. They show (Lemma 5.2) that the term-document occurrence rate matrix can be approximately factored into term-topic and topic-document distributions — the same quantities estimated by LDA — and that PCA with varimax rotation provides statistically consistent estimates of these latent distributions. The varimax rotation promotes sparsity in the estimated factor loadings, giving topics the interpretability property that makes them useful: each topic is characterized by a small number of high-weight terms, and each document is associated with a small number of dominant topics.
+
+The PCA-based approach offers two practical advantages over LDA. First, it is algebraic rather than iterative, making it deterministic and fully reproducible without random seeds. Second, efficient partial SVD algorithms for sparse matrices [@BaglamaAugmentedImplicitlyRestarted2005] make it substantially faster than iterative Bayesian methods — in a test case, `tmfast` fits topic models approximately 20× faster than `stm`.
 
 # Software Design
 
