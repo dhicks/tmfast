@@ -1,7 +1,7 @@
 ---
 title: 'tmfast: Fast Topic Models via Varimax-Rotated PCA'
 authors:
-  - name: Daniel J. Hicks
+  - name: D. Hicks
     orcid: 0000-0001-7945-4416
     affiliation: 1
 affiliations:
@@ -19,6 +19,11 @@ Topic modeling is a widely used natural language processing technique for discov
 
 # Statement of Need
 
+Topic modeling is widely used by computational social scientists, digital humanists, and researchers working with large text corpora to discover latent thematic structure [@BleiLatentDirichletAllocation2003; @RobertsStmPackageStructural2019]. A key advantage over other dimensionality reduction methods is that topic modeling simultaneously clusters both terms and documents, enabling analysts to assign human-meaningful, domain-specific labels to the discovered topics.
+
+However, standard topic modeling packages are slow, stochastic, and introduce researcher degrees of freedom through the choice of Bayesian prior distributions. Because fitting even a single model is computationally expensive, analysts rarely fit and compare multiple models — arguably the most principled way to assess sensitivity of results to methodological choices [@GelmanGardenForkingPaths2013; @SteegenIncreasingTransparencyMultiverse2016]. Instead, they typically settle on a single "best" model selected by informal assessments of topic interpretability, itself an additional source of researcher degrees of freedom.
+
+`tmfast` addresses these problems directly. Its algebraic fitting algorithm is deterministic — results are fully reproducible without setting a random seed — and requires no specification of Bayesian priors. In benchmarks, `tmfast` fits topic models approximately 20× faster than `stm` [@RobertsStmPackageStructural2019], making it practical to fit and compare many models as part of a routine analysis workflow.
 
 # State of the Field
 
