@@ -11,6 +11,11 @@ rotation(x, ...)
 
 \item{...}{Passed to methods}
 }
+\value{
+A numeric k x k orthogonal rotation matrix, where k is the number of
+requested factors. This is the varimax rotation matrix used to transform
+PCA loadings into the rotated factor solution.
+}
 \description{
 Extract varimax rotation
 }

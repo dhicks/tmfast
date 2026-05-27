@@ -11,6 +11,10 @@ scores(x, ...)
 
 \item{...}{Passed to methods}
 }
+\value{
+A numeric matrix with documents as rows and varimax factors as columns.
+Values are the factor score for each document on each factor.
+}
 \description{
 Extract item scores from a fitted PCA/varimax model
 }

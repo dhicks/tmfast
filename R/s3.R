@@ -2,6 +2,9 @@
 #'
 #' @param x Object to dispatch on
 #' @param ... Passed to methods
+#' @return An object of class \code{"loadings"} (from \pkg{stats}), structured as a
+#'   matrix with vocabulary terms as rows and varimax factors as columns. Values are
+#'   the loading (weight) of each term on each factor.
 #' @examples
 #' \donttest{
 #' set.seed(42)
@@ -42,6 +45,8 @@ loadings.varimaxes = function(x, k, ...) {
 #'
 #' @param x Object to dispatch on
 #' @param ... Passed to methods
+#' @return A numeric matrix with documents as rows and varimax factors as columns.
+#'   Values are the factor score for each document on each factor.
 #' @examples
 #' \donttest{
 #' set.seed(42)
@@ -71,6 +76,9 @@ scores.varimaxes = function(x, k, ...) {
 #'
 #' @param x Object to dispatch on
 #' @param ... Passed to methods
+#' @return A numeric k x k orthogonal rotation matrix, where k is the number of
+#'   requested factors. This is the varimax rotation matrix used to transform
+#'   PCA loadings into the rotated factor solution.
 #' @examples
 #' \donttest{
 #' set.seed(42)

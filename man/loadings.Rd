@@ -14,6 +14,11 @@ loadings(x, ...)
 
 \item{...}{Passed to methods}
 }
+\value{
+An object of class \code{"loadings"} (from \pkg{stats}), structured as a
+matrix with vocabulary terms as rows and varimax factors as columns. Values are
+the loading (weight) of each term on each factor.
+}
 \description{
 Extract a PCA/varimax loadings matrix
 }

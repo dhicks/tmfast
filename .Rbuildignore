@@ -11,6 +11,8 @@
 ^LICENSE\.md$
 ^\.claude$
 ^paper$
+^arxiv$
+^joss$
 ^scratch$
 ^vignettes/simulated_cache$
 ^tmfast_realbooks$
