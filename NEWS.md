@@ -1,6 +1,7 @@
 # tmfast 0.1.1.2026-06-01
 
 * Added CRAN status badge to README.
+* JOSS paper submission. 
 
 # tmfast 0.1.1
 
