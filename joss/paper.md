@@ -69,6 +69,7 @@ Softmax-normalized distributions tend to be flatter than the Dirichlet distribut
 
 # Research Impact Statement
 
+`tmfast` is available as an R package on CRAN (version 0.1.1, released May 2026) and as an arXiv preprint (arXiv:2305.01535, posted May 2023). The package was originally developed to support the text analysis in @HicksRaceScienceMainstream2025, which used topic models to study race science in mainstream psychology journals from 1960 to 2010; it has subsequently been developed as a standalone package for the broader text mining community.
 
 # AI Usage Disclosure
 

@@ -1,3 +1,11 @@
+# tmfast 0.1.1.2026-06-01
+
+* Added CRAN status badge to README.
+
+# tmfast 0.1.1
+
+* Initial CRAN publication
+
 # tmfast 0.1.0
 
 * Initial CRAN submission

@@ -1,6 +1,6 @@
 Package: tmfast
 Title: Fast Topic Models Using Varimax
-Version: 0.1.1
+Version: 0.1.1.2026-06-01
 Authors@R: 
     person("D.", "Hicks", , "hicks.daniel.j@gmail.com", role = c("aut", "cre", "cph"),
            comment = c(ORCID = "0000-0001-7945-4416"))
